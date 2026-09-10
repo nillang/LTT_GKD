@@ -1,11 +1,11 @@
-package com.ltt.gkd
+﻿package com.ltt.gkd
 
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import com.ltt.gkd.model.prefs.SettingsStore
-import com.ltt.gkd.model.util.Logger
+import com.ltt.gkd.data.prefs.SettingsStore
+import com.ltt.gkd.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

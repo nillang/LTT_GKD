@@ -1,0 +1,120 @@
+{
+  "name": "音乐类规则集",
+  "version": 1,
+  "author": "ltt_gkd",
+  "rules": [
+    {
+      "id": "com.netease.cloudmusic_splash",
+      "name": "网易云开屏",
+      "packageName": "com.netease.cloudmusic",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.netease.cloudmusic_popup",
+      "name": "网易云弹窗",
+      "packageName": "com.netease.cloudmusic",
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "不再提示"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.tencent.qqmusic_splash",
+      "name": "QQ音乐开屏",
+      "packageName": "com.tencent.qqmusic",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.kugou.android_splash",
+      "name": "酷狗音乐开屏",
+      "packageName": "com.kugou.android",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "cn.kuwo.player_splash",
+      "name": "酷我音乐开屏",
+      "packageName": "cn.kuwo.player",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.luna.music_splash",
+      "name": "汽水音乐开屏",
+      "packageName": "com.luna.music",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "cmccwm.musicstore_splash",
+      "name": "咪咕音乐开屏",
+      "packageName": "cmccwm.musicstore",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}

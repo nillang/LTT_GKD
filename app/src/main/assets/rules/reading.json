@@ -1,0 +1,103 @@
+{
+  "name": "阅读类规则集",
+  "version": 1,
+  "author": "ltt_gkd",
+  "rules": [
+    {
+      "id": "com.qidian.YDReader_splash",
+      "name": "起点读书开屏",
+      "packageName": "com.qidian.YDReader",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.dragon.read_splash",
+      "name": "番茄免费小说开屏",
+      "packageName": "com.dragon.read",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.dragon.read_popup",
+      "name": "番茄小说弹窗",
+      "packageName": "com.dragon.read",
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "不再显示"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.ximalaya.ting.android_splash",
+      "name": "喜马拉雅开屏",
+      "packageName": "com.ximalaya.ting.android",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.tencent.weread_splash",
+      "name": "微信读书开屏",
+      "packageName": "com.tencent.weread",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.douban.frodo_splash",
+      "name": "豆瓣开屏",
+      "packageName": "com.douban.frodo",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}

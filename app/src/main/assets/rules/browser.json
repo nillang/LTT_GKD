@@ -1,0 +1,87 @@
+{
+  "name": "浏览器类规则集",
+  "version": 1,
+  "author": "ltt_gkd",
+  "rules": [
+    {
+      "id": "com.quark.browser_splash",
+      "name": "夸克浏览器开屏",
+      "packageName": "com.quark.browser",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.UCMobile_splash",
+      "name": "UC浏览器开屏",
+      "packageName": "com.UCMobile",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.android.chrome_banner",
+      "name": "Chrome首页Banner",
+      "packageName": "com.android.chrome",
+      "enabled": true,
+      "priority": 60,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "不感兴趣"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.microsoft.emmx_banner",
+      "name": "Edge首页Banner",
+      "packageName": "com.microsoft.emmx",
+      "enabled": true,
+      "priority": 60,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "不感兴趣"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.baidu.browser.apps_splash",
+      "name": "百度浏览器开屏",
+      "packageName": "com.baidu.browser.apps",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}
