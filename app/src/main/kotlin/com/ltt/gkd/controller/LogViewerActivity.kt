@@ -1,0 +1,13 @@
+package com.ltt.gkd.controller
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import com.ltt.gkd.view.log.LogViewerScreen
+
+class LogViewerActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { LogViewerScreen() }
+    }
+}

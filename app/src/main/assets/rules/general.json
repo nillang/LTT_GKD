@@ -1,0 +1,49 @@
+{
+  "name": "通用兜底规则",
+  "version": 1,
+  "author": "LTT_GKD builtin",
+  "rules": [
+    {
+      "id": "universal_splash_skip",
+      "name": "通用开屏跳过",
+      "packageName": "",
+      "priority": 10,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "skip"],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "universal_popup_close",
+      "name": "通用弹窗关闭",
+      "packageName": "",
+      "priority": 5,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": ["关闭广告", "关闭", "×"],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "universal_ocr_splash",
+      "name": "通用开屏 OCR 兜底",
+      "packageName": "",
+      "priority": 1,
+      "throttleMs": 5000,
+      "match": {
+        "type": "OCR",
+        "text": ["跳过", "跳过广告", "Skip", "skip"],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "GESTURE_TAP", "delayMs": 0 }
+    }
+  ]
+}

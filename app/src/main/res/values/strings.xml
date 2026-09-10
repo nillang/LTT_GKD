@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LTT跳过</string>
+    <string name="title_rule_list">规则管理</string>
+    <string name="title_app_list">应用列表</string>
+    <string name="title_rule_edit">规则编辑</string>
+    <string name="title_log_viewer">日志查看</string>
+    <string name="title_settings">设置</string>
+
+    <string name="accessibility_service_label">LTT跳过 - 广告自动跳过</string>
+    <string name="accessibility_service_description">
+        监听应用窗口变化，自动点击开屏广告和插屏广告的"跳过""关闭"按钮。
+        本服务仅在本地运行，不上传任何用户数据。
+    </string>
+
+    <string name="status_service_off">无障碍服务未开启</string>
+    <string name="status_service_on">无障碍服务运行中</string>
+    <string name="action_open_accessibility">开启无障碍服务</string>
+    <string name="action_open_rules">管理规则</string>
+    <string name="action_open_apps">应用列表</string>
+    <string name="action_open_settings">设置</string>
+
+    <string name="stat_skip_count">本次已跳过：%1$d 次</string>
+    <string name="stat_total_count">累计已跳过：%1$d 次</string>
+    <string name="stat_reset">重置计数</string>
+
+    <string name="settings_ocr_title">OCR 兜底</string>
+    <string name="settings_ocr_summary">控件树找不到"跳过"文字时，使用截图 OCR 识别坐标点击</string>
+    <string name="settings_log_title">详细日志</string>
+    <string name="settings_log_summary">记录每次匹配与点击行为，便于排查规则问题</string>
+    <string name="settings_subscription_title">规则订阅</string>
+    <string name="settings_subscription_summary">从远程 URL 定期拉取规则更新</string>
+    <string name="settings_subscription_url">订阅 URL</string>
+    <string name="settings_subscription_interval">更新间隔（小时）</string>
+    <string name="settings_notification_title">跳过通知</string>
+    <string name="settings_notification_summary">每次自动跳过时弹出通知</string>
+    <string name="settings_hide_app_title">隐藏应用图标</string>
+    <string name="settings_hide_app_summary">从桌面隐藏图标（仍可通过设置进入）</string>
+
+    <string name="rule_app_name">应用名</string>
+    <string name="rule_pkg_name">包名</string>
+    <string name="rule_enabled">启用</string>
+    <string name="rule_actions">规则数</string>
+    <string name="rule_test">测试</string>
+    <string name="rule_import">导入</string>
+    <string name="rule_export">导出</string>
+
+    <string name="notification_channel_service">跳过服务</string>
+    <string name="notification_channel_skip_event">跳过事件</string>
+    <string name="notification_skip_text">已自动跳过 %1$s 广告</string>
+    <string name="notification_skip_title">跳过成功</string>
+</resources>

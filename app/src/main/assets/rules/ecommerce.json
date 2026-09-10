@@ -1,0 +1,98 @@
+{
+  "name": "电商购物类",
+  "version": 1,
+  "author": "LTT_GKD builtin",
+  "rules": [
+    {
+      "id": "com.taobao.taobao_splash",
+      "name": "淘宝开屏",
+      "packageName": "com.taobao.taobao",
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.taobao.taobao_popup",
+      "name": "淘宝弹窗广告",
+      "packageName": "com.taobao.taobao",
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": ["关闭", "不感兴趣", "我知道了"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.jingdong.app.mall_splash",
+      "name": "京东开屏",
+      "packageName": "com.jingdong.app.mall",
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.xunmeng.pinduoduo_splash",
+      "name": "拼多多开屏",
+      "packageName": "com.xunmeng.pinduoduo",
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.sankuai.meituan_splash",
+      "name": "美团开屏",
+      "packageName": "com.sankuai.meituan",
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "me.ele.android.app_splash",
+      "name": "饿了么开屏",
+      "packageName": "me.ele.android.app",
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.eg.android.AlipayGphone_popup",
+      "name": "支付宝弹窗",
+      "packageName": "com.eg.android.AlipayGphone",
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": ["关闭", "我知道了", "不了，谢谢"],
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}

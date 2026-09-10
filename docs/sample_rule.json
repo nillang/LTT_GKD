@@ -1,0 +1,142 @@
+{
+  "name": "示例规则集",
+  "version": 1,
+  "author": "your_name",
+  "rules": [
+    {
+      "id": "com.example.app_splash_text",
+      "name": "开屏-文本匹配",
+      "packageName": "com.example.app",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip", "skip ad"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.example.app_splash_id",
+      "name": "开屏-ViewID 匹配",
+      "packageName": "com.example.app",
+      "enabled": true,
+      "priority": 95,
+      "throttleMs": 5000,
+      "match": {
+        "type": "ID",
+        "text": [],
+        "ids": ["com.example.app:id/ad_skip_btn", "skip_btn"],
+        "regex": false,
+        "caseInsensitive": false
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.example.app_popup_desc",
+      "name": "弹窗-描述匹配",
+      "packageName": "com.example.app",
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "不再提示"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.example.app_splash_regex",
+      "name": "开屏-正则匹配",
+      "packageName": "com.example.app",
+      "enabled": true,
+      "priority": 90,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过\\s*\\d+s?", "skip\\s*\\d+"],
+        "ids": [],
+        "regex": true,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_COORD",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.example.app_splash_ocr",
+      "name": "开屏-OCR 兜底",
+      "packageName": "com.example.app",
+      "enabled": true,
+      "priority": 10,
+      "throttleMs": 5000,
+      "match": {
+        "type": "OCR",
+        "text": ["跳过", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "GESTURE_TAP",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.example.app_fullscreen_ad_back",
+      "name": "全屏广告-返回键关闭",
+      "packageName": "com.example.app",
+      "activity": "AdActivity",
+      "enabled": true,
+      "priority": 60,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": ["广告"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "BACK",
+        "delayMs": 100
+      }
+    },
+    {
+      "id": "universal_splash_skip",
+      "name": "通用兜底-任意包名",
+      "packageName": "",
+      "enabled": true,
+      "priority": 1,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    }
+  ]
+}
