@@ -16,6 +16,10 @@
     <!-- 通知 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- 读取应用列表（白名单功能需要；Android 11+ 需显式声明） -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
     <application
         android:name=".App"
         android:allowBackup="false"

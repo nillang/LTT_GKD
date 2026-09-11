@@ -25,9 +25,12 @@ import androidx.compose.material.icons.filled.PowerSettingsNew // 导入电源�
 import androidx.compose.material.icons.filled.Refresh // 导入刷新图标
 import androidx.compose.material.icons.filled.Visibility // 导入可见图标
 import androidx.compose.material3.Icon // 导入 Icon 组件
+import androidx.compose.material3.CenterAlignedTopAppBar // 导入居中顶部栏
+import androidx.compose.material3.ExperimentalMaterial3Api // 导入 Material3 实验 API 注解
 import androidx.compose.material3.MaterialTheme // 导入 MaterialTheme
 import androidx.compose.material3.Surface // 导入 Surface 容器
 import androidx.compose.material3.Text // 导入 Text 组件
+import androidx.compose.material3.TopAppBarDefaults // 导入顶部栏默认值
 import androidx.compose.runtime.Composable // 导入 Composable 注解
 import androidx.compose.runtime.getValue // 导入 getValue 委托
 import androidx.compose.ui.Alignment // 导入对齐方式
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.sp // 导入 sp 单位
  * @param onViewHistory 点击"查看"回调，进入跳过记录页。
  * @param onResetTotal 点击"重置"回调，清零累计跳过次数。
  */
+@OptIn(ExperimentalMaterial3Api::class) // 启用 Material3 实验 API
 @Composable // 标记为 Composable 函数
 fun HomeScreen( // 首页主组件
     serviceOn: Boolean, // 服务是否运行
@@ -59,6 +63,21 @@ fun HomeScreen( // 首页主组件
     onResetTotal: () -> Unit // 重置累计回调
 ) {
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) { // 全屏背景
+
+        // ---- 顶部：小狐标题栏 ----
+        CenterAlignedTopAppBar( // 居中标题栏
+            title = { // 标题内容
+                Text( // 应用名
+                    "小狐", // 标题文字
+                    fontSize = 18.sp, // 字号
+                    fontWeight = FontWeight.Bold, // 加粗
+                    color = MaterialTheme.colorScheme.primary // 主色
+                )
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors( // 标题栏配色
+                containerColor = MaterialTheme.colorScheme.surface // 背景与页面一致
+            )
+        )
 
         // ---- 居中：电源按钮 + 状态文字 ----
         Column( // 居中纵向容器

@@ -272,7 +272,7 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
             if (rules.isEmpty()) { // 无本地规则
                 toast("没有本地规则可导出"); return@launchSafe // 提示并中止
             }
-            val rs = RuleSet(name = "LTT规则导出", rules = rules) // 打包为 RuleSet
+            val rs = RuleSet(name = "小狐规则导出", rules = rules) // 打包为 RuleSet
             val json = globalAdapter<RuleSet>().toJson(rs) // 序列化为 JSON
             contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) } // 写入目标文件
             toast("已导出 ${rules.size} 条规则") // 提示成功

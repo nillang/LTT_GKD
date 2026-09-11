@@ -310,7 +310,7 @@ fun SettingsScreen( // 设置主组件
         // ---------- 关于 ----------
         SectionTitle("关于") // 分区标题
         Text( // 版本号
-            "LTT跳过 v1.0.0", // 文案
+            "小狐 v1.0.0", // 文案
             fontSize = 13.sp, // 字号
             color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
             modifier = Modifier.padding(start = 4.dp, bottom = 12.dp) // 内边距
