@@ -124,6 +124,55 @@ class GistClient(  // Gist 客户端类
     }
 
     /**
+     * 检查指定 Gist 中是否已存在同 ID 的规则（上传去重）。
+     *
+     * 规则：遍历 Gist 内所有文件，若文件名中包含该 ruleId 则视为已存在；
+     * 已存在时进一步解析文件内容取出 author 字段返回，便于调用方判断是否同作者。
+     *
+     * @param gistId Gist ID，空字符串时直接返回 (false, null)
+     * @param ruleId 规则 ID
+     * @return (是否已存在, 已存在规则的作者名或 null)
+     */
+    suspend fun checkRuleExists(  // 检查同 ID 规则是否已存在方法
+        gistId: String,  // Gist ID
+        ruleId: String  // 规则 ID
+    ): Pair<Boolean, String?> = withContext(Dispatchers.IO) {  // 返回 (是否已存在, 作者名或 null)，运行在 IO 线程
+        if (gistId.isEmpty() || ruleId.isEmpty()) return@withContext false to null  // 参数缺失直接返回不存在
+        runCatching {  // 捕获网络/解析异常
+            val req = Request.Builder()  // 构造 GET 请求
+                .url("$baseUrl/$gistId")  // 设置 URL
+                .header("Accept", "application/vnd.github+json")  // 设置 Accept 头
+                .get()  // 使用 GET 方法
+                .build()  // 构建请求
+            client.newCall(req).execute().use { resp ->  // 执行请求并自动关闭响应
+                if (!resp.isSuccessful) return@runCatching false to null  // HTTP 失败返回不存在
+                val raw = resp.body?.string() ?: return@runCatching false to null  // 读取响应体，空则返回不存在
+                val json = JSONObject(raw)  // 解析响应 JSON
+                val files = json.optJSONObject("files") ?: return@runCatching false to null  // 取 files 对象，缺失返回不存在
+                val keys = files.keys()  // 取 files 的所有 key 迭代器
+                while (keys.hasNext()) {  // 遍历每个文件名
+                    val name = keys.next()  // 文件名
+                    // 检查文件名是否包含该 ruleId
+                    if (!name.contains(ruleId)) continue  // 不包含则跳过
+                    val fileObj = files.optJSONObject(name) ?: continue  // 取该文件的 JSON 对象，缺失则跳过
+                    val content = fileObj.optString("content", "")  // 取文件内容字符串
+                    if (content.isBlank()) continue  // 内容为空跳过
+                    // 解析内容取出 author 字段，解析失败时作者返回 null
+                    val author = runCatching { globalAdapter<RuleSet>().fromJson(content) }  // 解析为 RuleSet
+                        .onFailure { Logger.w("Gist 去重检查解析 $name 失败", it) }  // 解析失败输出警告
+                        .getOrNull()  // 取结果或 null
+                        ?.author  // 取 author 字段
+                    return@runCatching true to author  // 已存在，返回作者名（可能为空串或 null）
+                }
+                false to null  // 遍历结束未命中，返回不存在
+            }
+        }.getOrElse { e ->  // 异常分支
+            Logger.w("Gist 规则去重检查失败", e)  // 输出警告日志
+            false to null  // 异常时返回不存在，允许后续上传流程继续
+        }
+    }
+
+    /**
      * 拉取订阅数（Gist 的 comments 数近似）。
      * @return comments 数；失败返回 0
      */

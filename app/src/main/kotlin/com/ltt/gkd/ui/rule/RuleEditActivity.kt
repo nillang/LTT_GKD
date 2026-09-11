@@ -120,6 +120,18 @@ class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
         }
         // 作者标识
         val author = DeviceIdProvider(this@RuleEditActivity, settings).get() // 生成设备 ID
+        // 上传前去重检查：同 ID 规则是否已存在于该 Gist
+        if (gistId.isNotEmpty()) { // 已有 Gist ID 时才检查
+            val (exists, existingAuthor) = gist.checkRuleExists(gistId, rule.id) // 查询是否已存在
+            if (exists && existingAuthor != null && existingAuthor != author) { // 已存在且作者不同
+                // 提示"规则已存在，只保留第一个创建者的版本"并终止上传
+                withContext(Dispatchers.Main) { // 切到主线程显示 Toast
+                    Toast.makeText(this@RuleEditActivity, "规则已存在，只保留第一个创建者的版本", Toast.LENGTH_SHORT).show() // Toast
+                }
+                return@withContext false // 返回失败
+            }
+            // 已存在且作者是自己 → 允许覆盖更新；不存在 → 正常上传
+        }
         val ruleWithMeta = rule.copy(author = author, createdAt = System.currentTimeMillis()) // 补作者与时间
         val ruleSet = com.ltt.gkd.data.rule.RuleSet( // 组装 RuleSet
             name = ruleWithMeta.name, // 名称
