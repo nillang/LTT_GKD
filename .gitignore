@@ -21,3 +21,7 @@ captures/
 
 # Logs
 *.log
+
+# Python (xlsx 生成脚本依赖)
+.pylibs/
+__pycache__/

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LTT跳过 — UI设计稿 v3</title>
+<style>
+:root {
+  --primary: #007070;
+  --primary-light: #00897B;
+  --primary-dark: #004D4D;
+  --primary-container: #9CF1F0;
+  --primary-container-light: #E0F5F4;
+  --on-primary: #FFFFFF;
+  --on-primary-container: #002020;
+  --surface: #FAFFFE;
+  --surface-variant: #DAE5E2;
+  --on-surface: #191C1B;
+  --on-surface-variant: #3F4946;
+  --outline: #6F7976;
+  --error: #BA1A1A;
+  --orange: #E65100;
+  --blue: #1565C0;
+  --purple: #7B1FA2;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-serif;
+  background: #E8ECEA;
+  color: var(--on-surface);
+  padding: 40px 20px;
+}
+
+.page-title { text-align:center; font-size:28px; font-weight:700; color:var(--primary); margin-bottom:6px; }
+.page-subtitle { text-align:center; font-size:13px; color:var(--on-surface-variant); margin-bottom:36px; }
+
+.design-grid { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; max-width:1300px; margin:0 auto; }
+
+.screen-card { display:flex; flex-direction:column; align-items:center; }
+.screen-label { font-size:12px; font-weight:600; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; }
+
+.phone {
+  width:340px; height:680px; background:var(--surface);
+  border-radius:32px; border:7px solid #1a1a1a; overflow:hidden; position:relative;
+  box-shadow:0 8px 28px rgba(0,0,0,0.12);
+  display:flex; flex-direction:column;
+}
+.phone::before {
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:110px; height:22px; background:#1a1a1a; border-radius:0 0 14px 14px; z-index:100;
+}
+
+.status-bar { height:32px; display:flex; align-items:center; justify-content:space-between; padding:6px 18px 0 22px; font-size:11px; font-weight:600; flex-shrink:0; }
+.status-bar-right { display:flex; align-items:center; gap:5px; }
+.status-bar-right svg { width:13px; height:13px; }
+
+.content { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+.content::-webkit-scrollbar { width:0; }
+
+.app-bar { height:52px; display:flex; align-items:center; padding:0 4px 0 12px; flex-shrink:0; }
+.app-bar-title { font-size:18px; font-weight:500; margin-left:8px; flex:1; }
+.icon-btn { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--on-surface); }
+.icon-btn:hover { background:rgba(0,0,0,0.06); }
+.icon-btn svg { width:22px; height:22px; }
+
+/* Bottom Nav */
+.bottom-nav { height:60px; display:flex; border-top:1px solid var(--surface-variant); background:white; flex-shrink:0; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; position:relative; }
+.nav-item svg { width:22px; height:22px; color:var(--outline); }
+.nav-item.active svg { color:var(--primary); }
+.nav-label { font-size:10px; color:var(--outline); font-weight:500; }
+.nav-item.active .nav-label { color:var(--primary); font-weight:600; }
+.nav-item.active::before { content:''; position:absolute; top:0; width:32px; height:3px; background:var(--primary); border-radius:0 0 3px 3px; }
+
+/* === Home: Centered Service Button === */
+.home-content { padding:0 20px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; gap:20px; }
+
+.service-circle {
+  width:140px; height:140px; border-radius:50%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; position:relative;
+  border: 3px solid var(--surface-variant);
+  background: var(--surface);
+  color: var(--outline);
+}
+.service-circle.on {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 0 24px rgba(0,112,112,0.3), var(--shadow-lg);
+}
+.service-circle.on::after {
+  content:''; position:absolute; inset:-8px; border-radius:50%;
+  border:2px solid var(--primary); opacity:0.2;
+  animation: ring 2s infinite;
+}
+@keyframes ring { 0%{transform:scale(1);opacity:0.2;} 100%{transform:scale(1.15);opacity:0;} }
+
+.service-circle svg { width:44px; height:44px; }
+.service-circle-text { font-size:14px; font-weight:600; margin-top:6px; }
+
+.skip-stat-mini { text-align:center; }
+.skip-stat-number { font-size:28px; font-weight:700; color:var(--primary); line-height:1; }
+.skip-stat-label { font-size:12px; color:var(--on-surface-variant); margin-top:2px; }
+
+.skip-mini-buttons { display:flex; gap:10px; justify-content:center; }
+.skip-mini-btn { padding:5px 14px; border-radius:16px; font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:4px; }
+.skip-mini-btn-view { background:var(--primary-container); color:var(--on-primary-container); border:none; }
+.skip-mini-btn-reset { background:transparent; color:var(--outline); border:1.5px solid var(--outline); }
+.skip-mini-btn svg { width:13px; height:13px; }
+
+.home-hint { font-size:11px; color:var(--on-surface-variant); text-align:center; line-height:1.5; max-width:220px; }
+
+/* === Rule Management === */
+.tab-row { display:flex; background:white; flex-shrink:0; border-bottom:1px solid var(--surface-variant); }
+.tab-item { flex:1; text-align:center; padding:12px 8px; font-size:14px; font-weight:500; color:var(--outline); cursor:pointer; position:relative; border-bottom:2px solid transparent; }
+.tab-item.active { color:var(--primary); font-weight:600; border-bottom-color:var(--primary); }
+
+/* Action bar with multiple buttons */
+.action-bar { padding:8px 12px; display:flex; gap:6px; border-bottom:1px solid var(--surface-variant); background:white; flex-shrink:0; }
+.action-btn { flex:1; height:34px; border-radius:17px; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; }
+.action-btn svg { width:14px; height:14px; }
+.action-btn-upload { background:transparent; color:var(--primary); border:1.5px solid var(--outline); }
+.action-btn-import { background:transparent; color:var(--on-surface-variant); border:1.5px solid var(--surface-variant); }
+.action-btn-export { background:transparent; color:var(--on-surface-variant); border:1.5px solid var(--surface-variant); }
+
+.rule-list { padding:10px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
+.rule-card { background:white; border-radius:var(--r-md); padding:12px; border:1px solid var(--surface-variant); }
+.rule-card-header { display:flex; align-items:flex-start; justify-content:space-between; }
+.rule-card-title-row { display:flex; align-items:center; gap:6px; }
+.rule-card-title { font-size:14px; font-weight:600; }
+.rule-badge { font-size:9px; padding:2px 7px; border-radius:8px; font-weight:500; }
+.rule-badge-local { background:var(--primary-container); color:var(--on-primary-container); }
+.rule-badge-subscribed { background:#F3E5F5; color:var(--purple); }
+.rule-card-info { font-size:11px; color:var(--on-surface-variant); display:flex; flex-wrap:wrap; gap:3px 10px; margin-top:6px; }
+.rule-card-info-item { display:flex; align-items:center; gap:3px; }
+
+.toggle { width:32px; height:18px; border-radius:9px; background:var(--primary); position:relative; cursor:pointer; flex-shrink:0; }
+.toggle::after { content:''; position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%; background:white; }
+.toggle.off { background:#BDBDBD; }
+.toggle.off::after { right:auto; left:2px; }
+
+/* FAB */
+.fab { position:absolute; bottom:72px; right:14px; width:52px; height:52px; border-radius:16px; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-lg); cursor:pointer; z-index:50; }
+.fab svg { width:24px; height:24px; }
+
+/* === Subscription === */
+.sub-content { padding:14px; display:flex; flex-direction:column; gap:14px; }
+.sub-card { background:white; border-radius:var(--r-md); padding:14px; border:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:10px; }
+.sub-card-title { font-size:13px; font-weight:600; color:var(--primary); display:flex; align-items:center; gap:5px; }
+.sub-card-title svg { width:16px; height:16px; }
+.sub-input-row { display:flex; flex-direction:column; gap:4px; }
+.sub-label { font-size:11px; font-weight:500; color:var(--on-surface-variant); }
+.sub-input { height:36px; border:1.5px solid var(--surface-variant); border-radius:var(--r-sm); padding:0 10px; font-size:13px; background:var(--surface); outline:none; color:var(--on-surface); }
+.sub-input:focus { border-color:var(--primary); }
+.sub-btn { height:38px; border-radius:19px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.sub-btn-auto { background:var(--primary); color:white; border:none; }
+.sub-btn-manual { background:transparent; color:var(--primary); border:1.5px solid var(--primary); }
+.sub-btn svg { width:18px; height:18px; }
+
+.sub-mode-row { display:flex; align-items:center; justify-content:space-between; }
+.sub-mode-label { font-size:13px; font-weight:500; }
+.sub-mode-desc { font-size:11px; color:var(--on-surface-variant); }
+
+.sub-divider { height:1px; background:var(--surface-variant); margin:2px 0; }
+
+/* === New Rule (李跳跳 style) === */
+.edit-content { padding:20px 20px 70px; display:flex; flex-direction:column; gap:20px; }
+
+.rule-dialog { background:white; border-radius:var(--r-lg); padding:20px; border:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:16px; }
+.dialog-title { font-size:16px; font-weight:600; text-align:center; }
+
+.input-group { display:flex; flex-direction:column; gap:5px; }
+.input-label { font-size:12px; color:var(--on-surface-variant); }
+.input-underline { border:none; border-bottom:2px solid var(--surface-variant); padding:8px 0; font-size:14px; background:transparent; outline:none; color:var(--on-surface); }
+.input-underline:focus { border-bottom-color:var(--primary); }
+.input-hint { font-size:10px; color:var(--outline); }
+
+.radio-row { display:flex; align-items:center; gap:8px; font-size:14px; }
+.radio { width:18px; height:18px; border-radius:50%; border:2px solid var(--outline); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.radio.checked { border-color:var(--primary); }
+.radio.checked::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--primary); }
+
+.dialog-buttons { display:flex; gap:8px; justify-content:center; margin-top:4px; }
+.dialog-btn { padding:8px 18px; border-radius:20px; font-size:14px; font-weight:500; cursor:pointer; }
+.dialog-btn-cancel { background:transparent; color:var(--primary); border:none; }
+.dialog-btn-example { background:var(--primary-container-light); color:var(--primary); border:1px solid var(--primary-container); }
+.dialog-btn-add { background:var(--primary); color:white; border:none; }
+
+/* Template chips above */
+.template-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.t-chip { padding:7px 12px; border-radius:var(--r-sm); border:1.5px solid var(--surface-variant); font-size:12px; font-weight:500; color:var(--on-surface-variant); background:white; cursor:pointer; display:flex; align-items:center; gap:4px; }
+.t-chip svg { width:14px; height:14px; }
+.t-chip.selected { border-color:var(--primary); background:var(--primary-container-light); color:var(--on-primary-container); }
+.section-title { font-size:12px; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+
+/* === Settings === */
+.settings-content { padding:8px 14px 20px; display:flex; flex-direction:column; gap:16px; }
+.settings-section { display:flex; flex-direction:column; gap:6px; }
+.settings-section-title { font-size:12px; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; padding-left:4px; }
+.settings-card { background:white; border-radius:var(--r-md); overflow:hidden; border:1px solid var(--surface-variant); }
+.settings-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--surface-variant); cursor:pointer; }
+.settings-item:last-child { border-bottom:none; }
+.settings-item-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.settings-item-icon svg { width:18px; height:18px; }
+.settings-item-text { flex:1; display:flex; flex-direction:column; gap:1px; }
+.settings-item-title { font-size:13px; font-weight:500; }
+.settings-item-subtitle { font-size:11px; color:var(--on-surface-variant); }
+.settings-arrow svg { width:18px; height:18px; color:var(--outline); }
+.settings-input-row { padding:12px 14px; border-bottom:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:4px; }
+.settings-input-row:last-child { border-bottom:none; }
+.settings-input-label { font-size:11px; font-weight:500; color:var(--on-surface-variant); }
+.settings-input { height:36px; border:1.5px solid var(--surface-variant); border-radius:var(--r-sm); padding:0 10px; font-size:12px; background:var(--surface); outline:none; color:var(--on-surface); }
+.settings-input:focus { border-color:var(--primary); }
+.security-note { font-size:10px; color:var(--on-surface-variant); background:var(--primary-container-light); border-radius:var(--r-sm); padding:8px 10px; display:flex; align-items:flex-start; gap:5px; margin:6px 14px 12px; }
+.security-note svg { width:13px; height:13px; color:var(--primary); flex-shrink:0; margin-top:1px; }
+
+/* Color Palette */
+.color-palette { max-width:1300px; margin:50px auto 0; padding:0 20px; }
+.palette-title { font-size:22px; font-weight:700; color:var(--primary); margin-bottom:20px; text-align:center; }
+.palette-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
+.palette-item { border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow); }
+.palette-color { height:70px; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:600; }
+.palette-info { background:white; padding:7px 10px; font-size:10px; color:var(--on-surface-variant); }
+.palette-info strong { color:var(--on-surface); display:block; margin-bottom:1px; }
+
+/* Design Notes */
+.design-notes { max-width:1300px; margin:50px auto; padding:0 20px; }
+.notes-title { font-size:22px; font-weight:700; color:var(--primary); margin-bottom:20px; text-align:center; }
+.notes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.note-card { background:white; border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow); }
+.note-card h3 { font-size:15px; font-weight:600; color:var(--primary); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.note-card h3 svg { width:18px; height:18px; }
+.note-card ul { list-style:none; padding:0; }
+.note-card li { font-size:12px; color:var(--on-surface-variant); padding:5px 0; padding-left:16px; position:relative; line-height:1.5; }
+.note-card li::before { content:'•'; position:absolute; left:4px; color:var(--primary); font-weight:bold; }
+
+</style>
+</head>
+<body>
+
+<h1 class="page-title">LTT跳过 — UI设计稿 v3</h1>
+<p class="page-subtitle">青绿色 #007070 · 极简风格 · 参考李跳跳</p>
+
+<div class="design-grid">
+
+<!-- ====== 1. 首页（居中服务按钮） ====== -->
+<div class="screen-card">
+  <div class="screen-label">① 首页 — 服务居中</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">LTT跳过</span>
+    </div>
+    <div class="content home-content">
+      <!-- 居中服务按钮 — 运行中状态 -->
+      <div class="service-circle on">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v10h2V3zm3.83 2.17l-1.42 1.42C17.99 8.86 19 11.31 19 14c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.69 1.01-5.14 2.59-6.41L6.17 5.17C4.16 7.02 3 9.36 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.64-1.16-4.98-2.17-6.83z"/></svg>
+        <span class="service-circle-text">点击关闭</span>
+      </div>
+
+      <!-- 累计跳过 — 小字 -->
+      <div class="skip-stat-mini">
+        <div class="skip-stat-number">1,247</div>
+        <div class="skip-stat-label">累计跳过</div>
+      </div>
+
+      <!-- 查看 / 重置 -->
+      <div class="skip-mini-buttons">
+        <button class="skip-mini-btn skip-mini-btn-view">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>
+          查看
+        </button>
+        <button class="skip-mini-btn skip-mini-btn-reset">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          重置
+        </button>
+      </div>
+
+      <p class="home-hint">点击开启无障碍服务<br>开启后自动跳过广告</p>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 1b. 首页 — 服务关闭状态 ====== -->
+<div class="screen-card">
+  <div class="screen-label">①b 首页 — 服务关闭</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">LTT跳过</span>
+    </div>
+    <div class="content home-content">
+      <!-- 居中服务按钮 — 关闭状态 -->
+      <div class="service-circle">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v10h2V3zm3.83 2.17l-1.42 1.42C17.99 8.86 19 11.31 19 14c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.69 1.01-5.14 2.59-6.41L6.17 5.17C4.16 7.02 3 9.36 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.64-1.16-4.98-2.17-6.83z"/></svg>
+        <span class="service-circle-text">点击开启</span>
+      </div>
+
+      <div class="skip-stat-mini">
+        <div class="skip-stat-number" style="color:var(--outline);">0</div>
+        <div class="skip-stat-label">累计跳过</div>
+      </div>
+
+      <div class="skip-mini-buttons" style="opacity:0.5;pointer-events:none;">
+        <button class="skip-mini-btn skip-mini-btn-view">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>
+          查看
+        </button>
+        <button class="skip-mini-btn skip-mini-btn-reset">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+          重置
+        </button>
+      </div>
+
+      <p class="home-hint">点击开启无障碍服务<br>开启后自动跳过广告</p>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 2. 跳过记录（纯数字） ====== -->
+<div class="screen-card">
+  <div class="screen-label">② 跳过记录 — 仅计数</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </div>
+      <span class="app-bar-title">跳过记录</span>
+    </div>
+    <div class="content" style="align-items:center;justify-content:center;padding:20px;">
+      <div style="text-align:center;">
+        <div style="font-size:72px;font-weight:800;color:var(--primary);line-height:1;">1,247</div>
+        <div style="font-size:14px;color:var(--on-surface-variant);margin-top:8px;">累计跳过次数</div>
+      </div>
+      <div style="margin-top:32px;display:flex;gap:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--on-surface);">23</div>
+          <div style="font-size:11px;color:var(--on-surface-variant);">今日</div>
+        </div>
+        <div style="width:1px;background:var(--surface-variant);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--on-surface);">156</div>
+          <div style="font-size:11px;color:var(--on-surface-variant);">本周</div>
+        </div>
+        <div style="width:1px;background:var(--surface-variant);"></div>
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--on-surface);">642</div>
+          <div style="font-size:11px;color:var(--on-surface-variant);">本月</div>
+        </div>
+      </div>
+      <button style="margin-top:32px;padding:8px 24px;border-radius:20px;border:1.5px solid var(--outline);background:transparent;color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        重置计数
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 3. 规则管理 — 本地 ====== -->
+<div class="screen-card">
+  <div class="screen-label">③ 规则管理 — 本地</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">规则管理</span>
+    </div>
+    <div class="tab-row">
+      <div class="tab-item active">本地 (8)</div>
+      <div class="tab-item">订阅 (23)</div>
+    </div>
+    <!-- 操作按钮栏：上传 + 导入 + 导出 -->
+    <div class="action-bar">
+      <button class="action-btn action-btn-upload">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        上传
+      </button>
+      <button class="action-btn action-btn-import">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        导入
+      </button>
+      <button class="action-btn action-btn-export">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+        导出
+      </button>
+    </div>
+    <div class="content" style="position:relative;">
+      <div class="rule-list">
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">抖音开屏跳过</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.ss.android.ugc.aweme</div>
+            <div class="rule-card-info-item">优先级 100</div>
+            <div class="rule-card-info-item">TEXT</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">微信弹窗关闭</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.tencent.mm</div>
+            <div class="rule-card-info-item">优先级 80</div>
+            <div class="rule-card-info-item">DESC</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">淘宝Banner</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.taobao.taobao</div>
+            <div class="rule-card-info-item">优先级 60</div>
+            <div class="rule-card-info-item">DESC</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">通用兜底</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">所有应用</div>
+            <div class="rule-card-info-item">优先级 1</div>
+            <div class="rule-card-info-item">TEXT</div>
+          </div>
+        </div>
+      </div>
+      <div class="fab">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 4. 规则管理 — 订阅（自动+手动） ====== -->
+<div class="screen-card">
+  <div class="screen-label">④ 规则管理 — 订阅</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">规则管理</span>
+    </div>
+    <div class="tab-row">
+      <div class="tab-item">本地 (8)</div>
+      <div class="tab-item active">订阅 (23)</div>
+    </div>
+    <div class="content">
+      <div class="sub-content">
+        <!-- 自动订阅 -->
+        <div class="sub-card">
+          <div class="sub-card-title">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-7 12c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+            自动订阅
+          </div>
+          <div class="sub-mode-row">
+            <div>
+              <div class="sub-mode-label">开启自动更新</div>
+              <div class="sub-mode-desc">定期拉取远程规则</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="sub-input-row">
+            <label class="sub-label">订阅 URL</label>
+            <input class="sub-input" value="https://gist.githubusercontent.com/user/rules.json">
+          </div>
+          <div class="sub-input-row">
+            <label class="sub-label">更新间隔（小时）</label>
+            <input class="sub-input" type="number" value="6">
+          </div>
+          <button class="sub-btn sub-btn-auto">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+            保存并开启自动更新
+          </button>
+        </div>
+
+        <!-- 手动同步 -->
+        <div class="sub-card">
+          <div class="sub-card-title">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            手动同步
+          </div>
+          <div class="sub-mode-desc">立即从订阅地址拉取最新规则</div>
+          <div style="display:flex;gap:8px;">
+            <button class="sub-btn sub-btn-manual" style="flex:1;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              立即同步
+            </button>
+            <button class="sub-btn sub-btn-manual" style="width:38px;flex:0 0 38px;border-radius:19px;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+          </div>
+          <div style="font-size:10px;color:var(--outline);margin-top:2px;">上次同步: 2026-09-11 09:30</div>
+        </div>
+
+        <div class="sub-divider"></div>
+
+        <!-- 已订阅规则 -->
+        <div class="sub-card-title" style="padding-left:2px;">已订阅规则</div>
+        <div class="rule-list" style="padding:0;gap:6px;">
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">抖音合集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 5 条规则</div>
+              <div class="rule-card-info-item">作者: @user1</div>
+              <div class="rule-card-info-item">订阅 1,203</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">微信合集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 3 条规则</div>
+              <div class="rule-card-info-item">作者: @user2</div>
+              <div class="rule-card-info-item">订阅 876</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">通用兜底集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle off"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 7 条规则</div>
+              <div class="rule-card-info-item">作者: @ltt_team</div>
+              <div class="rule-card-info-item">订阅 5,672</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 5. 新建规则（李跳跳风格） ====== -->
+<div class="screen-card">
+  <div class="screen-label">⑤ 新建规则 — 李跳跳风格</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </div>
+      <span class="app-bar-title">新增规则</span>
+    </div>
+    <div class="content edit-content">
+      <!-- 快速选择模板 -->
+      <div>
+        <div class="section-title">快速选择</div>
+        <div class="template-chips">
+          <div class="t-chip selected">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.5l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.58-4-4L2 17.09z"/></svg>
+            开屏广告
+          </div>
+          <div class="t-chip">插屏弹窗</div>
+          <div class="t-chip">Banner</div>
+          <div class="t-chip">激励视频</div>
+          <div class="t-chip">通用兜底</div>
+        </div>
+      </div>
+
+      <!-- 规则弹窗（李跳跳风格） -->
+      <div class="rule-dialog">
+        <div class="dialog-title">新增弹窗规则</div>
+
+        <div class="input-group">
+          <label class="input-label">用来定位弹窗的文字</label>
+          <input class="input-underline" placeholder="如：青少年模式" value="跳过广告">
+          <span class="input-hint">支持文字、ViewID，多个用逗号分隔</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">用来关闭弹窗的文字</label>
+          <input class="input-underline" placeholder="如：知道了" value="跳过">
+          <span class="input-hint">点击此文字/按钮来关闭弹窗</span>
+        </div>
+
+        <div class="radio-row">
+          <div class="radio checked"></div>
+          <span>能否通过返回键关闭</span>
+        </div>
+
+        <div class="dialog-buttons">
+          <button class="dialog-btn dialog-btn-cancel">算了</button>
+          <button class="dialog-btn dialog-btn-example">举例(5)</button>
+          <button class="dialog-btn dialog-btn-add">新增</button>
+        </div>
+      </div>
+
+      <!-- 高级选项折叠 -->
+      <div style="padding:4px;font-size:11px;color:var(--outline);display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        高级选项（包名、优先级、节流、正则等）
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 6. 设置 ====== -->
+<div class="screen-card">
+  <div class="screen-label">⑥ 设置</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">设置</span>
+    </div>
+    <div class="content settings-content">
+      <!-- 基础设置 -->
+      <div class="settings-section">
+        <div class="settings-section-title">基础设置</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:var(--primary-container);">
+              <svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M13 3h-2v10h2V3zm3.83 2.17l-1.42 1.42C17.99 8.86 19 11.31 19 14c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.69 1.01-5.14 2.59-6.41L6.17 5.17C4.16 7.02 3 9.36 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.64-1.16-4.98-2.17-6.83z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">无障碍服务</span>
+              <span class="settings-item-subtitle">点击开启跳过服务</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#E3F2FD;">
+              <svg viewBox="0 0 24 24" fill="var(--blue)"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">OCR 兜底</span>
+              <span class="settings-item-subtitle">控件树找不到时截图识别</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#FFF3E0;">
+              <svg viewBox="0 0 24 24" fill="var(--orange)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">日志</span>
+              <span class="settings-item-subtitle">记录跳过详情，点击查看</span>
+            </div>
+            <div class="settings-arrow">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#F3E5F5;">
+              <svg viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">跳过通知</span>
+              <span class="settings-item-subtitle">跳过广告时发送通知</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 贡献者 -->
+      <div class="settings-section">
+        <div class="settings-section-title">贡献者</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:var(--primary);">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">设备 ID</span>
+              <span class="settings-item-subtitle">a7f3c92e1b4d</span>
+            </div>
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">GitHub Token</label>
+            <input class="settings-input" type="password" placeholder="ghp_xxxxxxxx" value="ghp_a7f3c92e1b">
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">Gist ID（上传后自动生成）</label>
+            <input class="settings-input" placeholder="自动生成" value="abc123def456">
+          </div>
+          <div class="security-note">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            Token 使用 Android Keystore + AES-GCM 加密，Gist 设为私有，仅本地存储
+          </div>
+        </div>
+      </div>
+
+      <!-- 关于 -->
+      <div class="settings-section">
+        <div class="settings-section-title">关于</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:var(--primary-container);">
+              <svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">LTT跳过</span>
+              <span class="settings-item-subtitle">v1.0.0 · 仅本地运行，不上传数据</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Color Palette -->
+<div class="color-palette">
+  <h2 class="palette-title">青绿色配色方案 #007070</h2>
+  <div class="palette-grid">
+    <div class="palette-item"><div class="palette-color" style="background:#007070;">Primary</div><div class="palette-info"><strong>#007070</strong>主色 · 按钮强调</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#00897B;">Light</div><div class="palette-info"><strong>#00897B</strong>渐变浅色</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#004D4D;">Dark</div><div class="palette-info"><strong>#004D4D</strong>深色 · 文字</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#9CF1F0;color:#002020;">Container</div><div class="palette-info"><strong>#9CF1F0</strong>容器背景</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#E0F5F4;color:#002020;border:1px solid #DAE5E2;">Container Light</div><div class="palette-info"><strong>#E0F5F4</strong>浅容器 · 提示</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#FAFFFE;color:#191C1B;border:1px solid #DAE5E2;">Surface</div><div class="palette-info"><strong>#FAFFFE</strong>页面背景</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#6F7976;">Outline</div><div class="palette-info"><strong>#6F7976</strong>边框 · 未选中</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#BDBDBD;">Toggle Off</div><div class="palette-info"><strong>#BDBDBD</strong>开关关闭</div></div>
+  </div>
+</div>
+
+<!-- Design Notes -->
+<div class="design-notes">
+  <h2 class="notes-title">设计说明</h2>
+  <div class="notes-grid">
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>首页设计</h3>
+      <ul>
+        <li>服务按钮居中显示 — 大圆形，运行时高亮+脉冲光环</li>
+        <li>不显示"运行中"文字 — 按钮颜色本身就是状态指示</li>
+        <li>累计跳过小字显示在按钮下方 — 不抢视觉焦点</li>
+        <li>查看/重置按钮跟随跳过计数 — 小巧不突兀</li>
+        <li>关闭状态：灰色圆圈+0计数 — 一眼看出未开启</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>规则管理</h3>
+      <ul>
+        <li>本地Tab：上传 + 导入 + 导出 三按钮横排</li>
+        <li>"上传"简化命名（原"上传共享"→"上传"）</li>
+        <li>导入：从文件导入本地规则</li>
+        <li>导出：导出所有本地规则为文件</li>
+        <li>订阅Tab：自动订阅 + 手动同步 两个独立区块</li>
+        <li>自动：开关+URL+间隔+保存按钮</li>
+        <li>手动：立即同步按钮+删除已下载按钮</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>新建规则</h3>
+      <ul>
+        <li><strong>李跳跳风格</strong>：极简弹窗式表单</li>
+        <li>两个下划线输入框：定位文字 + 关闭文字</li>
+        <li>返回键关闭 — 单选按钮</li>
+        <li>三个按钮：算了 / 举例(5) / 新增</li>
+        <li>上方保留快速选择模板（5种）</li>
+        <li>高级选项默认折叠 — 包名/优先级/节流等</li>
+        <li>"举例(5)"提供5个示例帮用户理解格式</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--primary)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>其他优化</h3>
+      <ul>
+        <li>跳过记录 — 纯计数页面，大数字+今日/本周/本月</li>
+        <li>无跳过详情列表 — 保持简洁，只看数字</li>
+        <li>设置精简为基础设置 + 贡献者 + 关于</li>
+        <li>日志合并为基础设置中一项 — 开关+入口一体</li>
+        <li>共享规则更名为"贡献者" — 更直白的命名</li>
+        <li>规则订阅功能放在规则管理-订阅Tab内</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

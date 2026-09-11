@@ -49,4 +49,12 @@
     <string name="notification_channel_skip_event">跳过事件</string>
     <string name="notification_skip_text">已自动跳过 %1$s 广告</string>
     <string name="notification_skip_title">跳过成功</string>
+
+    <!-- 应用列表/白名单 -->
+    <string name="app_list_all">全部</string>
+    <string name="app_list_whitelisted">已白名单</string>
+    <string name="app_list_unwhitelisted">待跳过</string>
+    <string name="app_list_whitelist_hint">开启=不对该应用执行跳广告（系统应用默认开启）</string>
+    <string name="app_list_total">共 %1$d 个应用</string>
+    <string name="app_list_whitelist_reset">重置白名单</string>
 </resources>

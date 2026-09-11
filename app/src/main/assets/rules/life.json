@@ -1,0 +1,119 @@
+{
+  "name": "生活服务类规则集",
+  "version": 1,
+  "author": "ltt_gkd",
+  "rules": [
+    {
+      "id": "ctrip.android.view_splash",
+      "name": "携程旅行开屏",
+      "packageName": "ctrip.android.view",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.MobileTicket_splash",
+      "name": "12306开屏",
+      "packageName": "com.MobileTicket",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.sdu.didi.psnger_splash",
+      "name": "滴滴出行开屏",
+      "packageName": "com.sdu.didi.psnger",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.autonavi.minimap_splash",
+      "name": "高德地图开屏",
+      "packageName": "com.autonavi.minimap",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.baidu.BaiduMap_splash",
+      "name": "百度地图开屏",
+      "packageName": "com.baidu.BaiduMap",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.dianping.v1_splash",
+      "name": "大众点评开屏",
+      "packageName": "com.dianping.v1",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": ["跳过", "跳过广告", "Skip"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    },
+    {
+      "id": "com.sdu.didi.psnger_popup",
+      "name": "滴滴出行弹窗",
+      "packageName": "com.sdu.didi.psnger",
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "DESC",
+        "text": ["关闭", "关闭广告", "×"],
+        "ids": [],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}

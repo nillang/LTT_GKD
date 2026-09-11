@@ -1,7 +1,7 @@
-﻿package com.ltt.gkd.util
+package com.ltt.gkd.util // 包声明：本文件属于工具包 com.ltt.gkd.util
 
-import com.ltt.gkd.data.rule.MatchTarget
-import java.util.regex.Pattern
+import com.ltt.gkd.data.rule.MatchTarget // 导入 MatchTarget，提供 regex/caseInsensitive 等匹配配置
+import java.util.regex.Pattern // 导入 Pattern，编译后的正则模式对象
 
 /**
  * 正则编译工具：根据 [MatchTarget] 的 [MatchTarget.regex] / [MatchTarget.caseInsensitive]
@@ -21,18 +21,17 @@ object PatternUtils {
      * @param raw 原始字符串
      * @param target 提供 regex / caseInsensitive 配置
      */
-    fun compile(raw: String, target: MatchTarget): Pattern {
-        val flags = if (target.caseInsensitive) Pattern.CASE_INSENSITIVE else 0
-        return if (target.regex) {
+    fun compile(raw: String, target: MatchTarget): Pattern { // 入口：编译原始字符串为 Pattern
+        val flags = if (target.caseInsensitive) Pattern.CASE_INSENSITIVE else 0 // 根据是否忽略大小写设置 flags
+        return if (target.regex) { // 走正则编译分支
             try {
-                Pattern.compile(raw, flags)
+                Pattern.compile(raw, flags) // 按正则语法编译
             } catch (e: Exception) {
-                Logger.w("正则编译失败，按字面量处理: $raw", e)
-                Pattern.compile(Pattern.quote(raw), flags)
+                Logger.w("正则编译失败，按字面量处理: $raw", e) // 正则编译失败时降级为字面量匹配，避免因规则错误导致整体不可用
+                Pattern.compile(Pattern.quote(raw), flags) // 转义为字面量后重新编译
             }
         } else {
-            // 非正则模式：仍用 Pattern.quote 转义，避免特殊字符
-            Pattern.compile(Pattern.quote(raw), flags)
+            Pattern.compile(Pattern.quote(raw), flags) // 非正则模式：仍用 Pattern.quote 转义，避免特殊字符
         }
     }
 }

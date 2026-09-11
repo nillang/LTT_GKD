@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.LTT_GKD" parent="android:Theme.Material.Light.NoActionBar">
+    <!--
+        Material3 DayNight 宿主主题。
+        Compose 子界面通过 LTTGKDTheme 包裹获得完整的 Material3 语义色 token，
+        这里的 XML Theme 仅提供 Window 级属性（状态栏/导航栏）。
+    -->
+    <style name="Theme.LTT_GKD" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>

@@ -41,14 +41,7 @@
             </intent-filter>
         </activity>
 
-        <!-- 规则管理界面 -->
-        <activity
-            android:name=".ui.rule.RuleListActivity"
-            android:exported="false"
-            android:label="@string/title_rule_list"
-            android:parentActivityName=".ui.main.MainActivity" />
-
-        <!-- 应用列表界面 -->
+        <!-- 应用列表（白名单）界面 -->
         <activity
             android:name=".ui.app.AppListActivity"
             android:exported="false"
@@ -60,20 +53,14 @@
             android:name=".ui.rule.RuleEditActivity"
             android:exported="false"
             android:label="@string/title_rule_edit"
-            android:parentActivityName=".ui.rule.RuleListActivity" />
+            android:parentActivityName=".ui.main.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- 日志查看界面 -->
         <activity
             android:name=".ui.log.LogViewerActivity"
             android:exported="false"
             android:label="@string/title_log_viewer"
-            android:parentActivityName=".ui.settings.SettingsActivity" />
-
-        <!-- 设置界面 -->
-        <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_settings"
             android:parentActivityName=".ui.main.MainActivity" />
 
         <!-- 无障碍服务：核心 -->

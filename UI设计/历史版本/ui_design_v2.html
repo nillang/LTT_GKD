@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LTT跳过 — UI设计稿 v2</title>
+<style>
+:root {
+  --green-primary: #2E7D32;
+  --green-light: #4CAF50;
+  --green-dark: #1B5E20;
+  --green-container: #C8E6C9;
+  --green-container-light: #E8F5E9;
+  --green-on-container: #002106;
+  --surface: #FAFFFA;
+  --surface-variant: #DDE5DC;
+  --on-surface: #1A1E1A;
+  --on-surface-variant: #424942;
+  --outline: #72796E;
+  --error: #BA1A1A;
+  --orange: #E65100;
+  --blue: #1565C0;
+  --purple: #6A1B9A;
+  --grey-bg: #F0F4F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-serif;
+  background: #E8ECE8;
+  color: var(--on-surface);
+  padding: 40px 20px;
+}
+
+.page-title { text-align:center; font-size:28px; font-weight:700; color:var(--green-primary); margin-bottom:6px; }
+.page-subtitle { text-align:center; font-size:13px; color:var(--on-surface-variant); margin-bottom:36px; }
+
+.design-grid { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; max-width:1300px; margin:0 auto; }
+
+.screen-card { display:flex; flex-direction:column; align-items:center; }
+.screen-label { font-size:12px; font-weight:600; color:var(--green-primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; }
+
+.phone {
+  width:340px; height:680px; background:var(--surface);
+  border-radius:32px; border:7px solid #1a1a1a; overflow:hidden; position:relative;
+  box-shadow:0 8px 28px rgba(0,0,0,0.12);
+  display:flex; flex-direction:column;
+}
+.phone::before {
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:110px; height:22px; background:#1a1a1a; border-radius:0 0 14px 14px; z-index:100;
+}
+
+.status-bar {
+  height:32px; display:flex; align-items:center; justify-content:space-between;
+  padding:6px 18px 0 22px; font-size:11px; font-weight:600; flex-shrink:0;
+}
+.status-bar-right { display:flex; align-items:center; gap:5px; }
+.status-bar-right svg { width:13px; height:13px; }
+
+.content { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+.content::-webkit-scrollbar { width:0; }
+
+.app-bar { height:52px; display:flex; align-items:center; padding:0 4px 0 12px; flex-shrink:0; }
+.app-bar-title { font-size:18px; font-weight:500; margin-left:8px; flex:1; }
+.icon-btn { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--on-surface); }
+.icon-btn:hover { background:rgba(0,0,0,0.06); }
+.icon-btn svg { width:22px; height:22px; }
+
+/* === Bottom Nav (3 items) === */
+.bottom-nav { height:60px; display:flex; border-top:1px solid var(--surface-variant); background:white; flex-shrink:0; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; position:relative; }
+.nav-item svg { width:22px; height:22px; color:var(--outline); }
+.nav-item.active svg { color:var(--green-primary); }
+.nav-label { font-size:10px; color:var(--outline); font-weight:500; }
+.nav-item.active .nav-label { color:var(--green-primary); font-weight:600; }
+.nav-item.active::before { content:''; position:absolute; top:0; width:32px; height:3px; background:var(--green-primary); border-radius:0 0 3px 3px; }
+
+/* === Home: Minimal === */
+.home-content { padding:20px 16px; display:flex; flex-direction:column; gap:20px; }
+
+.home-status-card {
+  border-radius:var(--r-lg); padding:20px; color:white;
+  background:linear-gradient(135deg, var(--green-light) 0%, var(--green-primary) 100%);
+  box-shadow:var(--shadow-lg); text-align:center;
+}
+.home-status-card.off { background:linear-gradient(135deg, #BDBDBD 0%, #757575 100%); }
+
+.home-status-icon { width:48px; height:48px; margin:0 auto 8px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; }
+.home-status-icon svg { width:28px; height:28px; color:white; }
+
+.home-status-title { font-size:18px; font-weight:600; margin-bottom:4px; }
+.home-status-desc { font-size:12px; opacity:0.85; }
+
+/* 累计跳过 card */
+.skip-stat-card {
+  background:white; border-radius:var(--r-lg); padding:20px; border:1px solid var(--surface-variant);
+  text-align:center;
+}
+.skip-stat-number { font-size:48px; font-weight:800; color:var(--green-primary); line-height:1; margin-bottom:4px; }
+.skip-stat-label { font-size:13px; color:var(--on-surface-variant); margin-bottom:14px; }
+.skip-stat-buttons { display:flex; gap:10px; justify-content:center; }
+.skip-btn { padding:8px 20px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; }
+.skip-btn-view { background:var(--green-container); color:var(--green-on-container); border:none; }
+.skip-btn-reset { background:transparent; color:var(--outline); border:1.5px solid var(--outline); }
+
+/* 开启服务 button */
+.service-btn {
+  width:100%; height:52px; border-radius:26px; border:none;
+  font-size:16px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.2s;
+}
+.service-btn.on { background:var(--green-primary); color:white; box-shadow:var(--shadow-lg); }
+.service-btn.off { background:var(--green-container); color:var(--green-on-container); }
+.service-btn svg { width:20px; height:20px; }
+
+.home-hint { font-size:11px; color:var(--on-surface-variant); text-align:center; margin-top:4px; line-height:1.5; }
+
+/* === Skip History === */
+.history-list { padding:8px 16px 20px; display:flex; flex-direction:column; gap:8px; }
+.history-item {
+  background:white; border-radius:var(--r-md); padding:12px; border:1px solid var(--surface-variant);
+  display:flex; align-items:center; gap:10px;
+}
+.history-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:700; flex-shrink:0; }
+.history-info { flex:1; min-width:0; }
+.history-app { font-size:14px; font-weight:500; }
+.history-type { font-size:11px; color:var(--on-surface-variant); }
+.history-time { font-size:10px; color:var(--outline); white-space:nowrap; }
+
+.history-type-badge { font-size:9px; padding:2px 6px; border-radius:6px; font-weight:500; margin-left:4px; }
+.badge-splash { background:#E3F2FD; color:var(--blue); }
+.badge-popup { background:#FFF3E0; color:var(--orange); }
+.badge-banner { background:#F3E5F5; color:var(--purple); }
+
+/* === Rule Management === */
+.tab-row { display:flex; background:white; flex-shrink:0; border-bottom:1px solid var(--surface-variant); }
+.tab-item { flex:1; text-align:center; padding:12px 8px; font-size:14px; font-weight:500; color:var(--outline); cursor:pointer; position:relative; border-bottom:2px solid transparent; }
+.tab-item.active { color:var(--green-primary); font-weight:600; border-bottom-color:var(--green-primary); }
+
+.rule-list { padding:10px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
+.rule-card { background:white; border-radius:var(--r-md); padding:12px; border:1px solid var(--surface-variant); }
+.rule-card-header { display:flex; align-items:flex-start; justify-content:space-between; }
+.rule-card-title-row { display:flex; align-items:center; gap:6px; }
+.rule-card-title { font-size:14px; font-weight:600; }
+.rule-badge { font-size:9px; padding:2px 7px; border-radius:8px; font-weight:500; }
+.rule-badge-local { background:var(--green-container); color:var(--green-on-container); }
+.rule-badge-subscribed { background:#F3E5F5; color:var(--purple); }
+.rule-card-info { font-size:11px; color:var(--on-surface-variant); display:flex; flex-wrap:wrap; gap:3px 10px; margin-top:6px; }
+.rule-card-info-item { display:flex; align-items:center; gap:3px; }
+.rule-card-info-item svg { width:11px; height:11px; }
+
+.toggle { width:32px; height:18px; border-radius:9px; background:var(--green-primary); position:relative; cursor:pointer; flex-shrink:0; }
+.toggle::after { content:''; position:absolute; top:2px; right:2px; width:14px; height:14px; border-radius:50%; background:white; }
+.toggle.off { background:#BDBDBD; }
+.toggle.off::after { right:auto; left:2px; }
+
+/* Upload button in local tab */
+.upload-bar { padding:10px 14px; display:flex; gap:8px; border-bottom:1px solid var(--surface-variant); }
+.upload-btn { flex:1; height:36px; border-radius:18px; border:1.5px solid var(--outline); background:transparent; color:var(--green-primary); font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; }
+.upload-btn svg { width:16px; height:16px; }
+
+/* Subscription tab content */
+.sub-content { padding:14px; display:flex; flex-direction:column; gap:14px; }
+.sub-card { background:white; border-radius:var(--r-md); padding:14px; border:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:10px; }
+.sub-card-title { font-size:13px; font-weight:600; color:var(--green-primary); }
+.sub-input-row { display:flex; flex-direction:column; gap:4px; }
+.sub-label { font-size:11px; font-weight:500; color:var(--on-surface-variant); }
+.sub-input { height:36px; border:1.5px solid var(--surface-variant); border-radius:var(--r-sm); padding:0 10px; font-size:13px; background:var(--surface); outline:none; color:var(--on-surface); }
+.sub-input:focus { border-color:var(--green-primary); }
+.sub-sync-btn { height:38px; border-radius:19px; background:var(--green-primary); color:white; border:none; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.sub-sync-btn svg { width:18px; height:18px; }
+
+/* FAB */
+.fab { position:absolute; bottom:72px; right:14px; width:52px; height:52px; border-radius:16px; background:var(--green-primary); color:white; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-lg); cursor:pointer; z-index:50; }
+.fab svg { width:24px; height:24px; }
+
+/* === New Rule (李跳跳 style - simple) === */
+.edit-content { padding:14px 16px 70px; display:flex; flex-direction:column; gap:16px; }
+
+.template-section { }
+.section-title { font-size:12px; font-weight:600; color:var(--green-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+
+.template-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.t-chip { padding:8px 12px; border-radius:var(--r-sm); border:1.5px solid var(--surface-variant); font-size:12px; font-weight:500; color:var(--on-surface-variant); background:white; cursor:pointer; display:flex; align-items:center; gap:4px; }
+.t-chip svg { width:14px; height:14px; }
+.t-chip.selected { border-color:var(--green-primary); background:var(--green-container-light); color:var(--green-on-container); }
+
+.form-card { background:white; border-radius:var(--r-md); padding:12px; border:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:12px; }
+.form-row { display:flex; flex-direction:column; gap:3px; }
+.form-label { font-size:11px; font-weight:500; color:var(--on-surface-variant); }
+.form-input { height:38px; border:1.5px solid var(--surface-variant); border-radius:var(--r-sm); padding:0 10px; font-size:13px; background:var(--surface); outline:none; color:var(--on-surface); }
+.form-input:focus { border-color:var(--green-primary); }
+.form-row-inline { display:flex; align-items:center; justify-content:space-between; }
+.form-switch-label { font-size:13px; font-weight:500; }
+
+.chip-group { display:flex; flex-wrap:wrap; gap:5px; }
+.chip { padding:5px 11px; border-radius:16px; border:1.5px solid var(--outline); font-size:11px; font-weight:500; color:var(--outline); cursor:pointer; background:transparent; }
+.chip.selected { background:var(--green-container); border-color:var(--green-primary); color:var(--green-on-container); }
+
+.hint-text { font-size:10px; color:var(--outline); line-height:1.4; }
+
+.save-bar { position:absolute; bottom:0; left:0; right:0; background:white; padding:10px 14px; display:flex; gap:10px; border-top:1px solid var(--surface-variant); z-index:50; }
+.btn-primary { flex:1; height:42px; border-radius:21px; background:var(--green-primary); color:white; border:none; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-outlined { height:42px; width:42px; border-radius:50%; background:transparent; color:var(--green-primary); border:1.5px solid var(--outline); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.btn-outlined svg { width:20px; height:20px; }
+
+/* === Settings === */
+.settings-content { padding:8px 14px 20px; display:flex; flex-direction:column; gap:16px; }
+.settings-section { display:flex; flex-direction:column; gap:6px; }
+.settings-section-title { font-size:12px; font-weight:600; color:var(--green-primary); text-transform:uppercase; letter-spacing:0.5px; padding-left:4px; }
+.settings-card { background:white; border-radius:var(--r-md); overflow:hidden; border:1px solid var(--surface-variant); }
+.settings-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--surface-variant); cursor:pointer; }
+.settings-item:last-child { border-bottom:none; }
+.settings-item-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.settings-item-icon svg { width:18px; height:18px; }
+.settings-item-text { flex:1; display:flex; flex-direction:column; gap:1px; }
+.settings-item-title { font-size:13px; font-weight:500; }
+.settings-item-subtitle { font-size:11px; color:var(--on-surface-variant); }
+.settings-arrow svg { width:18px; height:18px; color:var(--outline); }
+
+.settings-input-row { padding:12px 14px; border-bottom:1px solid var(--surface-variant); display:flex; flex-direction:column; gap:4px; }
+.settings-input-row:last-child { border-bottom:none; }
+.settings-input-label { font-size:11px; font-weight:500; color:var(--on-surface-variant); }
+.settings-input { height:36px; border:1.5px solid var(--surface-variant); border-radius:var(--r-sm); padding:0 10px; font-size:12px; background:var(--surface); outline:none; color:var(--on-surface); }
+.settings-input:focus { border-color:var(--green-primary); }
+
+.security-note { font-size:10px; color:var(--on-surface-variant); background:var(--green-container-light); border-radius:var(--r-sm); padding:8px 10px; display:flex; align-items:flex-start; gap:5px; margin:6px 14px 12px; }
+.security-note svg { width:13px; height:13px; color:var(--green-primary); flex-shrink:0; margin-top:1px; }
+
+/* Color Palette */
+.color-palette { max-width:1300px; margin:50px auto 0; padding:0 20px; }
+.palette-title { font-size:22px; font-weight:700; color:var(--green-primary); margin-bottom:20px; text-align:center; }
+.palette-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
+.palette-item { border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow); }
+.palette-color { height:70px; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:600; }
+.palette-info { background:white; padding:7px 10px; font-size:10px; color:var(--on-surface-variant); }
+.palette-info strong { color:var(--on-surface); display:block; margin-bottom:1px; }
+
+/* Design Notes */
+.design-notes { max-width:1300px; margin:50px auto; padding:0 20px; }
+.notes-title { font-size:22px; font-weight:700; color:var(--green-primary); margin-bottom:20px; text-align:center; }
+.notes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.note-card { background:white; border-radius:var(--r-lg); padding:18px; box-shadow:var(--shadow); }
+.note-card h3 { font-size:15px; font-weight:600; color:var(--green-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.note-card h3 svg { width:18px; height:18px; }
+.note-card ul { list-style:none; padding:0; }
+.note-card li { font-size:12px; color:var(--on-surface-variant); padding:5px 0; padding-left:16px; position:relative; line-height:1.5; }
+.note-card li::before { content:'•'; position:absolute; left:4px; color:var(--green-primary); font-weight:bold; }
+
+</style>
+</head>
+<body>
+
+<h1 class="page-title">LTT跳过 — UI设计稿 v2</h1>
+<p class="page-subtitle">绿色主题 · 极简风格 · 参考李跳跳 + GKD</p>
+
+<div class="design-grid">
+
+<!-- ====== 1. 首页（极简） ====== -->
+<div class="screen-card">
+  <div class="screen-label">① 首页 — 仅两项</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">LTT跳过</span>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      </div>
+    </div>
+    <div class="content home-content">
+      <!-- 状态卡 -->
+      <div class="home-status-card">
+        <div class="home-status-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div class="home-status-title">服务运行中</div>
+        <div class="home-status-desc">正在自动跳过广告</div>
+      </div>
+
+      <!-- 累计跳过 -->
+      <div class="skip-stat-card">
+        <div class="skip-stat-number">1,247</div>
+        <div class="skip-stat-label">累计跳过</div>
+        <div class="skip-stat-buttons">
+          <button class="skip-btn skip-btn-view">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            查看
+          </button>
+          <button class="skip-btn skip-btn-reset">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            重置
+          </button>
+        </div>
+      </div>
+
+      <!-- 开启服务 -->
+      <button class="service-btn on">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v10h2V3zm3.83 2.17l-1.42 1.42C17.99 8.86 19 11.31 19 14c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.69 1.01-5.14 2.59-6.41L6.17 5.17C4.16 7.02 3 9.36 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.64-1.16-4.98-2.17-6.83z"/></svg>
+        开启服务
+      </button>
+      <p class="home-hint">点击开启无障碍服务<br>开启后自动跳过广告，无需其他操作</p>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 2. 跳过记录（点击"查看"） ====== -->
+<div class="screen-card">
+  <div class="screen-label">② 跳过记录 — 点击查看</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </div>
+      <span class="app-bar-title">跳过记录</span>
+    </div>
+    <div class="content">
+      <div style="padding:10px 14px 4px;font-size:11px;color:var(--on-surface-variant);">今日跳过 23 次 · 共 1,247 次</div>
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-icon" style="background:#000;">抖</div>
+          <div class="history-info">
+            <div class="history-app">抖音 <span class="history-type-badge badge-splash">开屏</span></div>
+            <div class="history-type">匹配: "跳过" → 点击节点</div>
+          </div>
+          <div class="history-time">刚刚</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#07C160;">微</div>
+          <div class="history-info">
+            <div class="history-app">微信 <span class="history-type-badge badge-popup">弹窗</span></div>
+            <div class="history-type">匹配: "关闭" → 点击节点</div>
+          </div>
+          <div class="history-time">2分钟前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#FF6B00;">淘</div>
+          <div class="history-info">
+            <div class="history-app">淘宝 <span class="history-type-badge badge-banner">Banner</span></div>
+            <div class="history-type">匹配: "不感兴趣" → 点击坐标</div>
+          </div>
+          <div class="history-time">12分钟前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#FB7299;">B</div>
+          <div class="history-info">
+            <div class="history-app">哔哩哔哩 <span class="history-type-badge badge-splash">开屏</span></div>
+            <div class="history-type">匹配: "Skip" → 点击节点</div>
+          </div>
+          <div class="history-time">25分钟前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#000;">抖</div>
+          <div class="history-info">
+            <div class="history-app">抖音 <span class="history-type-badge badge-popup">弹窗</span></div>
+            <div class="history-type">匹配: "关闭广告" → 点击节点</div>
+          </div>
+          <div class="history-time">1小时前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#2596E3;">支</div>
+          <div class="history-info">
+            <div class="history-app">支付宝 <span class="history-type-badge badge-popup">弹窗</span></div>
+            <div class="history-type">匹配: "不再提示" → 点击节点</div>
+          </div>
+          <div class="history-time">2小时前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-icon" style="background:#FF6B00;">淘</div>
+          <div class="history-info">
+            <div class="history-app">淘宝 <span class="history-type-badge badge-splash">开屏</span></div>
+            <div class="history-type">匹配: "跳过广告" → 点击节点</div>
+          </div>
+          <div class="history-time">3小时前</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 3. 规则管理 — 本地Tab ====== -->
+<div class="screen-card">
+  <div class="screen-label">③ 规则管理 — 本地</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">规则管理</span>
+    </div>
+    <div class="tab-row">
+      <div class="tab-item active">本地 (8)</div>
+      <div class="tab-item">订阅 (23)</div>
+    </div>
+    <!-- Upload bar -->
+    <div class="upload-bar">
+      <button class="upload-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        上传共享
+      </button>
+    </div>
+    <div class="content" style="position:relative;">
+      <div class="rule-list">
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">抖音开屏跳过</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.ss.android.ugc.aweme</div>
+            <div class="rule-card-info-item">优先级 100</div>
+            <div class="rule-card-info-item">TEXT</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">微信弹窗关闭</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.tencent.mm</div>
+            <div class="rule-card-info-item">优先级 80</div>
+            <div class="rule-card-info-item">DESC</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">淘宝Banner</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.taobao.taobao</div>
+            <div class="rule-card-info-item">优先级 60</div>
+            <div class="rule-card-info-item">DESC</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">通用兜底</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">所有应用</div>
+            <div class="rule-card-info-item">优先级 1</div>
+            <div class="rule-card-info-item">TEXT</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div class="rule-card-title-row">
+              <span class="rule-card-title">优酷激励视频</span>
+              <span class="rule-badge rule-badge-local">本地</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="rule-card-info">
+            <div class="rule-card-info-item">com.youku.phone</div>
+            <div class="rule-card-info-item">优先级 70</div>
+            <div class="rule-card-info-item">OCR</div>
+          </div>
+        </div>
+      </div>
+      <div class="fab">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 4. 规则管理 — 订阅Tab ====== -->
+<div class="screen-card">
+  <div class="screen-label">④ 规则管理 — 订阅</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">规则管理</span>
+    </div>
+    <div class="tab-row">
+      <div class="tab-item">本地 (8)</div>
+      <div class="tab-item active">订阅 (23)</div>
+    </div>
+    <div class="content">
+      <div class="sub-content">
+        <!-- 订阅配置 -->
+        <div class="sub-card">
+          <div class="sub-card-title">订阅源</div>
+          <div class="sub-input-row">
+            <label class="sub-label">订阅 URL</label>
+            <input class="sub-input" value="https://gist.githubusercontent.com/user/rules.json">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <div class="sub-input-row" style="flex:1;">
+              <label class="sub-label">更新间隔（小时）</label>
+              <input class="sub-input" type="number" value="6">
+            </div>
+            <div class="sub-input-row" style="flex:1;">
+              <label class="sub-label">自动更新</label>
+              <div style="display:flex;align-items:center;height:36px;">
+                <div class="toggle"></div>
+              </div>
+            </div>
+          </div>
+          <button class="sub-sync-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            立即同步
+          </button>
+        </div>
+
+        <!-- 已订阅规则 -->
+        <div class="sub-card-title" style="padding-left:2px;">已订阅规则</div>
+        <div class="rule-list" style="padding:0;gap:6px;">
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">抖音合集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 5 条规则</div>
+              <div class="rule-card-info-item">作者: @user1</div>
+              <div class="rule-card-info-item">订阅 1,203</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">微信合集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 3 条规则</div>
+              <div class="rule-card-info-item">作者: @user2</div>
+              <div class="rule-card-info-item">订阅 876</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">淘宝合集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle off"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 8 条规则</div>
+              <div class="rule-card-info-item">作者: @user3</div>
+              <div class="rule-card-info-item">订阅 2,451</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <div class="rule-card-title-row">
+                <span class="rule-card-title">通用兜底集</span>
+                <span class="rule-badge rule-badge-subscribed">订阅</span>
+              </div>
+              <div class="toggle"></div>
+            </div>
+            <div class="rule-card-info">
+              <div class="rule-card-info-item">含 7 条规则</div>
+              <div class="rule-card-info-item">作者: @ltt_team</div>
+              <div class="rule-card-info-item">订阅 5,672</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 5. 新建规则（李跳跳风格） ====== -->
+<div class="screen-card">
+  <div class="screen-label">⑤ 新建规则 — 极简表单</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </div>
+      <span class="app-bar-title">新建规则</span>
+    </div>
+    <div class="content edit-content">
+      <!-- 快速选择模板 -->
+      <div class="template-section">
+        <div class="section-title">快速选择</div>
+        <div class="template-chips">
+          <div class="t-chip selected">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.5l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.58-4-4L2 17.09z"/></svg>
+            开屏广告
+          </div>
+          <div class="t-chip">插屏弹窗</div>
+          <div class="t-chip">Banner</div>
+          <div class="t-chip">激励视频</div>
+          <div class="t-chip">通用兜底</div>
+        </div>
+      </div>
+
+      <!-- 规则名称 -->
+      <div class="form-card">
+        <div class="form-row">
+          <label class="form-label">规则名称</label>
+          <input class="form-input" placeholder="如：抖音开屏跳过" value="抖音开屏跳过">
+        </div>
+        <div class="form-row">
+          <label class="form-label">应用包名（留空=通用）</label>
+          <input class="form-input" placeholder="com.ss.android.ugc.aweme" value="com.ss.android.ugc.aweme">
+          <p class="hint-text">不知道包名？在应用列表中点击应用即可复制</p>
+        </div>
+      </div>
+
+      <!-- 匹配文字 -->
+      <div class="form-card">
+        <div class="section-title" style="margin-bottom:0;">匹配什么文字</div>
+        <div class="form-row">
+          <input class="form-input" placeholder="跳过, 跳过广告, Skip" value="跳过, 跳过广告, Skip, skip">
+          <p class="hint-text">多个关键词用英文逗号分隔，只要出现任一个就会触发</p>
+        </div>
+        <div class="form-row-inline">
+          <span class="form-switch-label">忽略大小写</span>
+          <div class="toggle"></div>
+        </div>
+      </div>
+
+      <!-- 怎么处理 -->
+      <div class="form-card">
+        <div class="section-title" style="margin-bottom:0;">怎么处理</div>
+        <div class="chip-group">
+          <span class="chip selected">点击文字</span>
+          <span class="chip">点击坐标</span>
+          <span class="chip">返回键</span>
+        </div>
+        <div class="form-row-inline">
+          <span class="form-switch-label">启用规则</span>
+          <div class="toggle"></div>
+        </div>
+      </div>
+
+      <!-- 高级（默认折叠，仅显示提示） -->
+      <div style="padding:4px 4px;font-size:11px;color:var(--outline);display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        高级选项（优先级、节流、正则、ViewID等）
+      </div>
+    </div>
+    <div class="save-bar">
+      <button class="btn-outlined">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.18c.54.5 1.25.83 2.04.83 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.88C7.5 9.3 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.3 2.04-.78l7.05 4.18c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </button>
+      <button class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+        保存
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 6. 设置 ====== -->
+<div class="screen-card">
+  <div class="screen-label">⑥ 设置 — 精简分组</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-bar-right">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="app-bar">
+      <span class="app-bar-title">设置</span>
+    </div>
+    <div class="content settings-content">
+      <!-- 基础设置 -->
+      <div class="settings-section">
+        <div class="settings-section-title">基础设置</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#E8F5E9;">
+              <svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M13 3h-2v10h2V3zm3.83 2.17l-1.42 1.42C17.99 8.86 19 11.31 19 14c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.69 1.01-5.14 2.59-6.41L6.17 5.17C4.16 7.02 3 9.36 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.64-1.16-4.98-2.17-6.83z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">无障碍服务</span>
+              <span class="settings-item-subtitle">点击开启跳过服务</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#E3F2FD;">
+              <svg viewBox="0 0 24 24" fill="var(--blue)"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">OCR 兜底</span>
+              <span class="settings-item-subtitle">控件树找不到时截图识别</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#FFF3E0;">
+              <svg viewBox="0 0 24 24" fill="var(--orange)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">日志</span>
+              <span class="settings-item-subtitle">记录跳过详情，点击查看</span>
+            </div>
+            <div class="settings-arrow">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#F3E5F5;">
+              <svg viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">跳过通知</span>
+              <span class="settings-item-subtitle">跳过广告时发送通知</span>
+            </div>
+            <div class="toggle off"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 规则订阅 + 贡献者 -->
+      <div class="settings-section">
+        <div class="settings-section-title">规则订阅</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#E3F2FD;">
+              <svg viewBox="0 0 24 24" fill="var(--blue)"><path d="M19 8H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-7 12c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v5z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">自动更新</span>
+              <span class="settings-item-subtitle">定期拉取远程规则</span>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">订阅 URL</label>
+            <input class="settings-input" value="https://gist.githubusercontent.com/user/rules.json">
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">更新间隔（小时）</label>
+            <input class="settings-input" type="number" value="6">
+          </div>
+        </div>
+      </div>
+
+      <!-- 贡献者 -->
+      <div class="settings-section">
+        <div class="settings-section-title">贡献者</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:#000;">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">设备 ID</span>
+              <span class="settings-item-subtitle">a7f3c92e1b4d</span>
+            </div>
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">GitHub Token</label>
+            <input class="settings-input" type="password" placeholder="ghp_xxxxxxxx" value="ghp_a7f3c92e1b">
+          </div>
+          <div class="settings-input-row">
+            <label class="settings-input-label">Gist ID（上传后自动生成）</label>
+            <input class="settings-input" placeholder="自动生成" value="abc123def456">
+          </div>
+          <div class="security-note">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            Token 使用 Android Keystore + AES-GCM 加密，Gist 设为私有，仅本地存储
+          </div>
+        </div>
+      </div>
+
+      <!-- 关于 -->
+      <div class="settings-section">
+        <div class="settings-section-title">关于</div>
+        <div class="settings-card">
+          <div class="settings-item">
+            <div class="settings-item-icon" style="background:var(--green-container);">
+              <svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></svg>
+            </div>
+            <div class="settings-item-text">
+              <span class="settings-item-title">LTT跳过</span>
+              <span class="settings-item-subtitle">v1.0.0 · 仅本地运行，不上传数据</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        <span class="nav-label">规则</span>
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.04.64.09.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg>
+        <span class="nav-label">设置</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Color Palette -->
+<div class="color-palette">
+  <h2 class="palette-title">绿色配色方案</h2>
+  <div class="palette-grid">
+    <div class="palette-item"><div class="palette-color" style="background:#2E7D32;">Primary</div><div class="palette-info"><strong>#2E7D32</strong>主色 · 按钮强调</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#4CAF50;">Light</div><div class="palette-info"><strong>#4CAF50</strong>渐变浅色 · 状态</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#1B5E20;">Dark</div><div class="palette-info"><strong>#1B5E20</strong>深色 · 文字</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#C8E6C9;color:#002106;">Container</div><div class="palette-info"><strong>#C8E6C9</strong>容器背景</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#E8F5E9;color:#002106;border:1px solid #DDE5DC;">Container Light</div><div class="palette-info"><strong>#E8F5E9</strong>浅容器 · 提示</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#FAFFFA;color:#1A1E1A;border:1px solid #DDE5DC;">Surface</div><div class="palette-info"><strong>#FAFFFA</strong>页面背景</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#424942;">Variant</div><div class="palette-info"><strong>#424942</strong>辅助文字</div></div>
+    <div class="palette-item"><div class="palette-color" style="background:#72796E;">Outline</div><div class="palette-info"><strong>#72796E</strong>边框 · 未选中</div></div>
+  </div>
+</div>
+
+<!-- Design Notes -->
+<div class="design-notes">
+  <h2 class="notes-title">设计说明</h2>
+  <div class="notes-grid">
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>设计哲学</h3>
+      <ul>
+        <li><strong>极简首页</strong>：只有状态卡 + 跳过统计 + 开启按钮，三秒上手</li>
+        <li><strong>李跳跳启发</strong>：新建规则极简 — 选模板 → 填包名 → 填文字 → 保存</li>
+        <li><strong>GKD启发</strong>：订阅Tab支持URL、自动更新、同步，规则合集展示</li>
+        <li>底部导航精简为3项：首页 / 规则 / 设置</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>页面结构</h3>
+      <ul>
+        <li><strong>首页</strong>：状态卡 + 累计跳过(查看/重置) + 开启服务按钮</li>
+        <li><strong>跳过记录</strong>：点击"查看"进入，按时间倒序展示跳过历史</li>
+        <li><strong>规则-本地</strong>：规则列表 + 上传共享按钮 + FAB新建</li>
+        <li><strong>规则-订阅</strong>：订阅源配置 + 同步按钮 + 合集列表</li>
+        <li><strong>新建规则</strong>：模板选择 + 名称/包名 + 匹配文字 + 动作 + 高级折叠</li>
+        <li><strong>设置</strong>：基础设置 + 规则订阅 + 贡献者 + 关于</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>优化点</h3>
+      <ul>
+        <li>日志合并入设置 — 基础设置中"日志"项既是开关也是入口</li>
+        <li>共享规则更名为"贡献者"，归入规则订阅分组</li>
+        <li>新建规则隐藏高级选项 — 默认折叠，降低认知负担</li>
+        <li>订阅Tab — 合集展示规则数、作者、订阅数，GKD风格</li>
+        <li>跳过记录 — 新增页面，让用户直观看到"跳过了什么"</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3><svg viewBox="0 0 24 24" fill="var(--green-primary)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>安全与隐私</h3>
+      <ul>
+        <li>贡献者 Token 使用 Android Keystore + AES-GCM 加密</li>
+        <li>安全提示用浅绿色卡片，显眼但不过度</li>
+        <li>关于页强调"仅本地运行，不上传数据"</li>
+        <li>白名单应用不执行跳过操作</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

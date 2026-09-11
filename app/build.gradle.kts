@@ -19,7 +19,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -50,6 +51,13 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+
+    testOptions {
+        unitTests {
+            // android.util.Log 等 Android stub 方法默认返回 0/null 而非抛 RuntimeException
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -65,6 +73,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Material Components（XML Theme.Material3.DayNight 宿主主题）
+    implementation("com.google.android.material:material:1.12.0")
 
     // 数据存储
     implementation("androidx.datastore:datastore-preferences:1.1.1")
@@ -85,4 +96,10 @@ dependencies {
 
     // 调试
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+
+    // 单元测试
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.12")
+    // Coroutines 测试支持
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 }
