@@ -1,6 +1,7 @@
 package com.ltt.gkd.ui.history // 声明包名
 
 import androidx.compose.foundation.background // 导入背景修饰符
+import androidx.compose.foundation.Canvas // 导入 Canvas 画布
 import androidx.compose.foundation.layout.Arrangement // 导入排列方向
 import androidx.compose.foundation.layout.Box // 导入 Box
 import androidx.compose.foundation.layout.Column // 导入纵向容器
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon // 导入图标组件
 import androidx.compose.material3.IconButton // 导入图标按钮
 import androidx.compose.material3.MaterialTheme // 导入主题
 import androidx.compose.material3.Scaffold // 导入骨架
+import androidx.compose.material3.Surface // 导入 Surface 容器
 import androidx.compose.material3.Text // 导入文本
 import androidx.compose.material3.TextButton // 导入文本按钮
 import androidx.compose.material3.TopAppBar // 导入顶部栏
@@ -35,6 +37,9 @@ import androidx.compose.runtime.remember // 导入 remember
 import androidx.compose.runtime.setValue // 导入 setValue
 import androidx.compose.ui.Alignment // 导入对齐
 import androidx.compose.ui.Modifier // 导入修饰符
+import androidx.compose.ui.geometry.CornerRadius // 导入圆角半径
+import androidx.compose.ui.geometry.Offset // 导入坐标点
+import androidx.compose.ui.geometry.Size // 导入尺寸
 import androidx.compose.ui.graphics.Color // 导入颜色
 import androidx.compose.ui.text.font.FontWeight // 导入字体粗细
 import androidx.compose.ui.unit.dp // 导入 dp
@@ -334,3 +339,103 @@ private fun relativeTime(ts: Long): String { // 相对时间格式化
 /** 数字千分位格式化：1247 -> "1,247"。 */
 private fun formatNumber(n: Int): String = // 千分位格式化
     n.toString().reversed().chunked(3).joinToString(",").reversed() // 反转→分块→逗号→再反转
+
+/**
+ * 最近 7 天跳过趋势柱状图：纯 Canvas 绘制，无第三方依赖。
+ *
+ * @param data [(日期标签, 跳过计数), ...]，长度应为 7。
+ */
+@Composable // 标记为 Composable
+private fun WeekTrendChart(data: List<Pair<String, Int>>) { // 7 天趋势柱状图
+    val maxVal = (data.maxOfOrNull { it.second } ?: 0).coerceAtLeast(1) // 最大值，至少 1 避免除零
+    val barColor = MaterialTheme.colorScheme.primary // 柱子颜色
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant // 标签颜色
+    val valColor = MaterialTheme.colorScheme.onSurface // 数值颜色
+    val dark = isSystemInDarkTheme() // 判断深色模式
+    val gridColor = if (dark) Color(0xFF3F4946) else Color(0xFFDAE5E2) // 网格线颜色
+
+    Surface( // 卡片容器
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp), // 水平边距
+        shape = RoundedCornerShape(12.dp), // 圆角
+        color = MaterialTheme.colorScheme.surface, // 表面色
+        tonalElevation = 1.dp // 轻微 tonal
+    ) {
+        Column(Modifier.padding(16.dp)) { // 内边距
+            Text( // 图表标题
+                "最近 7 天趋势", // 文案
+                fontSize = 11.sp, // 字号
+                fontWeight = FontWeight.SemiBold, // 半粗体
+                color = labelColor // 标签色
+            )
+            Spacer(Modifier.height(12.dp)) // 间距
+
+            // 柱状图区域：Canvas 高度 120dp
+            Box(
+                Modifier.fillMaxWidth().height(120.dp),
+                contentAlignment = Alignment.BottomCenter // 底部对齐
+            ) {
+                Canvas(Modifier.fillMaxSize()) { // 画布
+                    val w = size.width // 画布宽度
+                    val h = size.height // 画布高度
+                    val barCount = data.size // 柱子数量
+                    val slot = w / barCount // 每柱槽位宽
+                    val barW = slot * 0.5f // 柱子宽度为槽位一半
+
+                    // 底部基线
+                    drawLine(
+                        color = gridColor, // 网格色
+                        start = Offset(0f, h), // 左下
+                        end = Offset(w, h), // 右下
+                        strokeWidth = 1f // 线宽
+                    )
+                    // 中线（50% 参考）
+                    drawLine(
+                        color = gridColor.copy(alpha = 0.5f), // 半透明网格色
+                        start = Offset(0f, h * 0.5f), // 左中
+                        end = Offset(w, h * 0.5f), // 右中
+                        strokeWidth = 0.5f // 细线
+                    )
+
+                    // 逐柱绘制
+                    data.forEachIndexed { i, (_, count) -> // 遍历数据
+                        val ratio = count.toFloat() / maxVal // 高度比例
+                        val barH = h * ratio * 0.9f // 实际柱高（留 10% 顶部间距）
+                        val x = i * slot + (slot - barW) / 2f // 柱子 x 起点（居中在槽位内）
+                        drawRoundRect( // 圆角矩形柱
+                            color = barColor, // 柱色
+                            topLeft = Offset(x, h - barH), // 左上角
+                            size = Size(barW, barH), // 尺寸
+                            cornerRadius = CornerRadius(4f, 4f) // 圆角半径
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(4.dp)) // 间距
+
+            // X 轴标签
+            Row( // 日期标签行
+                Modifier.fillMaxWidth(), // 占满宽度
+                horizontalArrangement = Arrangement.SpaceEvenly // 均匀分布
+            ) {
+                data.forEach { (label, count) -> // 遍历数据
+                    Column( // 每柱标签列
+                        horizontalAlignment = Alignment.CenterHorizontally // 居中
+                    ) {
+                        Text( // 跳过数
+                            count.toString(), // 数值
+                            fontSize = 9.sp, // 极小字号
+                            fontWeight = FontWeight.Bold, // 加粗
+                            color = valColor // 数值色
+                        )
+                        Text( // 日期标签
+                            label, // MM/dd
+                            fontSize = 8.sp, // 极小字号
+                            color = labelColor // 标签色
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

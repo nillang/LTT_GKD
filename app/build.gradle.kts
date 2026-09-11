@@ -102,4 +102,9 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     // Coroutines 测试支持
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+
+    // AndroidX Instrumented Test（androidTest）依赖
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")  // AndroidJUnit4 runner
+    androidTestImplementation("androidx.test:runner:1.6.2")    // AndroidJUnitRunner
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")  // 协程测试支持（Dispatchers.setMain 等）
 }
