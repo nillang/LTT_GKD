@@ -217,8 +217,8 @@ fun RulesScreen( // 规则管理主组件
                     onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
                     onClick = { onEditRule(it.id) }, // 点击编辑
                     onDelete = null, // 订阅不允许删除
-                    showUsage = true, // 展示作者与使用量（社区数据）
-                    usageHeader = "共 ${subscribed.size} 条 · 累计使用量 ${formatCount(subscribed.sumOf { it.subscribers })}" // 使用量汇总头
+                    showUsage = true, // 展示作者与使用量（来源于 Gist 订阅数）
+                    usageHeader = "共 ${subscribed.size} 条 · 使用量（订阅数）${formatCount(subscribed.maxOfOrNull { it.subscribers } ?: 0)}" // 使用量=订阅源的订阅数（Gist 级，非逐条累加；空列表安全）
                 )
                 2 -> BuiltInContent( // 内置规则列表
                     files = builtInFiles, // 分类文件
@@ -500,7 +500,7 @@ private fun RuleCard( // 单条规则卡片
                         color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
                     )
                 }
-                if (rule.uploaded) { // 已分享本地规则：展示与订阅同步回来的社区使用量
+                if (rule.uploaded) { // 已分享本地规则：展示与订阅同步回来的使用量（Gist 订阅数）
                     val dark = isSystemInDarkTheme() // 深色模式判断
                     val hasUsage = uploadedUsage != null && uploadedUsage > 0 // 是否已有使用量
                     val emphasis = if (dark) DarkAccentBlue else AccentBlue // 强调蓝（深色适配）
@@ -516,9 +516,9 @@ private fun RuleCard( // 单条规则卡片
                         )
                         Text( // 使用量文案（鼓励用户上传分享）
                             when { // 按同步状态分支
-                                uploadedUsage == null -> "已分享到社区，同步后显示使用量" // 尚未同步到使用量
+                                uploadedUsage == null -> "已分享，同步后显示使用量" // 尚未同步到使用量
                                 uploadedUsage > 0 -> "已被 ${formatCount(uploadedUsage)} 人使用 · 感谢分享" // 已被他人使用
-                                else -> "已分享到社区，暂未被使用" // 已同步但使用量为 0
+                                else -> "已分享，暂无使用量" // 已同步但使用量为 0
                             },
                             fontSize = 11.sp, // 字号
                             color = if (hasUsage) emphasis else MaterialTheme.colorScheme.onSurfaceVariant, // 有使用量时蓝色强调
