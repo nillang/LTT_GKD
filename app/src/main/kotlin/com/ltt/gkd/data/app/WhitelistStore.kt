@@ -18,6 +18,13 @@ import kotlinx.coroutines.SupervisorJob  // 导入 SupervisorJob，子协程异�
 import kotlinx.coroutines.launch  // 导入 launch，启动协程
 
 /**
+ * 全局 DataStore 委托（文件级别，整个应用共享一个实例）。
+ * 必须定义在顶层，不能放在类内部——否则每次实例化 WhitelistStore
+ * 都会创建新的 dataStore 属性，导致 "multiple DataStores active for the same file" 崩溃。
+ */
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "whitelist")  // 顶层 DataStore 委托，名为 "whitelist"
+
+/**
  * 应用白名单存储：持久化"跳过广告时需排除的包名集合"。
  *
  * 设计：
@@ -33,8 +40,6 @@ import kotlinx.coroutines.launch  // 导入 launch，启动协程
 class WhitelistStore(private val context: Context) {  // 白名单存储类
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)  // 内部协程作用域，IO 线程 + SupervisorJob
-
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "whitelist")  // 顶层 DataStore 委托，名为 "whitelist"
 
     /** 当前白名单（包名集合）。StateFlow 保证订阅者始终拿到最新值。 */
     val whitelist: StateFlow<Set<String>> = context.dataStore.data  // 从 DataStore 数据 Flow 开始

@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.CloudUpload // 导入云上传图�
 import androidx.compose.material.icons.filled.Delete // 导入删除图标
 import androidx.compose.material.icons.filled.Folder // 导入文件夹图标
 import androidx.compose.material.icons.filled.MoreVert // 导入三点菜单图标
+import androidx.compose.material.icons.filled.Person // 导入人物图标（作者展示）
+import androidx.compose.material.icons.filled.Whatshot // 导入火焰图标（热门规则）
 import androidx.compose.material3.AlertDialog // 导入对话框
 import androidx.compose.material3.DropdownMenu // 导入下拉菜单
 import androidx.compose.material3.DropdownMenuItem // 导入下拉菜单项
@@ -61,6 +63,10 @@ import com.ltt.gkd.ui.theme.AccentPurple // 导入主题强调紫色（亮色）
 import com.ltt.gkd.ui.theme.PurpleBadgeBg // 导入主题紫色徽章背景（亮色）
 import com.ltt.gkd.ui.theme.DarkAccentPurple // 导入深色模式紫色前景
 import com.ltt.gkd.ui.theme.DarkPurpleBadgeBg // 导入深色紫色徽章背景
+import com.ltt.gkd.ui.theme.AccentAmber // 导入主题强调琥珀色（亮色，热门徽章）
+import com.ltt.gkd.ui.theme.AmberBadgeBg // 导入琥珀色徽章背景（亮色）
+import com.ltt.gkd.ui.theme.DarkAccentAmber // 导入深色模式琥珀色前景
+import com.ltt.gkd.ui.theme.DarkAmberBadgeBg // 导入深色琥珀色徽章背景
 import androidx.compose.foundation.isSystemInDarkTheme // 导入深色主题判断函数
 import kotlinx.coroutines.launch // 导入协程启动
 
@@ -83,22 +89,25 @@ fun RulesScreen( // 规则管理主组件
     settings: SettingsStore, // 设置存储
     onAddNew: () -> Unit, // 新增规则回调
     onEditRule: (String) -> Unit, // 编辑规则回调
-    onSyncSubscribed: () -> Unit, // 同步订阅回调
+    onSyncSubscribed: ((Boolean) -> Unit) -> Unit, // 同步订阅回调，参数为完成回调(是否成功)
     onImport: () -> Unit, // 导入回调
     onExport: () -> Unit, // 导出回调
-    onPreviewBuiltIn: (String) -> String? // 预览内置规则回调
+    onPreviewBuiltIn: (String) -> String?, // 预览内置规则回调
+    onGoToSettings: () -> Unit = {} // 无订阅源时跳转设置页的回调
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
     val local by repo.localRules.collectAsState() // 本地规则列表
     val subscribed by repo.subscribedRules.collectAsState() // 订阅规则列表
     val builtIn by repo.builtInRules.collectAsState() // 内置规则列表
     val disabledIds by settings.disabledRuleIds.collectAsState(initial = emptySet()) // 已禁用 ID 集合
+    val gistId by settings.gistId.collectAsState(initial = "") // 订阅源 Gist ID
     val builtInFiles = remember { repo.listBuiltInRuleFiles() } // 内置规则文件名列表
 
     var tabIndex by remember { mutableStateOf(0) } // 当前 Tab 索引
     var menuOpen by remember { mutableStateOf(false) } // 三点菜单展开状态
     var deleteTarget by remember { mutableStateOf<Rule?>(null) } // 待删除规则
     var preview by remember { mutableStateOf<Pair<String, String?>?>(null) } // 内置规则预览内容
+    var syncing by remember { mutableStateOf(false) } // 同步中状态，控制 FAB loading 显示
 
     LaunchedEffect(Unit) { repo.reload() } // 首次进入重新加载规则
 
@@ -136,8 +145,28 @@ fun RulesScreen( // 规则管理主组件
                 0 -> FloatingActionButton(onClick = onAddNew) { // 新增按钮
                     Icon(Icons.Filled.Add, contentDescription = "新增规则") // 加号图标
                 }
-                1 -> FloatingActionButton(onClick = onSyncSubscribed) { // 同步按钮
-                    Icon(Icons.Filled.CloudDownload, contentDescription = "同步订阅") // 云下载图标
+                1 -> FloatingActionButton( // 同步按钮
+                    onClick = { // 点击同步
+                        if (gistId.isEmpty()) { // 未配置订阅源
+                            onGoToSettings() // 跳转设置页配置订阅源
+                        } else if (!syncing) { // 已配置且未在同步中
+                            syncing = true // 标记同步中，禁用重复点击
+                            onSyncSubscribed { _ -> // 执行同步，完成后回调
+                                syncing = false // 解除 loading 状态
+                                // 成功/失败由 syncSubscribed 内部 Toast 提示
+                            }
+                        }
+                    }
+                ) {
+                    if (syncing) { // 同步中显示加载动画
+                        androidx.compose.material3.CircularProgressIndicator( // 加载圈
+                            modifier = Modifier.size(20.dp), // 尺寸
+                            color = MaterialTheme.colorScheme.onPrimary, // 颜色
+                            strokeWidth = 2.dp // 线宽
+                        )
+                    } else { // 非同步中显示云下载图标
+                        Icon(Icons.Filled.CloudDownload, contentDescription = "同步订阅") // 云下载图标
+                    }
                 }
             }
         }
@@ -167,7 +196,9 @@ fun RulesScreen( // 规则管理主组件
                     emptyHint = "暂无订阅规则，点右下角同步按钮拉取", // 空态提示
                     onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
                     onClick = { onEditRule(it.id) }, // 点击编辑
-                    onDelete = null // 订阅不允许删除
+                    onDelete = null, // 订阅不允许删除
+                    showUsage = true, // 展示作者与使用量（社区数据）
+                    usageHeader = "共 ${subscribed.size} 条 · 累计使用量 ${formatCount(subscribed.sumOf { it.subscribers })}" // 使用量汇总头
                 )
                 2 -> BuiltInContent( // 内置规则列表
                     files = builtInFiles, // 分类文件
@@ -225,6 +256,8 @@ fun RulesScreen( // 规则管理主组件
  * @param onToggle 规则开关切换回调，参数为规则与目标布尔值。
  * @param onClick 点击卡片回调（跳转编辑），参数为规则。
  * @param onDelete 删除按钮回调；为 null 时不显示删除按钮（订阅 Tab）。
+ * @param showUsage 是否在卡片上展示作者与使用量等社区数据（订阅 Tab 用）。
+ * @param usageHeader 列表顶部的使用量汇总文案；为 null 时不显示汇总头。
  */
 @Composable // 标记为 Composable
 private fun RuleListContent( // 规则列表内容
@@ -233,7 +266,9 @@ private fun RuleListContent( // 规则列表内容
     emptyHint: String, // 空态提示
     onToggle: (Rule, Boolean) -> Unit, // 开关切换
     onClick: (Rule) -> Unit, // 点击卡片
-    onDelete: ((Rule) -> Unit)? // 删除回调，可为空
+    onDelete: ((Rule) -> Unit)?, // 删除回调，可为空
+    showUsage: Boolean = false, // 是否展示社区使用量数据
+    usageHeader: String? = null // 顶部使用量汇总文案
 ) {
     if (rules.isEmpty()) { // 列表为空
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { // 居中容器
@@ -245,13 +280,25 @@ private fun RuleListContent( // 规则列表内容
         Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 10.dp), // 内边距
         verticalArrangement = Arrangement.spacedBy(8.dp) // 项间距
     ) {
+        if (usageHeader != null) { // 有汇总头则作为首项渲染
+            item(key = "usage_header") { // 汇总头项
+                Text( // 汇总文案
+                    usageHeader, // 文案
+                    fontSize = 12.sp, // 字号
+                    fontWeight = FontWeight.SemiBold, // 半粗体
+                    color = MaterialTheme.colorScheme.primary, // 主色
+                    modifier = Modifier.padding(bottom = 2.dp) // 底部间距
+                )
+            }
+        }
         items(rules, key = { it.id }) { rule -> // 按规则 ID 作为 key
             RuleCard( // 单条规则卡片
                 rule = rule, // 规则
                 active = rule.enabled && rule.id !in disabledIds, // 是否激活
                 onToggle = { on -> onToggle(rule, on) }, // 开关切换
                 onClick = { onClick(rule) }, // 点击卡片
-                onDelete = onDelete?.let { { it(rule) } } // 删除回调
+                onDelete = onDelete?.let { { it(rule) } }, // 删除回调
+                showUsage = showUsage // 是否展示使用量
             )
         }
     }
@@ -329,6 +376,7 @@ private fun BuiltInContent( // 内置规则内容
  * @param onToggle 开关切换回调。
  * @param onClick 点击卡片回调；为 null 时卡片不可点击（内置 Tab）。
  * @param onDelete 删除按钮回调；为 null 时不显示删除按钮。
+ * @param showUsage 是否展示社区数据（作者、使用量、热门徽章）。
  */
 @Composable // 标记为 Composable
 private fun RuleCard( // 单条规则卡片
@@ -336,7 +384,8 @@ private fun RuleCard( // 单条规则卡片
     active: Boolean, // 是否激活
     onToggle: (Boolean) -> Unit, // 开关切换
     onClick: (() -> Unit)?, // 点击回调，可为空
-    onDelete: (() -> Unit)? // 删除回调，可为空
+    onDelete: (() -> Unit)?, // 删除回调，可为空
+    showUsage: Boolean = false // 是否展示社区使用量数据
 ) {
     Surface( // 卡片容器
         modifier = Modifier.fillMaxWidth().then( // 占满宽度
@@ -358,6 +407,11 @@ private fun RuleCard( // 单条规则卡片
                         modifier = Modifier.weight(1f, fill = false) // 不强制填满
                     )
                     Spacer(Modifier.width(6.dp)) // 间距
+                    // 热门徽章：使用量达到阈值时展示，排在来源徽章之前
+                    if (showUsage && rule.subscribers >= HOT_SUBSCRIBER_THRESHOLD) { // 达到热门阈值
+                        HotBadge() // 热门徽章
+                        Spacer(Modifier.width(4.dp)) // 与来源徽章间距
+                    }
                     SourceBadge(rule.source) // 来源徽章
                 }
                 Spacer(Modifier.height(4.dp)) // 间距
@@ -376,6 +430,36 @@ private fun RuleCard( // 单条规则卡片
                         fontSize = 11.sp, // 字号
                         color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
                     )
+                }
+                if (showUsage) { // 展示社区数据行：作者 + 使用量
+                    Spacer(Modifier.height(4.dp)) // 与上一行间距
+                    Row( // 作者/使用量行
+                        verticalAlignment = Alignment.CenterVertically, // 垂直居中
+                        horizontalArrangement = Arrangement.spacedBy(6.dp) // 间距
+                    ) {
+                        Icon( // 作者图标
+                            Icons.Filled.Person, contentDescription = null, // 无障碍描述留空
+                            tint = MaterialTheme.colorScheme.outline, // 灰色
+                            modifier = Modifier.size(12.dp) // 图标尺寸
+                        )
+                        Text( // 作者名
+                            rule.author.ifEmpty { "匿名" }, // 空作者显示匿名
+                            fontSize = 11.sp, // 字号
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
+                            maxLines = 1, // 单行
+                            modifier = Modifier.weight(1f, fill = false) // 不强制填满
+                        )
+                        Icon( // 使用量图标
+                            Icons.Filled.Whatshot, contentDescription = null, // 无障碍描述留空
+                            tint = MaterialTheme.colorScheme.outline, // 灰色
+                            modifier = Modifier.size(12.dp) // 图标尺寸
+                        )
+                        Text( // 使用量文案
+                            "使用 ${formatCount(rule.subscribers)}", // 格式化后的使用量
+                            fontSize = 11.sp, // 字号
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
+                        )
+                    }
                 }
             }
             if (onDelete != null) { // 有删除回调
@@ -423,4 +507,63 @@ private fun SourceBadge(source: RuleSource) { // 来源徽章
             .background(bg, RoundedCornerShape(8.dp)) // 圆角背景
             .padding(horizontal = 7.dp, vertical = 2.dp) // 内边距
     )
+}
+
+/** 热门阈值：使用量（订阅数）达到该值的规则展示"热门"徽章。 */
+private const val HOT_SUBSCRIBER_THRESHOLD = 10 // 热门规则的使用量阈值
+
+/**
+ * 将使用量数字格式化为紧凑中文样式，避免卡片上出现过长数字。
+ *
+ * - >= 10000：显示为 "X.Y万"（保留一位小数，整万时省略小数）
+ * - >= 1000：显示为 "X.Yk"（保留一位小数，整千时省略小数）
+ * - 其余：原样显示
+ *
+ * @param n 使用量（订阅数）
+ * @return 格式化后的字符串
+ */
+private fun formatCount(n: Int): String = when { // 按数量级分支
+    n >= 10_000 -> { // 万级
+        val v = n / 10_000.0 // 换算为万
+        if (v >= 100) "${v.toInt()}万" else trimDecimal(v) + "万" // 大于 100 万取整，否则保留一位小数
+    }
+    n >= 1_000 -> { // 千级
+        val v = n / 1_000.0 // 换算为千
+        trimDecimal(v) + "k" // 保留一位小数
+    }
+    else -> n.toString() // 小于 1000 原样显示
+}
+
+/** 保留一位小数，若小数为 0 则只保留整数部分（如 2.0 -> "2"，2.5 -> "2.5"）。 */
+private fun trimDecimal(v: Double): String { // 裁剪多余小数
+    val rounded = kotlin.math.round(v * 10) / 10 // 四舍五入到一位小数
+    return if (rounded % 1.0 == 0.0) rounded.toInt().toString() else rounded.toString() // 整数值去掉小数
+}
+
+/**
+ * 热门徽章：火焰图标 + "热门"文案，使用琥珀色（深色模式自动切换暗色变体）。
+ */
+@Composable // 标记为 Composable
+private fun HotBadge() { // 热门徽章
+    val dark = isSystemInDarkTheme() // 判断深色模式
+    val bg = if (dark) DarkAmberBadgeBg else AmberBadgeBg // 背景色（深色适配）
+    val fg = if (dark) DarkAccentAmber else AccentAmber // 前景色（深色适配）
+    Row( // 横向布局
+        verticalAlignment = Alignment.CenterVertically, // 垂直居中
+        modifier = Modifier // 修饰符链
+            .background(bg, RoundedCornerShape(8.dp)) // 圆角背景
+            .padding(horizontal = 6.dp, vertical = 2.dp) // 内边距
+    ) {
+        Icon( // 火焰图标
+            Icons.Filled.Whatshot, contentDescription = null, // 无障碍描述留空
+            tint = fg, // 前景色
+            modifier = Modifier.size(10.dp) // 图标尺寸
+        )
+        Spacer(Modifier.width(2.dp)) // 图标与文字间距
+        Text( // 徽章文本
+            "热门", // 文案
+            fontSize = 9.sp, // 极小字号
+            color = fg // 前景色
+        )
+    }
 }

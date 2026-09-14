@@ -68,11 +68,16 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
      * 5. 合并后按 priority 倒序输出到 [rules]
      */
     suspend fun reload() = withContext(Dispatchers.IO) {  // 重新加载并合并规则，运行在 IO 线程
-        // 1. 内置
+        // 1. 内置（仅保留已安装应用的规则 + 通用兜底规则）
+        val installedPkgs = runCatching {  // 获取已安装应用包名集合，失败则返回空集合（不过滤）
+            context.packageManager.getInstalledPackages(0).map { it.packageName }.toSet()  // 取已安装包名集合
+        }.getOrDefault(emptySet())  // 异常时返回空集合
         val builtInRs = readBuiltInRules()  // 读取所有内置规则集
-        val builtInRules = builtInRs.flatMap { it.rules }.map { it.copy(source = RuleSource.BUILT_IN) }  // 展平并标记为内置来源
+        val builtInRules = builtInRs.flatMap { it.rules }  // 展平所有规则
+            .filter { it.packageName.isEmpty() || it.packageName in installedPkgs }  // 仅保留通用兜底或已安装应用的规则
+            .map { it.copy(source = RuleSource.BUILT_IN) }  // 标记为内置来源
         _builtInRules.value = builtInRules  // 更新内置规则 StateFlow
-        Logger.d("加载内置规则 ${builtInRules.size} 条")  // 输出调试日志
+        Logger.d("加载内置规则 ${builtInRules.size} 条（过滤未安装应用后）")  // 输出调试日志
 
         // 2. 本地（按 createdAt 倒序）
         val localRs = readRulesFromDir(localDir)  // 读取本地目录下所有规则集

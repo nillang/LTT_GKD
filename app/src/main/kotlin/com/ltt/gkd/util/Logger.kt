@@ -2,7 +2,7 @@ package com.ltt.gkd.util // 包声明：本文件属于工具包 com.ltt.gkd.uti
 
 import android.content.Context // 导入 Context，访问 filesDir 等
 import android.util.Log // 导入 Log，输出到 Logcat
-import com.ltt.gkd.data.prefs.SettingsStore // 导入 SettingsStore，读取 verbose 开关
+import com.ltt.gkd.App // 导入 Application 单例，复用其 settings 实例
 import kotlinx.coroutines.CoroutineScope // 导入 CoroutineScope，协程作用域
 import kotlinx.coroutines.Dispatchers // 导入 Dispatchers，IO 调度器
 import kotlinx.coroutines.SupervisorJob // 导入 SupervisorJob，子任务异常不波及兄弟
@@ -60,7 +60,8 @@ object Logger {
     fun init(context: Context) { // 入口：初始化 Logger
         if (initialized) return // 防止重复初始化
         initialized = true // 标记已初始化
-        val store = SettingsStore(context) // 构造设置存储
+        // 复用 App 中的 SettingsStore 单例，避免重复构造导致 DataStore 多实例崩溃
+        val store = App.get().settings
         // 异步读取 verbose 开关，避免主线程阻塞；首次默认 false（不输出 V/D 级日志）
         scope.launch { verbose = store.logEnabled.first() } // 后台读取 verbose 设置
         // 后台消费 channel 写文件

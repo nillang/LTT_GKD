@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll // 导入纵向滚动修饰符
 import androidx.compose.material.icons.Icons // 导入图标集合
 import androidx.compose.material.icons.automirrored.filled.Article // 导入文章图标
 import androidx.compose.material.icons.filled.Checklist // 导入清单图标
+import androidx.compose.material.icons.filled.Info // 导入信息图标
 import androidx.compose.material.icons.filled.ExpandLess // 导入收起图标
 import androidx.compose.material.icons.filled.ExpandMore // 导入展开图标
 import androidx.compose.material.icons.filled.Notifications // 导入通知图标
@@ -33,6 +34,7 @@ import androidx.compose.material3.Surface // 导入 Surface
 import androidx.compose.material3.Switch // 导入开关
 import androidx.compose.material3.Text // 导入文本
 import androidx.compose.runtime.Composable // 导入 Composable 注解
+import androidx.compose.runtime.LaunchedEffect // 导入 LaunchedEffect
 import androidx.compose.runtime.collectAsState // 导入 collectAsState
 import androidx.compose.runtime.getValue // 导入 getValue
 import androidx.compose.runtime.mutableStateOf // 导入可变状态
@@ -57,6 +59,7 @@ import com.ltt.gkd.ui.theme.DarkAccentBlue // 导入深色模式蓝色前景
 import com.ltt.gkd.ui.theme.DarkAccentOrange // 导入深色模式橙色前景
 import androidx.compose.foundation.isSystemInDarkTheme // 导入深色主题判断函数
 import com.ltt.gkd.util.Logger // 导入日志工具
+import kotlinx.coroutines.flow.first // 导入 Flow.first
 import kotlinx.coroutines.launch // 导入协程启动
 
 /**
@@ -76,20 +79,35 @@ fun SettingsScreen( // 设置主组件
     onOpenAccessibility: () -> Unit, // 跳无障碍设置
     onOpenLogs: () -> Unit, // 打开日志
     onOpenWhitelist: () -> Unit, // 打开白名单
-    onSyncSubscribed: () -> Unit // 同步订阅
+    onSyncSubscribed: ((Boolean) -> Unit) -> Unit // 同步订阅，参数为完成回调(是否成功)
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
     val log by settings.logEnabled.collectAsState(initial = false) // 日志开关
     val ocr by settings.ocrEnabled.collectAsState(initial = true) // OCR 兜底
     val sub by settings.subscriptionEnabled.collectAsState(initial = false) // 订阅开关
-    val subUrl by settings.subscriptionUrl.collectAsState(initial = "") // 订阅 URL
-    val subInterval by settings.subscriptionIntervalHours.collectAsState(initial = 24) // 订阅间隔
     val skipNoti by settings.skipNotificationEnabled.collectAsState(initial = false) // 跳过通知
-    val ghToken by settings.githubToken.collectAsState(initial = "") // GitHub Token
-    val gistId by settings.gistId.collectAsState(initial = "") // Gist ID
     val deviceId by settings.deviceId.collectAsState(initial = "") // 设备 ID
 
+    // ---- 文本输入框：用本地状态保证输入流畅，避免 Flow 异步回写导致光标跳开头 ----
+    var localSubUrl by remember { mutableStateOf("") } // 订阅 URL 本地状态
+    var localSubInterval by remember { mutableStateOf("24") } // 更新间隔本地状态
+    var localGhToken by remember { mutableStateOf("") } // Token 本地状态
+    var localGistId by remember { mutableStateOf("") } // Gist ID 本地状态
+    // 首次加载从 Flow 同步初始值到本地状态
+    LaunchedEffect(Unit) { // 组件首次挂载时执行
+        settings.subscriptionUrl.collect { localSubUrl = it } // 同步订阅 URL
+        settings.subscriptionIntervalHours.collect { localSubInterval = it.toString() } // 同步间隔
+        settings.githubToken.collect { localGhToken = it } // 同步 Token
+        settings.gistId.collect { localGistId = it } // 同步 Gist ID
+    }
+
+    // 订阅卡片展开状态
     var subExpanded by remember { mutableStateOf(false) } // 订阅卡片展开
+    // 首次加载 Gist ID 后，若为空则自动展开订阅卡片引导用户配置
+    LaunchedEffect(Unit) { // 组件首次挂载
+        val gid = settings.gistId.first() // 取 Gist ID 首值
+        if (gid.isEmpty()) subExpanded = true // 无订阅源时自动展开
+    }
 
     Column( // 滚动纵向容器
         Modifier
@@ -196,7 +214,7 @@ fun SettingsScreen( // 设置主组件
                 Column(Modifier.weight(1f)) { // 文本列
                     Text("自动更新", fontSize = 14.sp, fontWeight = FontWeight.Bold) // 标题
                     Text( // 副标题
-                        if (sub) "自动更新：每${subInterval}小时" else "已关闭", // 状态文案
+                        if (sub) "自动更新：每${localSubInterval}小时" else "已关闭", // 状态文案
                         fontSize = 11.sp, // 字号
                         color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
                     )
@@ -210,6 +228,31 @@ fun SettingsScreen( // 设置主组件
             if (subExpanded) { // 展开时显示
                 CardDivider() // 分隔线
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { // 内容列
+                    // 无订阅源时显示引导提示
+                    if (localGistId.isEmpty()) { // Gist ID 为空
+                        Surface( // 提示横幅
+                            color = MaterialTheme.colorScheme.primaryContainer, // 主容器色
+                            shape = RoundedCornerShape(10.dp), // 圆角
+                            modifier = Modifier.fillMaxWidth() // 占满
+                        ) {
+                            Row( // 横向布局
+                                Modifier.padding(10.dp), // 内边距
+                                verticalAlignment = Alignment.CenterVertically, // 垂直居中
+                                horizontalArrangement = Arrangement.spacedBy(8.dp) // 间距
+                            ) {
+                                Icon( // 信息图标
+                                    Icons.Filled.Info, contentDescription = null, // 无障碍描述留空
+                                    tint = MaterialTheme.colorScheme.primary, // 主色
+                                    modifier = Modifier.size(18.dp) // 尺寸
+                                )
+                                Text( // 引导文案
+                                    "请填写订阅 URL（GitHub Gist ID 或链接），点击「手动获取」同步规则", // 文案
+                                    fontSize = 11.sp, // 字号
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer // 主容器前景色
+                                )
+                            }
+                        }
+                    }
                     Row(verticalAlignment = Alignment.CenterVertically) { // 自动更新开关行
                         Column(Modifier.weight(1f)) { // 文本列
                             Text("自动更新", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) // 标题
@@ -221,15 +264,19 @@ fun SettingsScreen( // 设置主组件
                         })
                     }
                     OutlinedTextField( // 订阅 URL 输入框
-                        value = subUrl, // 当前值
-                        onValueChange = { v -> scope.launch { settings.setSubscriptionUrl(v) } }, // 异步保存
+                        value = localSubUrl, // 本地状态值（输入流畅）
+                        onValueChange = { v -> // 输入回调
+                            localSubUrl = v // 立即更新本地状态
+                            scope.launch { settings.setSubscriptionUrl(v) } // 异步保存到 DataStore
+                        },
                         label = { Text("订阅 URL") }, // 标签
                         modifier = Modifier.fillMaxWidth(), // 占满
                         singleLine = true // 单行
                     )
                     OutlinedTextField( // 更新间隔输入框
-                        value = subInterval.toString(), // 当前值
+                        value = localSubInterval, // 本地状态值
                         onValueChange = { v -> // 输入回调
+                            localSubInterval = v // 立即更新本地状态
                             v.toIntOrNull()?.takeIf { it > 0 }?.let { n -> // 仅正整数
                                 scope.launch { settings.setSubscriptionInterval(n) } // 异步保存
                             }
@@ -244,7 +291,7 @@ fun SettingsScreen( // 设置主组件
                         verticalAlignment = Alignment.CenterVertically // 垂直居中
                     ) {
                         Button( // 手动获取按钮
-                            onClick = onSyncSubscribed, // 点击同步
+                            onClick = { onSyncSubscribed {} }, // 点击同步（不处理完成回调）
                             modifier = Modifier.weight(1f) // 占满
                         ) { Text("手动获取") } // 文案
                     }
@@ -274,8 +321,11 @@ fun SettingsScreen( // 设置主组件
                 Text("GitHub Token", fontSize = 11.sp, // 标签
                     color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
                 OutlinedTextField( // Token 输入框
-                    value = ghToken, // 当前值
-                    onValueChange = { v -> scope.launch { settings.setGithubToken(v) } }, // 异步保存
+                    value = localGhToken, // 本地状态值
+                    onValueChange = { v -> // 输入回调
+                        localGhToken = v // 立即更新本地状态
+                        scope.launch { settings.setGithubToken(v) } // 异步保存
+                    },
                     placeholder = { Text("ghp_xxxxxxxx") }, // 占位
                     modifier = Modifier.fillMaxWidth(), // 占满
                     singleLine = true, // 单行
@@ -287,8 +337,11 @@ fun SettingsScreen( // 设置主组件
                 Text("Gist ID（上传后自动生成）", fontSize = 11.sp, // 标签
                     color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
                 OutlinedTextField( // Gist ID 输入框
-                    value = gistId, // 当前值
-                    onValueChange = { v -> scope.launch { settings.setGistId(v) } }, // 异步保存
+                    value = localGistId, // 本地状态值
+                    onValueChange = { v -> // 输入回调
+                        localGistId = v // 立即更新本地状态
+                        scope.launch { settings.setGistId(v) } // 异步保存
+                    },
                     placeholder = { Text("自动生成") }, // 占位
                     modifier = Modifier.fillMaxWidth(), // 占满
                     singleLine = true // 单行

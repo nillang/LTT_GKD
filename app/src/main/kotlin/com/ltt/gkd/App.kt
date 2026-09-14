@@ -4,6 +4,7 @@ import android.app.Application // 导入 Application 基类，应用启动入口
 import android.app.NotificationChannel // 导入通知渠道类，Android O+ 必需
 import android.app.NotificationManager // 导入通知管理器，用于创建渠道
 import android.os.Build // 导入 Build 类，用于判断系统版本
+import android.os.Looper // 导入 Looper，用于判断是否主线程
 import com.ltt.gkd.data.app.WhitelistStore // 导入应用白名单存储
 import com.ltt.gkd.data.history.SkipHistoryStore // 导入跳过历史记录存储
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储（DataStore 偏好）
@@ -46,6 +47,28 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
         history = SkipHistoryStore(this) // 初始化跳过历史存储
         Logger.init(this) // 初始化日志工具
         registerNotificationChannels() // 注册通知渠道
+        setupCrashHandler() // 设置全局异常捕获，防止无障碍服务因未处理异常崩溃
+    }
+
+    /**
+     * 设置全局未捕获异常处理器。
+     *
+     * 目的：当无障碍服务所在线程发生未捕获异常时，记录日志并吞掉异常，
+     * 避免进程崩溃导致无障碍服务被系统停止。系统重启服务后可继续工作。
+     * 仅处理非致命异常；主线程致命异常仍交由系统默认处理器（避免 ANR）。
+     */
+    private fun setupCrashHandler() { // 设置全局异常处理器
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler() // 保存系统默认处理器
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable -> // 设置全局处理器
+            Logger.e("未捕获异常 [${thread.name}]: ${throwable.message}", throwable) // 记录异常到日志
+            // 非主线程异常直接吞掉，让进程继续运行（无障碍服务不中断）
+            if (thread != Looper.getMainLooper().thread) { // 非主线程
+                // 子线程异常不杀进程，服务可继续工作
+            } else { // 主线程异常
+                // 主线程异常仍交系统默认处理器，避免界面卡住导致 ANR
+                defaultHandler?.uncaughtException(thread, throwable) // 调用默认处理器
+            }
+        }
     }
 
     /** 注册无障碍服务保活 + 跳过事件通知渠道（Android O+ 必需）。 */

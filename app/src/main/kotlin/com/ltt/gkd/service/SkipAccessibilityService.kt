@@ -59,6 +59,20 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
     override fun onServiceConnected() { // 入口：服务连接成功回调
         super.onServiceConnected() // 调用父类初始化
         instance = this // 置位静态实例引用
+        // 整体包一层 runCatching：任一组件初始化失败（如设备不支持 OCR）时仅记录日志，
+        // 不让异常冒泡导致无障碍服务被系统停止。失败时 processor 保持未初始化，
+        // onAccessibilityEvent 会因 ::processor.isInitialized 为 false 而安全忽略事件。
+        runCatching { initComponents() } // 初始化业务组件
+            .onFailure { Logger.e("无障碍服务初始化失败，跳过功能暂不可用", it) } // 失败记录 error 日志
+    }
+
+    /**
+     * 初始化所有业务组件：构造规则仓库、规则引擎、匹配器、手势执行器、OCR 管理器，
+     * 装配到 [WindowEventProcessor]，并异步触发规则加载。
+     *
+     * 抽成独立方法便于 [onServiceConnected] 用 runCatching 统一兜底。
+     */
+    private fun initComponents() { // 内部：装配业务组件
         val app = App.get() // 获取全局 App 实例
         val settings: SettingsStore = app.settings // 取出设置存储
         val repo = RuleRepository(this) // 构造规则仓库（依赖 Service Context）
@@ -100,7 +114,12 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) { // 入口：事件回调
         if (event == null || !::processor.isInitialized) return // 空事件或处理器未就绪直接返回
-        scope.launch { processor.handle(event) } // 在服务作用域中异步处理
+        // 单个事件处理异常就地兜底：记录 warn 后吞掉，避免异常冒泡触发全局崩溃处理器，
+        // 保证一次异常窗口事件不影响后续事件的正常处理。
+        scope.launch { // 在服务作用域中异步处理
+            runCatching { processor.handle(event) } // 处理事件，捕获异常
+                .onFailure { Logger.w("处理无障碍事件异常", it) } // 失败记录 warn 日志
+        }
     }
 
     /**
@@ -113,6 +132,8 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
     /**
      * 服务解绑时回调：清理 [instance] 引用、关闭 OCR、取消协程作用域。
      *
+     * 若为系统异常断开（非用户主动关闭），尝试延迟重启服务。
+     *
      * @param intent 触发解绑的 Intent
      * @return 是否调用父类解绑逻辑
      */
@@ -121,6 +142,31 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
         runCatching { ocr?.close() } // 关闭 OCR 资源，忽略异常
         scope.cancel() // 取消服务作用域内所有协程
         Logger.i("无障碍服务已断开") // 记录日志
-        return super.onUnbind(intent) // 调用父类返回结果
+        // 仅当系统设置中无障碍开关仍处于开启状态（说明是崩溃/异常断开而非用户主动关闭）时，
+        // 才尝试唤起进程，配合系统对已启用无障碍服务的自动重启机制恢复。
+        // 用户主动关闭时开关已从系统设置移除，此处不再弹出主界面打扰用户。
+        if (isServiceStillEnabledInSettings()) { // 仍启用 = 异常断开
+            runCatching { // 尝试唤起进程
+                val launchIntent = packageManager.getLaunchIntentForPackage(packageName) // 获取启动 Intent
+                launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // 新任务栈
+                if (launchIntent != null) startActivity(launchIntent) // 启动主 Activity 唤起进程
+            }.onFailure { Logger.w("异常断开后唤起进程失败", it) } // 失败记录 warn
+        }
+        return super.onUnbind(intent) // 调用父类返回结果（传入原始 intent 参数）
     }
+
+    /**
+     * 判断系统设置中本无障碍服务是否仍处于"已启用"状态。
+     *
+     * 用于区分"用户主动关闭"与"异常断开"：主动关闭时系统会先把本服务从
+     * [android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES] 中移除再回调解绑，
+     * 此时返回 false；异常断开时开关仍在，返回 true。读取失败时保守返回 false（不打扰用户）。
+     */
+    private fun isServiceStillEnabledInSettings(): Boolean = runCatching { // 读取系统无障碍开关状态
+        val enabled = android.provider.Settings.Secure.getString( // 读取安全设置字符串
+            contentResolver, // 内容解析器
+            android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES // 已启用无障碍服务键
+        ) ?: "" // 为空时用空串
+        enabled.contains("$packageName/") // 含本应用组件前缀即视为仍启用
+    }.getOrDefault(false) // 读取异常时保守返回 false
 }

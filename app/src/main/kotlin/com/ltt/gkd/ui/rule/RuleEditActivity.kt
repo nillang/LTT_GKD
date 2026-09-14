@@ -80,8 +80,10 @@ class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
                             // 保存到本地 filesDir/rules/local/manual_<id>.json
                             val ok = repo.saveLocalRule(rule) // 保存到本地
                             val msg = if (ok) "已保存到本地：${rule.name}" else "保存失败，请查看日志" // 结果文案
-                            Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show() // Toast
-                            if (ok) finish() // 保存成功则关闭
+                            withContext(Dispatchers.Main) { // 切主线程显示 Toast + finish
+                                Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show() // Toast
+                                if (ok) finish() // 保存成功则关闭
+                            }
                         }
                     },
                     onUpload = { rule -> // 上传回调
@@ -90,7 +92,9 @@ class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
                             // 通过 GistClient 上传到 GitHub Gist
                             val ok = uploadRule(rule) // 上传
                             val msg = if (ok) "已上传：${rule.name}" else "上传失败，检查 Token/网络/日志" // 结果文案
-                            Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show() // Toast
+                            withContext(Dispatchers.Main) { // 切主线程显示 Toast
+                                Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show() // Toast
+                            }
                         }
                     }
                 )

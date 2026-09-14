@@ -14,14 +14,19 @@ import kotlinx.coroutines.flow.Flow  // 导入 Flow，冷流
 import kotlinx.coroutines.flow.map  // 导入 map 操作符
 
 /**
+ * 全局 DataStore 委托（文件级别，整个应用共享一个实例）。
+ * 必须定义在顶层，不能放在类内部——否则每次实例化 SettingsStore
+ * 都会创建新的 dataStore 属性，导致 "multiple DataStores active for the same file" 崩溃。
+ */
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")  // 顶层 DataStore 委托，名为 "settings"
+
+/**
  * 全局设置存储（DataStore）。
  *
  * 注意：因为 [Logger] 在 [App.onCreate] 早期就要读 logEnabled，
  * 这里没有依赖注入；直接构造即可。
  */
 class SettingsStore(private val context: Context) {  // 设置存储类
-
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")  // 顶层 DataStore 委托，名为 "settings"
 
     /** 日志开关：控制 Logger V/D 级输出（I/W/E 始终输出）。 */
     val logEnabled: Flow<Boolean> = context.dataStore.data.map { it[KEY_LOG] ?: false }  // 日志开关 Flow，默认 false

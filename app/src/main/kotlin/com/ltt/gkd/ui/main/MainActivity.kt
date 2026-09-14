@@ -4,6 +4,7 @@ import android.content.Intent // 导入 Intent，用于跳转 Activity
 import android.net.Uri // 导入 Uri，用于文件选择返回的 URI
 import android.os.Bundle // 导入 Bundle，用于保存/恢复状态
 import android.provider.Settings // 导入系统 Settings，用于跳转无障碍设置页
+import android.view.accessibility.AccessibilityManager // 导入无障碍管理器，检测服务启用状态
 import android.widget.Toast // 导入 Toast，用于底部短提示
 import androidx.activity.ComponentActivity // 导入 ComponentActivity，Jetpack Activity 基类
 import androidx.activity.compose.rememberLauncherForActivityResult // 导入 Compose 中启动 Activity 结果的辅助函数
@@ -70,14 +71,16 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                 val app = App.get() // 获取全局应用实例
 
                 // 服务运行状态（ON_RESUME 时刷新）
+                // 检测逻辑：优先检查系统设置中无障碍服务是否启用，再检查服务实例是否运行
+                // 这样可避免应用崩溃后服务重启期间误显示"已关闭"
                 var serviceOn by remember { // 声明可变状态 serviceOn
-                    mutableStateOf(SkipAccessibilityService.instance != null) // 初始值取服务单例是否非空
+                    mutableStateOf(isAccessibilityEnabled()) // 初始值用系统设置状态判断
                 }
                 val lifecycleOwner = LocalLifecycleOwner.current // 取当前生命周期所有者
                 DisposableEffect(lifecycleOwner) { // 注册生命周期副作用
                     val observer = LifecycleEventObserver { _, e -> // 创建事件观察者
                         if (e == Lifecycle.Event.ON_RESUME) { // 当事件为 ON_RESUME
-                            serviceOn = SkipAccessibilityService.instance != null // 刷新服务运行状态
+                            serviceOn = isAccessibilityEnabled() // 刷新服务运行状态
                         }
                     }
                     lifecycleOwner.lifecycle.addObserver(observer) // 注册观察者
@@ -177,14 +180,15 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                     onEditRule = { id -> // 编辑规则回调
                                         RuleEditActivity.start(this@MainActivity, id) // 跳转编辑页
                                     },
-                                    onSyncSubscribed = { syncSubscribed() }, // 同步订阅
+                                    onSyncSubscribed = { onDone -> syncSubscribed(onDone) }, // 同步订阅，带完成回调
                                     onImport = { // 导入回调
-                                        importLauncher.launch(arrayOf("application/json", "*/*")) // 启动选择器
+                                        importLauncher.launch(arrayOf("application/json", "text/plain")) // 启动选择器，仅 JSON/文本
                                     },
                                     onExport = { // 导出回调
                                         exportLauncher.launch("ltt_rules_export.json") // 启动创建文档
                                     },
-                                    onPreviewBuiltIn = { name -> repo.readBuiltInRaw(name) } // 预览内置规则
+                                    onPreviewBuiltIn = { name -> repo.readBuiltInRaw(name) }, // 预览内置规则
+                                    onGoToSettings = { tab = 2 } // 无订阅源时跳转到设置 Tab
                                 )
                                 2 -> SettingsScreen( // 设置页
                                     settings = app.settings, // 设置存储
@@ -207,7 +211,7 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                                 AppListActivity::class.java) // 目标类
                                         )
                                     },
-                                    onSyncSubscribed = { syncSubscribed() } // 同步订阅
+                                    onSyncSubscribed = { onDone -> syncSubscribed(onDone) } // 同步订阅，带完成回调
                                 )
                             }
                         }
@@ -223,15 +227,19 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
      * 流程：校验 Gist ID → 拉取规则集与订阅数 → 清空旧订阅文件 →
      * 写入新规则文件（标记来源为 SUBSCRIBED 并填充订阅数）→ 触发仓库 reload。
      * 失败时通过 Toast 提示检查 Gist ID/Token/网络。
+     *
+     * @param onDone 同步完成回调，参数为是否成功（用于 UI 解除 loading 状态）。
      */
-    private fun syncSubscribed() { // 同步订阅规则
+    private fun syncSubscribed(onDone: (Boolean) -> Unit = {}) { // 同步订阅规则，带完成回调
         launchSafe { // 安全启动协程
             val settings = App.get().settings // 取设置存储
             val gistId = settings.gistId.first() // 取 Gist ID 首值
             if (gistId.isEmpty()) { // 未配置 Gist ID
-                toast("未配置 Gist ID，请在设置中填写") // 提示用户
+                toast("未配置订阅源，请先在设置中填写 Gist ID") // 提示用户
+                onDone(false) // 回调失败
                 return@launchSafe // 中止
             }
+            toast("正在同步订阅规则…") // 同步中提示
             val ok = runCatching { // 尝试执行可能失败的代码块
                 val rsList = gist.fetchRuleSets(gistId) // 拉取规则集列表
                 if (rsList.isEmpty()) return@runCatching false // 没规则返回 false
@@ -254,7 +262,12 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
             }.getOrElse { // 捕获异常
                 Logger.w("同步订阅失败", it); false // 记录警告并返回 false
             }
-            toast(if (ok) "已同步订阅规则" else "同步失败，检查 Gist ID/Token/网络") // 根据结果 Toast
+            if (ok) { // 同步成功
+                toast("已同步订阅规则") // 提示成功
+            } else { // 同步失败
+                toast("同步失败，请重新检查订阅源（Gist ID / Token / 网络）") // 提示检查订阅源
+            }
+            onDone(ok) // 回调完成状态
         }
     }
 
@@ -306,6 +319,33 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
     }
 
     private fun toast(msg: String) { // Toast 辅助函数
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() // 显示短 Toast
+        // launchSafe 协程运行在 Dispatchers.Default，Toast 必须在主线程调用
+        runOnUiThread { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() } // 切换到主线程显示 Toast
+    }
+
+    /**
+     * 检测无障碍服务是否已启用。
+     *
+     * 检查系统设置中的无障碍开关状态 + 服务实例是否运行。
+     * 优先看系统设置：如果设置中已启用，即使服务因崩溃短暂未重启也视为"已开启"，
+     * 避免用户误以为需要重新去设置里开关一次。
+     */
+    private fun isAccessibilityEnabled(): Boolean { // 检测无障碍服务启用状态
+        // 1. 检查服务实例是否正在运行
+        if (SkipAccessibilityService.instance != null) return true // 服务实例存在，直接返回 true
+        // 2. 通过系统设置字符串检测（兼容 OPPO 等 ROM）
+        val enabled = android.provider.Settings.Secure.getString( // 读取安全设置
+            contentResolver, android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES // 已启用无障碍服务键
+        ) ?: "" // 为空时用空串
+        // 检查字符串中是否包含本应用的无障碍服务组件名
+        if (enabled.contains("$packageName/")) return true // 包含包名即视为启用
+        // 3. 兜底：通过 AccessibilityManager 检测
+        val am = getSystemService(ACCESSIBILITY_SERVICE) as? AccessibilityManager // 取无障碍管理器
+        val enabledServices = am?.getEnabledAccessibilityServiceList( // 获取已启用的无障碍服务列表
+            android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK // 所有反馈类型
+        ) ?: emptyList() // 为空时返回空列表
+        return enabledServices.any { info -> // 只要有一个匹配本应用包名即视为启用
+            info.resolveInfo.serviceInfo.packageName == packageName // 匹配包名
+        }
     }
 }
