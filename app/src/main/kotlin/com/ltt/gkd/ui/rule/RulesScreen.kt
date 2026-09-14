@@ -21,10 +21,12 @@ import androidx.compose.material.icons.automirrored.filled.InsertDriveFile // �
 import androidx.compose.material.icons.filled.Add // 导入加号图标
 import androidx.compose.material.icons.filled.CloudDownload // 导入云下载图标
 import androidx.compose.material.icons.filled.CloudUpload // 导入云上传图标
+import androidx.compose.material.icons.filled.ContentPaste // 导入粘贴图标（粘贴 JSON 导入）
 import androidx.compose.material.icons.filled.Delete // 导入删除图标
 import androidx.compose.material.icons.filled.Folder // 导入文件夹图标
 import androidx.compose.material.icons.filled.MoreVert // 导入三点菜单图标
 import androidx.compose.material.icons.filled.Person // 导入人物图标（作者展示）
+import androidx.compose.material.icons.filled.Star // 导入星标图标（已分享标记）
 import androidx.compose.material.icons.filled.Whatshot // 导入火焰图标（热门规则）
 import androidx.compose.material3.AlertDialog // 导入对话框
 import androidx.compose.material3.DropdownMenu // 导入下拉菜单
@@ -34,6 +36,7 @@ import androidx.compose.material3.FloatingActionButton // 导入悬浮按钮
 import androidx.compose.material3.Icon // 导入图标组件
 import androidx.compose.material3.IconButton // 导入图标按钮
 import androidx.compose.material3.MaterialTheme // 导入主题
+import androidx.compose.material3.OutlinedTextField // 导入描边文本框（粘贴导入用）
 import androidx.compose.material3.OutlinedButton // 导入描边按钮
 import androidx.compose.material3.Scaffold // 导入骨架
 import androidx.compose.material3.Surface // 导入 Surface 容器
@@ -67,6 +70,10 @@ import com.ltt.gkd.ui.theme.AccentAmber // 导入主题强调琥珀色（亮色�
 import com.ltt.gkd.ui.theme.AmberBadgeBg // 导入琥珀色徽章背景（亮色）
 import com.ltt.gkd.ui.theme.DarkAccentAmber // 导入深色模式琥珀色前景
 import com.ltt.gkd.ui.theme.DarkAmberBadgeBg // 导入深色琥珀色徽章背景
+import com.ltt.gkd.ui.theme.AccentBlue // 导入主题强调蓝色（亮色，已分享徽章）
+import com.ltt.gkd.ui.theme.BlueBadgeBg // 导入蓝色徽章背景（亮色）
+import com.ltt.gkd.ui.theme.DarkAccentBlue // 导入深色模式蓝色前景
+import com.ltt.gkd.ui.theme.DarkBlueBadgeBg // 导入深色蓝色徽章背景
 import androidx.compose.foundation.isSystemInDarkTheme // 导入深色主题判断函数
 import kotlinx.coroutines.launch // 导入协程启动
 
@@ -79,6 +86,7 @@ import kotlinx.coroutines.launch // 导入协程启动
  * @param onEditRule 点击规则卡片回调，参数为规则 ID，跳转编辑页修改。
  * @param onSyncSubscribed 点击"同步订阅"FAB 回调，拉取远程订阅规则。
  * @param onImport 选择导入文件回调，由调用方启动文件选择器。
+ * @param onImportFromText 从粘贴的 RuleSet JSON 文本导入规则的回调。
  * @param onExport 选择导出文件回调，由调用方启动文件创建器。
  * @param onPreviewBuiltIn 预览内置规则文件回调，参数为文件名，返回文件内容或 null。
  */
@@ -91,6 +99,7 @@ fun RulesScreen( // 规则管理主组件
     onEditRule: (String) -> Unit, // 编辑规则回调
     onSyncSubscribed: ((Boolean) -> Unit) -> Unit, // 同步订阅回调，参数为完成回调(是否成功)
     onImport: () -> Unit, // 导入回调
+    onImportFromText: (String) -> Unit = {}, // 粘贴 JSON 代码导入回调
     onExport: () -> Unit, // 导出回调
     onPreviewBuiltIn: (String) -> String?, // 预览内置规则回调
     onGoToSettings: () -> Unit = {} // 无订阅源时跳转设置页的回调
@@ -102,12 +111,16 @@ fun RulesScreen( // 规则管理主组件
     val disabledIds by settings.disabledRuleIds.collectAsState(initial = emptySet()) // 已禁用 ID 集合
     val gistId by settings.gistId.collectAsState(initial = "") // 订阅源 Gist ID
     val builtInFiles = remember { repo.listBuiltInRuleFiles() } // 内置规则文件名列表
+    // 订阅规则的 id -> 使用量映射：本地"已分享"规则据此联动显示社区使用量（同步后生效）
+    val subscribedUsageById = remember(subscribed) { subscribed.associate { it.id to it.subscribers } } // id→使用量
 
     var tabIndex by remember { mutableStateOf(0) } // 当前 Tab 索引
     var menuOpen by remember { mutableStateOf(false) } // 三点菜单展开状态
     var deleteTarget by remember { mutableStateOf<Rule?>(null) } // 待删除规则
     var preview by remember { mutableStateOf<Pair<String, String?>?>(null) } // 内置规则预览内容
     var syncing by remember { mutableStateOf(false) } // 同步中状态，控制 FAB loading 显示
+    var pasteOpen by remember { mutableStateOf(false) } // 粘贴导入对话框展开状态
+    var pasteText by remember { mutableStateOf("") } // 粘贴导入的 JSON 文本
 
     LaunchedEffect(Unit) { repo.reload() } // 首次进入重新加载规则
 
@@ -127,6 +140,12 @@ fun RulesScreen( // 规则管理主组件
                                 text = { Text("导入规则") }, // 文案
                                 onClick = { menuOpen = false; onImport() }, // 关闭并触发导入
                                 leadingIcon = { Icon(Icons.AutoMirrored.Filled.InsertDriveFile, null) } // 文件图标
+                            )
+                            // 粘贴导入：直接粘贴 RuleSet JSON 代码导入（与文件导入同格式）
+                            DropdownMenuItem( // 粘贴导入菜单项
+                                text = { Text("粘贴 JSON 导入") }, // 文案
+                                onClick = { menuOpen = false; pasteText = ""; pasteOpen = true }, // 关闭菜单并打开粘贴对话框
+                                leadingIcon = { Icon(Icons.Filled.ContentPaste, null) } // 粘贴图标
                             )
                             // 导出：将本地规则打包为 JSON 写入用户选择的文件
                             DropdownMenuItem( // 导出菜单项
@@ -188,7 +207,8 @@ fun RulesScreen( // 规则管理主组件
                     emptyHint = "暂无本地规则，点右下角 + 新建", // 空态提示
                     onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
                     onClick = { onEditRule(it.id) }, // 点击编辑
-                    onDelete = { deleteTarget = it } // 删除目标
+                    onDelete = { deleteTarget = it }, // 删除目标
+                    uploadedUsageById = subscribedUsageById // 已上传本地规则的社区使用量联动
                 )
                 1 -> RuleListContent( // 订阅规则列表
                     rules = subscribed, // 规则
@@ -245,6 +265,44 @@ fun RulesScreen( // 规则管理主组件
             }
         )
     }
+
+    // 粘贴导入弹窗：直接粘贴 RuleSet JSON 代码导入（与文件导入同一格式）
+    if (pasteOpen) { // 展开时显示
+        AlertDialog( // 对话框
+            onDismissRequest = { pasteOpen = false }, // 关闭
+            title = { Text("粘贴 JSON 导入") }, // 标题
+            text = { // 内容区
+                Column { // 纵向容器
+                    Text( // 说明文案
+                        "粘贴导出/分享的 RuleSet JSON 内容，与文件导入格式一致。", // 提示
+                        fontSize = 11.sp, // 字号
+                        color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
+                    )
+                    Spacer(Modifier.height(8.dp)) // 间距
+                    OutlinedTextField( // 多行文本框
+                        value = pasteText, // 绑定粘贴文本
+                        onValueChange = { pasteText = it }, // 输入回调
+                        placeholder = { Text("{\n  \"name\": ...,\n  \"rules\": [ ... ]\n}", fontSize = 11.sp) }, // 占位示例
+                        modifier = Modifier.fillMaxWidth().height(200.dp), // 占满宽度并限定高度
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 11.sp) // 小字号便于查看 JSON
+                    )
+                }
+            },
+            confirmButton = { // 导入按钮
+                OutlinedButton( // 描边按钮
+                    onClick = { // 点击导入
+                        onImportFromText(pasteText.trim()) // 触发粘贴导入
+                        pasteOpen = false // 关闭对话框
+                        pasteText = "" // 清空文本
+                    },
+                    enabled = pasteText.isNotBlank() // 非空才可点
+                ) { Text("导入") } // 文案
+            },
+            dismissButton = { // 取消按钮
+                OutlinedButton(onClick = { pasteOpen = false }) { Text("取消") } // 关闭对话框
+            }
+        )
+    }
 }
 
 /**
@@ -258,6 +316,7 @@ fun RulesScreen( // 规则管理主组件
  * @param onDelete 删除按钮回调；为 null 时不显示删除按钮（订阅 Tab）。
  * @param showUsage 是否在卡片上展示作者与使用量等社区数据（订阅 Tab 用）。
  * @param usageHeader 列表顶部的使用量汇总文案；为 null 时不显示汇总头。
+ * @param uploadedUsageById 规则 ID → 社区使用量映射；供本地"已分享"规则联动展示（本地 Tab 用）。
  */
 @Composable // 标记为 Composable
 private fun RuleListContent( // 规则列表内容
@@ -268,7 +327,8 @@ private fun RuleListContent( // 规则列表内容
     onClick: (Rule) -> Unit, // 点击卡片
     onDelete: ((Rule) -> Unit)?, // 删除回调，可为空
     showUsage: Boolean = false, // 是否展示社区使用量数据
-    usageHeader: String? = null // 顶部使用量汇总文案
+    usageHeader: String? = null, // 顶部使用量汇总文案
+    uploadedUsageById: Map<String, Int> = emptyMap() // 已分享本地规则的使用量映射
 ) {
     if (rules.isEmpty()) { // 列表为空
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { // 居中容器
@@ -298,7 +358,9 @@ private fun RuleListContent( // 规则列表内容
                 onToggle = { on -> onToggle(rule, on) }, // 开关切换
                 onClick = { onClick(rule) }, // 点击卡片
                 onDelete = onDelete?.let { { it(rule) } }, // 删除回调
-                showUsage = showUsage // 是否展示使用量
+                showUsage = showUsage, // 是否展示使用量
+                // 已分享的本地规则联动社区使用量：仅当 uploaded 为真时取值，否则 null
+                uploadedUsage = if (rule.uploaded) uploadedUsageById[rule.id] else null // 已分享规则的使用量
             )
         }
     }
@@ -377,6 +439,7 @@ private fun BuiltInContent( // 内置规则内容
  * @param onClick 点击卡片回调；为 null 时卡片不可点击（内置 Tab）。
  * @param onDelete 删除按钮回调；为 null 时不显示删除按钮。
  * @param showUsage 是否展示社区数据（作者、使用量、热门徽章）。
+ * @param uploadedUsage 本地"已分享"规则从订阅同步回来的社区使用量；null 表示尚未同步到。
  */
 @Composable // 标记为 Composable
 private fun RuleCard( // 单条规则卡片
@@ -385,7 +448,8 @@ private fun RuleCard( // 单条规则卡片
     onToggle: (Boolean) -> Unit, // 开关切换
     onClick: (() -> Unit)?, // 点击回调，可为空
     onDelete: (() -> Unit)?, // 删除回调，可为空
-    showUsage: Boolean = false // 是否展示社区使用量数据
+    showUsage: Boolean = false, // 是否展示社区使用量数据
+    uploadedUsage: Int? = null // 已分享本地规则同步回来的使用量
 ) {
     Surface( // 卡片容器
         modifier = Modifier.fillMaxWidth().then( // 占满宽度
@@ -407,6 +471,11 @@ private fun RuleCard( // 单条规则卡片
                         modifier = Modifier.weight(1f, fill = false) // 不强制填满
                     )
                     Spacer(Modifier.width(6.dp)) // 间距
+                    // 已分享徽章：本地规则被上传到社区时展示的特殊标记
+                    if (rule.uploaded) { // 该本地规则已分享
+                        UploadedBadge() // "已分享"徽章
+                        Spacer(Modifier.width(4.dp)) // 与其它徽章间距
+                    }
                     // 热门徽章：使用量达到阈值时展示，排在来源徽章之前
                     if (showUsage && rule.subscribers >= HOT_SUBSCRIBER_THRESHOLD) { // 达到热门阈值
                         HotBadge() // 热门徽章
@@ -430,6 +499,32 @@ private fun RuleCard( // 单条规则卡片
                         fontSize = 11.sp, // 字号
                         color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
                     )
+                }
+                if (rule.uploaded) { // 已分享本地规则：展示与订阅同步回来的社区使用量
+                    val dark = isSystemInDarkTheme() // 深色模式判断
+                    val hasUsage = uploadedUsage != null && uploadedUsage > 0 // 是否已有使用量
+                    val emphasis = if (dark) DarkAccentBlue else AccentBlue // 强调蓝（深色适配）
+                    Spacer(Modifier.height(4.dp)) // 与上一行间距
+                    Row( // 使用量行
+                        verticalAlignment = Alignment.CenterVertically, // 垂直居中
+                        horizontalArrangement = Arrangement.spacedBy(6.dp) // 间距
+                    ) {
+                        Icon( // 使用量图标
+                            Icons.Filled.Whatshot, contentDescription = null, // 无障碍描述留空
+                            tint = if (hasUsage) emphasis else MaterialTheme.colorScheme.outline, // 有使用量时蓝色强调
+                            modifier = Modifier.size(12.dp) // 图标尺寸
+                        )
+                        Text( // 使用量文案（鼓励用户上传分享）
+                            when { // 按同步状态分支
+                                uploadedUsage == null -> "已分享到社区，同步后显示使用量" // 尚未同步到使用量
+                                uploadedUsage > 0 -> "已被 ${formatCount(uploadedUsage)} 人使用 · 感谢分享" // 已被他人使用
+                                else -> "已分享到社区，暂未被使用" // 已同步但使用量为 0
+                            },
+                            fontSize = 11.sp, // 字号
+                            color = if (hasUsage) emphasis else MaterialTheme.colorScheme.onSurfaceVariant, // 有使用量时蓝色强调
+                            maxLines = 1 // 单行
+                        )
+                    }
                 }
                 if (showUsage) { // 展示社区数据行：作者 + 使用量
                     Spacer(Modifier.height(4.dp)) // 与上一行间距
@@ -562,6 +657,37 @@ private fun HotBadge() { // 热门徽章
         Spacer(Modifier.width(2.dp)) // 图标与文字间距
         Text( // 徽章文本
             "热门", // 文案
+            fontSize = 9.sp, // 极小字号
+            color = fg // 前景色
+        )
+    }
+}
+
+/**
+ * 已分享徽章：星标图标 + "已分享"文案，使用蓝色（深色模式自动切换暗色变体）。
+ *
+ * 用于标记当前用户已上传到社区的本地规则，配合卡片上的使用量联动，
+ * 让"上传分享"这件事有可见的正反馈。
+ */
+@Composable // 标记为 Composable
+private fun UploadedBadge() { // 已分享徽章
+    val dark = isSystemInDarkTheme() // 判断深色模式
+    val bg = if (dark) DarkBlueBadgeBg else BlueBadgeBg // 背景色（深色适配）
+    val fg = if (dark) DarkAccentBlue else AccentBlue // 前景色（深色适配）
+    Row( // 横向布局
+        verticalAlignment = Alignment.CenterVertically, // 垂直居中
+        modifier = Modifier // 修饰符链
+            .background(bg, RoundedCornerShape(8.dp)) // 圆角背景
+            .padding(horizontal = 6.dp, vertical = 2.dp) // 内边距
+    ) {
+        Icon( // 星标图标
+            Icons.Filled.Star, contentDescription = null, // 无障碍描述留空
+            tint = fg, // 前景色
+            modifier = Modifier.size(10.dp) // 图标尺寸
+        )
+        Spacer(Modifier.width(2.dp)) // 图标与文字间距
+        Text( // 徽章文本
+            "已分享", // 文案
             fontSize = 9.sp, // 极小字号
             color = fg // 前景色
         )

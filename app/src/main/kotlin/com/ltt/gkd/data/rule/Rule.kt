@@ -83,6 +83,8 @@ enum class ActionType { CLICK_NODE, CLICK_COORD, BACK, GESTURE_TAP }  // 动作�
  * @param createdAt 创建时间戳（毫秒）；本地规则按此倒序排序
  * @param subscribers 订阅数；订阅规则按此倒序排序
  * @param source 规则来源（本地/订阅/内置），运行时不存 JSON，由文件路径决定
+ * @param uploaded 该本地规则是否已被当前用户上传/分享到社区；用于在本地卡片展示
+ *   "已分享"特殊标记，并与订阅同步回来的使用量联动显示（让上传更有成就感）
  */
 @JsonClass(generateAdapter = true)  // 标记 Moshi 自动生成该数据类的 JSON 适配器
 data class Rule(  // 单条规则数据类，描述如何识别并跳过某应用的广告
@@ -97,6 +99,7 @@ data class Rule(  // 单条规则数据类，描述如何识别并跳过某应�
     val createdAt: Long = 0L,  // 创建时间戳（毫秒）
     val subscribers: Int = 0,  // 订阅数
     val source: RuleSource = RuleSource.LOCAL,  // 规则来源（本地/订阅/内置）
+    val uploaded: Boolean = false,  // 是否已被当前用户上传/分享到社区（本地卡片特殊标记用）
     val match: MatchTarget = MatchTarget(),  // 匹配目标，描述如何定位广告按钮
     val action: MatchAction = MatchAction()  // 命中后执行的动作
 )

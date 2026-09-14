@@ -155,6 +155,10 @@ fun RuleEditScreen( // 规则编辑主组件
         matchType = matchType, textCsv = textCsv, idsCsv = idsCsv, // 匹配相关
         regex = regex, caseInsensitive = caseInsensitive, // 正则与大小写
         actionType = actionType, actionDelayMs = actionDelayMs // 动作相关
+    ).copy( // 保留社区/身份字段，避免编辑保存后丢失"已分享"标记与使用量联动
+        author = initial.author, // 保留原作者
+        subscribers = initial.subscribers, // 保留原使用量
+        uploaded = initial.uploaded // 保留已分享标记
     )
 
     Scaffold( // 骨架

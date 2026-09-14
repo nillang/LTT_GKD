@@ -184,6 +184,7 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                     onImport = { // 导入回调
                                         importLauncher.launch(arrayOf("application/json", "text/plain")) // 启动选择器，仅 JSON/文本
                                     },
+                                    onImportFromText = { json -> importRulesFromText(json) }, // 粘贴 JSON 代码导入
                                     onExport = { // 导出回调
                                         exportLauncher.launch("ltt_rules_export.json") // 启动创建文档
                                     },
@@ -305,17 +306,41 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
             val json = contentResolver.openInputStream(uri)?.use { // 打开输入流
                 it.bufferedReader().readText() // 读取全部文本
             } ?: return@launchSafe // 为空则中止
-            val rs = runCatching { globalAdapter<RuleSet>().fromJson(json) }.getOrNull() // 尝试反序列化为 RuleSet
-            if (rs == null) { // 解析失败
-                toast("文件格式错误，导入失败"); return@launchSafe // 提示并中止
-            }
-            var imported = 0 // 已导入计数
-            rs.rules.forEach { rule: Rule -> // 遍历每条规则
-                if (repo.saveLocalRule(rule)) imported++ // 保存成功则计数
-            }
-            repo.reload() // 触发仓库重新加载
-            toast("成功导入 $imported 条规则") // 提示结果
+            importRulesFromJson(json) // 复用统一的 JSON 导入逻辑
         }
+    }
+
+    /**
+     * 从粘贴的 JSON 代码导入规则（导入方式二：直接粘贴 RuleSet JSON 文本）。
+     *
+     * 与文件导入共用 [importRulesFromJson] 解析逻辑，格式即本应用导出/订阅所用的
+     * `RuleSet` JSON，因此"文件"与"代码"两种来源天然兼容同一套序列化格式。
+     *
+     * @param json 用户粘贴的 RuleSet JSON 文本。
+     */
+    private fun importRulesFromText(json: String) { // 从粘贴文本导入规则
+        launchSafe { importRulesFromJson(json) } // 安全启动协程并复用统一解析
+    }
+
+    /**
+     * 解析 RuleSet JSON 并逐条保存到本地仓库（文件导入与粘贴导入共用）。
+     *
+     * 导入的规则统一置 `uploaded=false`：导入内容并非当前用户所分享，
+     * 不应携带原作者的"已分享"标记，避免本地卡片误显示分享徽章与使用量联动。
+     *
+     * @param json RuleSet JSON 文本；解析失败时 Toast 提示并中止。
+     */
+    private suspend fun importRulesFromJson(json: String) { // 统一的 JSON 导入解析逻辑
+        val rs = runCatching { globalAdapter<RuleSet>().fromJson(json) }.getOrNull() // 尝试反序列化为 RuleSet
+        if (rs == null) { // 解析失败
+            toast("格式错误，导入失败（需为 RuleSet JSON）"); return // 提示并中止
+        }
+        var imported = 0 // 已导入计数
+        rs.rules.forEach { rule: Rule -> // 遍历每条规则
+            if (repo.saveLocalRule(rule.copy(uploaded = false))) imported++ // 保存（清除已分享标记）成功则计数
+        }
+        repo.reload() // 触发仓库重新加载
+        toast("成功导入 $imported 条规则") // 提示结果
     }
 
     private fun toast(msg: String) { // Toast 辅助函数

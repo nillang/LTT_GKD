@@ -136,7 +136,7 @@ class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
             }
             // 已存在且作者是自己 → 允许覆盖更新；不存在 → 正常上传
         }
-        val ruleWithMeta = rule.copy(author = author, createdAt = System.currentTimeMillis()) // 补作者与时间
+        val ruleWithMeta = rule.copy(author = author, createdAt = System.currentTimeMillis(), uploaded = false) // 补作者与时间；分享到社区的副本不带本地"已分享"标记
         val ruleSet = com.ltt.gkd.data.rule.RuleSet( // 组装 RuleSet
             name = ruleWithMeta.name, // 名称
             version = 1, // 版本
@@ -154,8 +154,9 @@ class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
         if (ok && gistId.isEmpty() && newGistId.isNotEmpty()) { // 首次上传成功且原 Gist ID 为空
             settings.setGistId(newGistId) // 回写 Gist ID
         }
-        // 上传成功后同时保存一份到本地（便于复用）
-        if (ok) repo.saveLocalRule(ruleWithMeta) // 同步本地
+        // 上传成功后同时保存一份到本地（便于复用），并标记 uploaded=true，
+        // 使本地规则卡片展示"已分享"特殊标记并与订阅使用量联动
+        if (ok) repo.saveLocalRule(ruleWithMeta.copy(uploaded = true)) // 同步本地（标记已分享）
         ok // 返回结果
     }
 
