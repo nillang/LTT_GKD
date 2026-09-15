@@ -2,6 +2,8 @@ package com.ltt.gkd.ui.rule // 声明包名，对应规则界面目录
 
 import androidx.compose.foundation.background // 导入背景修饰符
 import androidx.compose.foundation.clickable // 导入点击修饰符
+import androidx.compose.foundation.rememberScrollState // 导入滚动状态（订阅源列表）
+import androidx.compose.foundation.verticalScroll // 导入纵向滚动修饰符（订阅源列表）
 import androidx.compose.foundation.layout.Arrangement // 导入排列方向
 import androidx.compose.foundation.layout.Box // 导入 Box 容器
 import androidx.compose.foundation.layout.Column // 导入纵向容器
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer // 导入占位
 import androidx.compose.foundation.layout.fillMaxSize // 导入填满尺寸
 import androidx.compose.foundation.layout.fillMaxWidth // 导入填满宽度
 import androidx.compose.foundation.layout.height // 导入高度
+import androidx.compose.foundation.layout.heightIn // 导入高度约束（订阅源列表限高）
 import androidx.compose.foundation.layout.padding // 导入内边距
 import androidx.compose.foundation.layout.size // 导入尺寸
 import androidx.compose.foundation.layout.width // 导入宽度
@@ -26,6 +29,7 @@ import androidx.compose.material.icons.filled.Delete // 导入删除图标
 import androidx.compose.material.icons.filled.Folder // 导入文件夹图标
 import androidx.compose.material.icons.filled.MoreVert // 导入三点菜单图标
 import androidx.compose.material.icons.filled.Person // 导入人物图标（作者展示）
+import androidx.compose.material.icons.filled.Refresh // 导入刷新图标（单源同步）
 import androidx.compose.material.icons.filled.Star // 导入星标图标（已分享标记）
 import androidx.compose.material.icons.filled.Whatshot // 导入火焰图标（热门规则）
 import androidx.compose.material3.AlertDialog // 导入对话框
@@ -44,6 +48,7 @@ import androidx.compose.material3.Switch // 导入开关组件
 import androidx.compose.material3.Tab // 导入 Tab 项
 import androidx.compose.material3.TabRow // 导入 Tab 容器
 import androidx.compose.material3.Text // 导入文本组件
+import androidx.compose.material3.TextButton // 导入文本按钮（全部同步）
 import androidx.compose.material3.TopAppBar // 导入顶部应用栏
 import androidx.compose.runtime.Composable // 导入 Composable 注解
 import androidx.compose.runtime.LaunchedEffect // 导入一次性副作用
@@ -56,6 +61,7 @@ import androidx.compose.runtime.setValue // 导入 setValue 委托
 import androidx.compose.ui.Alignment // 导入对齐
 import androidx.compose.ui.Modifier // 导入修饰符
 import androidx.compose.ui.text.font.FontWeight // 导入字体粗细
+import androidx.compose.ui.text.style.TextOverflow // 导入文本溢出省略（订阅源链接）
 import androidx.compose.ui.unit.dp // 导入 dp 单位
 import androidx.compose.ui.unit.sp // 导入 sp 单位
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储
@@ -63,6 +69,11 @@ import com.ltt.gkd.data.rule.Rule // 导入规则数据类
 import com.ltt.gkd.data.rule.RuleGroup // 导入规则合集数据类（内置分组）
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
 import com.ltt.gkd.data.rule.RuleSource // 导入规则来源枚举
+import com.ltt.gkd.data.subscription.SourceType // 导入订阅源类型枚举
+import com.ltt.gkd.data.subscription.SubscriptionSource // 导入订阅源数据类
+import com.ltt.gkd.data.subscription.SubscriptionStore // 导入订阅源存储
+import com.ltt.gkd.data.subscription.SubscriptionSyncer // 导入订阅同步器
+import com.ltt.gkd.data.subscription.SubscriptionUrls // 导入订阅链接识别工具
 import com.ltt.gkd.ui.theme.AccentPurple // 导入主题强调紫色（亮色）
 import com.ltt.gkd.ui.theme.PurpleBadgeBg // 导入主题紫色徽章背景（亮色）
 import com.ltt.gkd.ui.theme.DarkAccentPurple // 导入深色模式紫色前景
@@ -85,7 +96,7 @@ import kotlinx.coroutines.launch // 导入协程启动
  * @param settings 设置存储，用于读写规则启用/禁用集合。
  * @param onAddNew 点击"新增规则"FAB 回调，跳转规则编辑页新建。
  * @param onEditRule 点击规则卡片回调，参数为规则 ID，跳转编辑页修改。
- * @param onSyncSubscribed 点击"同步订阅"FAB 回调，拉取远程订阅规则。
+ * @param subscriptions 订阅源存储（多源），订阅 Tab 的源管理（增删/开关/同步）依赖它。
  * @param onImport 选择导入文件回调，由调用方启动文件选择器。
  * @param onImportFromText 从粘贴的 RuleSet JSON 文本导入规则的回调。
  * @param onExport 选择导出文件回调，由调用方启动文件创建器。
@@ -96,14 +107,13 @@ import kotlinx.coroutines.launch // 导入协程启动
 fun RulesScreen( // 规则管理主组件
     repo: RuleRepository, // 规则仓库
     settings: SettingsStore, // 设置存储
+    subscriptions: SubscriptionStore, // 订阅源存储（多源）
     onAddNew: () -> Unit, // 新增规则回调
     onEditRule: (String) -> Unit, // 编辑规则回调
-    onSyncSubscribed: ((Boolean) -> Unit) -> Unit, // 同步订阅回调，参数为完成回调(是否成功)
     onImport: () -> Unit, // 导入回调
     onImportFromText: (String) -> Unit = {}, // 粘贴 JSON 代码导入回调
     onExport: () -> Unit, // 导出回调
-    onPreviewBuiltIn: (String) -> String?, // 预览内置规则回调
-    onGoToSettings: () -> Unit = {} // 无订阅源时跳转设置页的回调
+    onPreviewBuiltIn: (String) -> String? // 预览内置规则回调
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
     val local by repo.localRules.collectAsState() // 本地规则列表
@@ -111,15 +121,20 @@ fun RulesScreen( // 规则管理主组件
     val builtIn by repo.builtInRules.collectAsState() // 内置规则列表
     val builtInGroups by repo.builtInGroups.collectAsState() // 内置规则合集分组（按合集展示）
     val disabledIds by settings.disabledRuleIds.collectAsState(initial = emptySet()) // 已禁用 ID 集合
-    val gistId by settings.gistId.collectAsState(initial = "") // 订阅源 Gist ID
+    val sources by subscriptions.sources.collectAsState(initial = emptyList()) // 订阅源列表（多源）
     // 订阅规则的 id -> 使用量映射：本地"已分享"规则据此联动显示社区使用量（同步后生效）
     val subscribedUsageById = remember(subscribed) { subscribed.associate { it.id to it.subscribers } } // id→使用量
+    val syncer = remember { SubscriptionSyncer() } // 订阅同步器（无状态，可复用）
 
     var tabIndex by remember { mutableStateOf(0) } // 当前 Tab 索引
     var menuOpen by remember { mutableStateOf(false) } // 三点菜单展开状态
     var deleteTarget by remember { mutableStateOf<Rule?>(null) } // 待删除规则
     var preview by remember { mutableStateOf<Pair<String, String?>?>(null) } // 内置规则预览内容
-    var syncing by remember { mutableStateOf(false) } // 同步中状态，控制 FAB loading 显示
+    var syncingAll by remember { mutableStateOf(false) } // 全部同步中状态
+    var syncingId by remember { mutableStateOf<String?>(null) } // 单源同步中的源 ID
+    var addSourceOpen by remember { mutableStateOf(false) } // 添加订阅源对话框展开状态
+    var addName by remember { mutableStateOf("") } // 添加订阅源：名称输入
+    var addUrl by remember { mutableStateOf("") } // 添加订阅源：链接输入
     var pasteOpen by remember { mutableStateOf(false) } // 粘贴导入对话框展开状态
     var pasteText by remember { mutableStateOf("") } // 粘贴导入的 JSON 文本
 
@@ -160,33 +175,19 @@ fun RulesScreen( // 规则管理主组件
             )
         },
         floatingActionButton = { // 悬浮按钮
-            // FAB 随当前 Tab 切换：本地 Tab 显示新增，订阅 Tab 显示同步，内置 Tab 无 FAB
+            // FAB 随当前 Tab 切换：本地 Tab 显示新增规则，订阅 Tab 显示添加订阅源，内置 Tab 无 FAB
             when (tabIndex) { // 按 Tab 显示不同 FAB
                 0 -> FloatingActionButton(onClick = onAddNew) { // 新增按钮
                     Icon(Icons.Filled.Add, contentDescription = "新增规则") // 加号图标
                 }
-                1 -> FloatingActionButton( // 同步按钮
-                    onClick = { // 点击同步
-                        if (gistId.isEmpty()) { // 未配置订阅源
-                            onGoToSettings() // 跳转设置页配置订阅源
-                        } else if (!syncing) { // 已配置且未在同步中
-                            syncing = true // 标记同步中，禁用重复点击
-                            onSyncSubscribed { _ -> // 执行同步，完成后回调
-                                syncing = false // 解除 loading 状态
-                                // 成功/失败由 syncSubscribed 内部 Toast 提示
-                            }
-                        }
+                1 -> FloatingActionButton( // 添加订阅源按钮
+                    onClick = { // 点击添加
+                        addName = "" // 清空名称
+                        addUrl = "" // 清空链接
+                        addSourceOpen = true // 打开添加对话框
                     }
                 ) {
-                    if (syncing) { // 同步中显示加载动画
-                        androidx.compose.material3.CircularProgressIndicator( // 加载圈
-                            modifier = Modifier.size(20.dp), // 尺寸
-                            color = MaterialTheme.colorScheme.onPrimary, // 颜色
-                            strokeWidth = 2.dp // 线宽
-                        )
-                    } else { // 非同步中显示云下载图标
-                        Icon(Icons.Filled.CloudDownload, contentDescription = "同步订阅") // 云下载图标
-                    }
+                    Icon(Icons.Filled.Add, contentDescription = "添加订阅源") // 加号图标
                 }
             }
         }
@@ -211,16 +212,52 @@ fun RulesScreen( // 规则管理主组件
                     onDelete = { deleteTarget = it }, // 删除目标
                     uploadedUsageById = subscribedUsageById // 已上传本地规则的社区使用量联动
                 )
-                1 -> RuleListContent( // 订阅规则列表
-                    rules = subscribed, // 规则
-                    disabledIds = disabledIds, // 禁用集合
-                    emptyHint = "暂无订阅规则，点右下角同步按钮拉取", // 空态提示
-                    onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
-                    onClick = { onEditRule(it.id) }, // 点击编辑
-                    onDelete = null, // 订阅不允许删除
-                    showUsage = true, // 展示作者与使用量（来源于 Gist 订阅数）
-                    usageHeader = "共 ${subscribed.size} 条 · 使用量（订阅数）${formatCount(subscribed.maxOfOrNull { it.subscribers } ?: 0)}" // 使用量=订阅源的订阅数（Gist 级，非逐条累加；空列表安全）
-                )
+                1 -> Column(Modifier.fillMaxSize()) { // 订阅 Tab：源管理 + 订阅规则列表
+                    SubscriptionSourceManager( // 订阅源管理区
+                        sources = sources, // 源列表
+                        syncingAll = syncingAll, // 全部同步中
+                        syncingId = syncingId, // 单源同步中
+                        onSyncAll = { // 全部同步
+                            if (!syncingAll && sources.any { it.enabled }) { // 有空闲且有启用源
+                                syncingAll = true // 标记同步中
+                                scope.launch { // 异步执行
+                                    syncer.syncAll(sources.filter { it.enabled }, subscriptions, repo) // 同步所有启用源
+                                    syncingAll = false // 解除
+                                }
+                            }
+                        },
+                        onSyncSource = { s -> // 单源同步
+                            if (syncingId == null) { // 空闲时
+                                syncingId = s.id // 标记该源同步中
+                                scope.launch { // 异步执行
+                                    syncer.syncAndPersist(s, subscriptions, repo) // 同步并持久化
+                                    syncingId = null // 解除
+                                }
+                            }
+                        },
+                        onToggleSource = { s, on -> scope.launch { subscriptions.setEnabled(s.id, on) } }, // 启用/禁用源
+                        onDeleteSource = { s -> // 删除源
+                            scope.launch { // 异步执行
+                                subscriptions.delete(s.id) // 删除源记录
+                                repo.subscribedDirFile.listFiles { f -> f.name.startsWith(s.id + "__") } // 该源下载的文件
+                                    ?.forEach { it.delete() } // 逐个删除
+                                repo.reload() // 重新加载合并规则
+                            }
+                        }
+                    )
+                    Box(Modifier.weight(1f)) { // 订阅规则列表占据剩余空间
+                        RuleListContent( // 订阅规则列表
+                            rules = subscribed, // 规则
+                            disabledIds = disabledIds, // 禁用集合
+                            emptyHint = "暂无订阅规则，添加订阅源后自动同步", // 空态提示
+                            onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
+                            onClick = { onEditRule(it.id) }, // 点击编辑
+                            onDelete = null, // 订阅不允许删除
+                            showUsage = true, // 展示作者与使用量（来源于 Gist 订阅数）
+                            usageHeader = "共 ${subscribed.size} 条 · 使用量（订阅数）${formatCount(subscribed.maxOfOrNull { it.subscribers } ?: 0)}" // 使用量=订阅源的订阅数
+                        )
+                    }
+                }
                 2 -> BuiltInContent( // 内置规则列表（按合集分组）
                     groups = builtInGroups, // 内置合集分组
                     disabledIds = disabledIds, // 禁用集合
@@ -303,6 +340,51 @@ fun RulesScreen( // 规则管理主组件
             },
             dismissButton = { // 取消按钮
                 OutlinedButton(onClick = { pasteOpen = false }) { Text("取消") } // 关闭对话框
+            }
+        )
+    }
+
+    // 添加订阅源弹窗：粘贴 Gist 链接/ID 或任意 RuleSet JSON 链接
+    if (addSourceOpen) { // 展开时显示
+        AlertDialog( // 对话框
+            onDismissRequest = { addSourceOpen = false }, // 关闭
+            title = { Text("添加订阅源") }, // 标题
+            text = { // 内容区
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { // 纵向容器
+                    OutlinedTextField( // 名称输入框
+                        value = addName, // 绑定名称
+                        onValueChange = { addName = it }, // 输入回调
+                        label = { Text("名称（可选）") }, // 标签
+                        placeholder = { Text("例如：我的规则") }, // 占位
+                        modifier = Modifier.fillMaxWidth(), // 占满
+                        singleLine = true // 单行
+                    )
+                    OutlinedTextField( // 链接输入框
+                        value = addUrl, // 绑定链接
+                        onValueChange = { addUrl = it }, // 输入回调
+                        label = { Text("订阅链接") }, // 标签
+                        placeholder = { Text("Gist 链接/ID，或任意 RuleSet JSON 链接") }, // 占位
+                        modifier = Modifier.fillMaxWidth(), // 占满
+                        singleLine = true // 单行
+                    )
+                }
+            },
+            confirmButton = { // 添加按钮
+                OutlinedButton( // 描边按钮
+                    onClick = { // 点击添加并立即同步
+                        scope.launch { // 异步执行
+                            val src = subscriptions.add(addName.trim(), addUrl.trim()) // 新增源（自动识别类型）
+                            addSourceOpen = false // 关闭对话框
+                            syncingId = src.id // 标记该源同步中
+                            syncer.syncAndPersist(src, subscriptions, repo) // 立即同步一次
+                            syncingId = null // 解除
+                        }
+                    },
+                    enabled = SubscriptionUrls.isValid(addUrl) // 链接合法才可点
+                ) { Text("添加并同步") } // 文案
+            },
+            dismissButton = { // 取消按钮
+                OutlinedButton(onClick = { addSourceOpen = false }) { Text("取消") } // 关闭对话框
             }
         )
     }
@@ -719,5 +801,152 @@ private fun UploadedBadge() { // 已分享徽章
             fontSize = 9.sp, // 极小字号
             color = fg // 前景色
         )
+    }
+}
+
+/**
+ * 订阅源管理区：列出所有订阅源，支持整源启用/禁用、单源同步、删除，以及"全部同步"。
+ *
+ * @param sources 订阅源列表。
+ * @param syncingAll 是否正在"全部同步"。
+ * @param syncingId 正在单独同步的源 ID（null 表示无）。
+ * @param onSyncAll "全部同步"回调。
+ * @param onSyncSource 单源同步回调。
+ * @param onToggleSource 源启用/禁用回调。
+ * @param onDeleteSource 删除源回调。
+ */
+@Composable // 标记为 Composable
+private fun SubscriptionSourceManager( // 订阅源管理区
+    sources: List<SubscriptionSource>, // 源列表
+    syncingAll: Boolean, // 全部同步中
+    syncingId: String?, // 单源同步中的 ID
+    onSyncAll: () -> Unit, // 全部同步回调
+    onSyncSource: (SubscriptionSource) -> Unit, // 单源同步回调
+    onToggleSource: (SubscriptionSource, Boolean) -> Unit, // 启用/禁用回调
+    onDeleteSource: (SubscriptionSource) -> Unit // 删除回调
+) {
+    val busy = syncingAll || syncingId != null // 是否有同步进行中
+    Surface( // 卡片容器
+        modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 14.dp, top = 10.dp), // 占满 + 内边距
+        shape = RoundedCornerShape(12.dp), // 圆角
+        color = MaterialTheme.colorScheme.surface // 背景色
+    ) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { // 内容列
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { // 头部行
+                Icon( // 订阅图标
+                    Icons.Filled.CloudDownload, contentDescription = null, // 云下载图标
+                    tint = MaterialTheme.colorScheme.primary, // 主色
+                    modifier = Modifier.size(18.dp) // 尺寸
+                )
+                Spacer(Modifier.width(8.dp)) // 间距
+                Text( // 标题
+                    "订阅源 (${sources.size})", // 文案带数量
+                    fontSize = 13.sp, // 字号
+                    fontWeight = FontWeight.SemiBold, // 半粗体
+                    modifier = Modifier.weight(1f) // 占满剩余
+                )
+                TextButton( // 全部同步按钮
+                    onClick = onSyncAll, // 点击回调
+                    enabled = !busy && sources.any { it.enabled } // 空闲且有启用源才可点
+                ) {
+                    if (syncingAll) { // 同步中显示加载圈
+                        androidx.compose.material3.CircularProgressIndicator( // 加载圈
+                            modifier = Modifier.size(14.dp), strokeWidth = 2.dp) // 尺寸与线宽
+                    } else { // 否则显示文案
+                        Text("全部同步", fontSize = 12.sp) // 文案
+                    }
+                }
+            }
+            if (sources.isEmpty()) { // 无源
+                Text( // 引导文案
+                    "还没有订阅源，点右下角 + 添加（Gist 链接/ID 或任意 RuleSet JSON 链接）", // 提示
+                    fontSize = 11.sp, // 字号
+                    color = MaterialTheme.colorScheme.outline // 次要色
+                )
+            } else { // 有源：可滚动列表（限高，避免挤占规则列表空间）
+                Column( // 源列表容器
+                    Modifier.fillMaxWidth().heightIn(max = 240.dp).verticalScroll(rememberScrollState()), // 限高 + 滚动
+                    verticalArrangement = Arrangement.spacedBy(6.dp) // 项间距
+                ) {
+                    sources.forEach { s -> // 遍历每个源
+                        Row( // 源行
+                            Modifier.fillMaxWidth() // 占满
+                                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp)) // 背景
+                                .padding(horizontal = 10.dp, vertical = 6.dp), // 内边距
+                            verticalAlignment = Alignment.CenterVertically // 垂直居中
+                        ) {
+                            Column(Modifier.weight(1f)) { // 文本列
+                                Row(verticalAlignment = Alignment.CenterVertically) { // 名称 + 类型徽章
+                                    Text( // 源名称
+                                        s.name, // 名称
+                                        fontSize = 13.sp, // 字号
+                                        fontWeight = FontWeight.SemiBold, // 半粗体
+                                        maxLines = 1, // 单行
+                                        modifier = Modifier.weight(1f, fill = false) // 不强制填满
+                                    )
+                                    Spacer(Modifier.width(6.dp)) // 间距
+                                    Text( // 类型徽章
+                                        if (s.type == SourceType.GIST) "Gist" else "链接", // 类型文案
+                                        fontSize = 9.sp, // 极小字号
+                                        color = MaterialTheme.colorScheme.primary, // 主色
+                                        modifier = Modifier.background( // 圆角背景
+                                            MaterialTheme.colorScheme.surface, RoundedCornerShape(6.dp)
+                                        ).padding(horizontal = 5.dp, vertical = 1.dp) // 内边距
+                                    )
+                                }
+                                Text( // 链接
+                                    s.url, // URL
+                                    fontSize = 10.sp, // 字号
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
+                                    maxLines = 1, // 单行
+                                    overflow = TextOverflow.Ellipsis // 省略号
+                                )
+                                Text( // 同步状态
+                                    when { // 按状态分支
+                                        s.lastError.isNotEmpty() -> "同步失败：${s.lastError}" // 失败信息
+                                        s.lastSyncAt > 0L -> "已同步 ${s.lastRuleCount} 条规则" // 成功信息
+                                        else -> "尚未同步" // 未同步
+                                    },
+                                    fontSize = 10.sp, // 字号
+                                    maxLines = 1, // 单行
+                                    color = if (s.lastError.isNotEmpty()) MaterialTheme.colorScheme.error // 失败用错误色
+                                    else MaterialTheme.colorScheme.onSurfaceVariant // 否则次要色
+                                )
+                            }
+                            IconButton( // 单源同步按钮
+                                onClick = { onSyncSource(s) }, // 点击同步
+                                enabled = !busy, // 空闲才可点
+                                modifier = Modifier.size(32.dp) // 按钮尺寸
+                            ) {
+                                if (syncingId == s.id) { // 该源同步中
+                                    androidx.compose.material3.CircularProgressIndicator( // 加载圈
+                                        modifier = Modifier.size(14.dp), strokeWidth = 2.dp) // 尺寸与线宽
+                                } else { // 否则刷新图标
+                                    Icon( // 刷新图标
+                                        Icons.Filled.Refresh, contentDescription = "同步", // 无障碍描述
+                                        tint = MaterialTheme.colorScheme.outline, // 灰色
+                                        modifier = Modifier.size(18.dp) // 图标尺寸
+                                    )
+                                }
+                            }
+                            IconButton( // 删除按钮
+                                onClick = { onDeleteSource(s) }, // 点击删除
+                                modifier = Modifier.size(32.dp) // 按钮尺寸
+                            ) {
+                                Icon( // 删除图标
+                                    Icons.Filled.Delete, contentDescription = "删除", // 无障碍描述
+                                    tint = MaterialTheme.colorScheme.outline, // 灰色
+                                    modifier = Modifier.size(18.dp) // 图标尺寸
+                                )
+                            }
+                            Switch( // 启用开关
+                                checked = s.enabled, // 当前状态
+                                onCheckedChange = { onToggleSource(s, it) } // 切换回调
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }

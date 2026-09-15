@@ -35,7 +35,7 @@ import kotlinx.coroutines.withContext // 导入切换上下文
  */
 class RuleEditActivity : ComponentActivity() { // 规则编辑 Activity
 
-    private val repo: RuleRepository by lazy { RuleRepository(this) } // 规则仓库，懒加载
+    private val repo: RuleRepository get() = App.get().repo // 规则仓库，使用全局共享单例
     private val gist: GistClient by lazy { GistClient() } // Gist 客户端，懒加载
 
     /**

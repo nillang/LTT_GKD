@@ -92,6 +92,9 @@ dependencies {
     // 网络订阅
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // 订阅自动更新（周期任务，系统调度，替代常驻前台服务）
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+
     // MLKit 端侧 OCR（不依赖 Google Play 服务）
     implementation("com.google.mlkit:text-recognition-chinese:16.0.0")
 

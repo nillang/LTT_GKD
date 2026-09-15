@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.PowerSettingsNew // 导入电源�
 import androidx.compose.material.icons.filled.QrCodeScanner // 导入扫码图标
 import androidx.compose.material.icons.filled.Shield // 导入盾牌图标
 import androidx.compose.material.icons.filled.Sync // 导入同步图标
-import androidx.compose.material3.Button // 导入按钮
 import androidx.compose.material3.Icon // 导入图标组件
 import androidx.compose.material3.MaterialTheme // 导入主题
 import androidx.compose.material3.OutlinedTextField // 导入描边文本框
@@ -59,7 +58,6 @@ import com.ltt.gkd.ui.theme.DarkAccentBlue // 导入深色模式蓝色前景
 import com.ltt.gkd.ui.theme.DarkAccentOrange // 导入深色模式橙色前景
 import androidx.compose.foundation.isSystemInDarkTheme // 导入深色主题判断函数
 import com.ltt.gkd.util.Logger // 导入日志工具
-import kotlinx.coroutines.flow.first // 导入 Flow.first
 import kotlinx.coroutines.launch // 导入协程启动
 
 /**
@@ -70,7 +68,6 @@ import kotlinx.coroutines.launch // 导入协程启动
  * @param onOpenAccessibility 点击"无障碍服务"行回调，跳转系统无障碍设置。
  * @param onOpenLogs 点击"日志"行回调，打开日志查看页。
  * @param onOpenWhitelist 点击"应用白名单"行回调，打开应用列表页。
- * @param onSyncSubscribed 点击"手动获取"回调，立即拉取一次订阅规则。
  */
 @Composable // 标记为 Composable
 fun SettingsScreen( // 设置主组件
@@ -78,8 +75,7 @@ fun SettingsScreen( // 设置主组件
     serviceOn: Boolean, // 服务状态
     onOpenAccessibility: () -> Unit, // 跳无障碍设置
     onOpenLogs: () -> Unit, // 打开日志
-    onOpenWhitelist: () -> Unit, // 打开白名单
-    onSyncSubscribed: ((Boolean) -> Unit) -> Unit // 同步订阅，参数为完成回调(是否成功)
+    onOpenWhitelist: () -> Unit // 打开白名单
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
     val log by settings.logEnabled.collectAsState(initial = false) // 日志开关
@@ -89,13 +85,11 @@ fun SettingsScreen( // 设置主组件
     val deviceId by settings.deviceId.collectAsState(initial = "") // 设备 ID
 
     // ---- 文本输入框：用本地状态保证输入流畅，避免 Flow 异步回写导致光标跳开头 ----
-    var localSubUrl by remember { mutableStateOf("") } // 订阅 URL 本地状态
     var localSubInterval by remember { mutableStateOf("24") } // 更新间隔本地状态
     var localGhToken by remember { mutableStateOf("") } // Token 本地状态
     var localGistId by remember { mutableStateOf("") } // Gist ID 本地状态
     // 首次加载从 Flow 同步初始值到本地状态
     LaunchedEffect(Unit) { // 组件首次挂载时执行
-        settings.subscriptionUrl.collect { localSubUrl = it } // 同步订阅 URL
         settings.subscriptionIntervalHours.collect { localSubInterval = it.toString() } // 同步间隔
         settings.githubToken.collect { localGhToken = it } // 同步 Token
         settings.gistId.collect { localGistId = it } // 同步 Gist ID
@@ -103,11 +97,6 @@ fun SettingsScreen( // 设置主组件
 
     // 订阅卡片展开状态
     var subExpanded by remember { mutableStateOf(false) } // 订阅卡片展开
-    // 首次加载 Gist ID 后，若为空则自动展开订阅卡片引导用户配置
-    LaunchedEffect(Unit) { // 组件首次挂载
-        val gid = settings.gistId.first() // 取 Gist ID 首值
-        if (gid.isEmpty()) subExpanded = true // 无订阅源时自动展开
-    }
 
     Column( // 滚动纵向容器
         Modifier
@@ -228,51 +217,39 @@ fun SettingsScreen( // 设置主组件
             if (subExpanded) { // 展开时显示
                 CardDivider() // 分隔线
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { // 内容列
-                    // 无订阅源时显示引导提示
-                    if (localGistId.isEmpty()) { // Gist ID 为空
-                        Surface( // 提示横幅
-                            color = MaterialTheme.colorScheme.primaryContainer, // 主容器色
-                            shape = RoundedCornerShape(10.dp), // 圆角
-                            modifier = Modifier.fillMaxWidth() // 占满
+                    // 提示：订阅源改到「规则 → 订阅」页统一管理
+                    Surface( // 提示横幅
+                        color = MaterialTheme.colorScheme.primaryContainer, // 主容器色
+                        shape = RoundedCornerShape(10.dp), // 圆角
+                        modifier = Modifier.fillMaxWidth() // 占满
+                    ) {
+                        Row( // 横向布局
+                            Modifier.padding(10.dp), // 内边距
+                            verticalAlignment = Alignment.CenterVertically, // 垂直居中
+                            horizontalArrangement = Arrangement.spacedBy(8.dp) // 间距
                         ) {
-                            Row( // 横向布局
-                                Modifier.padding(10.dp), // 内边距
-                                verticalAlignment = Alignment.CenterVertically, // 垂直居中
-                                horizontalArrangement = Arrangement.spacedBy(8.dp) // 间距
-                            ) {
-                                Icon( // 信息图标
-                                    Icons.Filled.Info, contentDescription = null, // 无障碍描述留空
-                                    tint = MaterialTheme.colorScheme.primary, // 主色
-                                    modifier = Modifier.size(18.dp) // 尺寸
-                                )
-                                Text( // 引导文案
-                                    "请填写订阅 URL（GitHub Gist ID 或链接），点击「手动获取」同步规则", // 文案
-                                    fontSize = 11.sp, // 字号
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer // 主容器前景色
-                                )
-                            }
+                            Icon( // 信息图标
+                                Icons.Filled.Info, contentDescription = null, // 无障碍描述留空
+                                tint = MaterialTheme.colorScheme.primary, // 主色
+                                modifier = Modifier.size(18.dp) // 尺寸
+                            )
+                            Text( // 引导文案
+                                "订阅源请在「规则 → 订阅」页添加与管理；此处仅设置自动更新策略", // 文案
+                                fontSize = 11.sp, // 字号
+                                color = MaterialTheme.colorScheme.onPrimaryContainer // 主容器前景色
+                            )
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) { // 自动更新开关行
                         Column(Modifier.weight(1f)) { // 文本列
                             Text("自动更新", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) // 标题
-                            Text("定期拉取远程规则", fontSize = 11.sp, // 副标题
+                            Text("按间隔后台同步所有启用的订阅源", fontSize = 11.sp, // 副标题
                                 color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
                         }
                         Switch(checked = sub, onCheckedChange = { // 自动更新开关
                             scope.launch { settings.setSubscription(it) } // 异步保存
                         })
                     }
-                    OutlinedTextField( // 订阅 URL 输入框
-                        value = localSubUrl, // 本地状态值（输入流畅）
-                        onValueChange = { v -> // 输入回调
-                            localSubUrl = v // 立即更新本地状态
-                            scope.launch { settings.setSubscriptionUrl(v) } // 异步保存到 DataStore
-                        },
-                        label = { Text("订阅 URL") }, // 标签
-                        modifier = Modifier.fillMaxWidth(), // 占满
-                        singleLine = true // 单行
-                    )
                     OutlinedTextField( // 更新间隔输入框
                         value = localSubInterval, // 本地状态值
                         onValueChange = { v -> // 输入回调
@@ -285,16 +262,6 @@ fun SettingsScreen( // 设置主组件
                         modifier = Modifier.fillMaxWidth(), // 占满
                         singleLine = true // 单行
                     )
-                    Row( // 手动获取按钮行
-                        Modifier.fillMaxWidth(), // 占满
-                        horizontalArrangement = Arrangement.spacedBy(10.dp), // 间距
-                        verticalAlignment = Alignment.CenterVertically // 垂直居中
-                    ) {
-                        Button( // 手动获取按钮
-                            onClick = { onSyncSubscribed {} }, // 点击同步（不处理完成回调）
-                            modifier = Modifier.weight(1f) // 占满
-                        ) { Text("手动获取") } // 文案
-                    }
                 }
             }
         }

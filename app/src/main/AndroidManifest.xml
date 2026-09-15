@@ -81,16 +81,6 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- 规则订阅前台服务（可选保活） -->
-        <service
-            android:name=".service.RuleSubscriptionService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="rule_subscription" />
-        </service>
-
         <!-- 文件分享（日志导出） -->
         <provider
             android:name="androidx.core.content.FileProvider"

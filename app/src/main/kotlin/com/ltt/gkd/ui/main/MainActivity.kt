@@ -23,6 +23,7 @@ import androidx.compose.material3.NavigationBarItemDefaults // 导入导航栏�
 import androidx.compose.material3.Scaffold // 导入 Scaffold，提供页面骨架
 import androidx.compose.material3.Text // 导入 Text 组件
 import androidx.compose.runtime.DisposableEffect // 导入 DisposableEffect，生命周期相关副作用
+import androidx.compose.runtime.LaunchedEffect // 导入 LaunchedEffect，挂载时启动协程
 import androidx.compose.runtime.collectAsState // 导入 collectAsState，把 Flow 收集为 Compose 状态
 import androidx.compose.runtime.getValue // 导入 getValue 操作符重载，支持 by 委托
 import androidx.compose.runtime.mutableIntStateOf // 导入可变 Int 状态
@@ -37,7 +38,7 @@ import com.ltt.gkd.App // 导入应用入口类
 import com.ltt.gkd.data.rule.Rule // 导入规则数据类
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
 import com.ltt.gkd.data.rule.RuleSet // 导入规则集（序列化/反序列化用）
-import com.ltt.gkd.data.subscription.GistClient // 导入 GitHub Gist 客户端
+import com.ltt.gkd.data.subscription.SubscriptionScheduler // 导入订阅自动更新调度器
 import com.ltt.gkd.service.SkipAccessibilityService // 导入跳过无障碍服务
 import com.ltt.gkd.ui.app.AppListActivity // 导入应用列表 Activity
 import com.ltt.gkd.ui.history.HistoryScreen // 导入跳过记录页 Composable
@@ -46,9 +47,9 @@ import com.ltt.gkd.ui.rule.RuleEditActivity // 导入规则编辑 Activity
 import com.ltt.gkd.ui.rule.RulesScreen // 导入规则管理 Composable
 import com.ltt.gkd.ui.settings.SettingsScreen // 导入设置页 Composable
 import com.ltt.gkd.ui.theme.LTTGKDTheme // 导入应用主题
-import com.ltt.gkd.util.Logger // 导入日志工具
 import com.ltt.gkd.util.globalAdapter // 导入全局 JSON 适配器
 import com.ltt.gkd.util.launchSafe // 导入安全启动协程的辅助函数
+import kotlinx.coroutines.flow.combine // 导入 combine，合并多个 Flow
 import kotlinx.coroutines.flow.first // 导入 Flow.first，取首个值
 import kotlinx.coroutines.launch // 导入协程 launch
 
@@ -61,8 +62,7 @@ import kotlinx.coroutines.launch // 导入协程 launch
  */
 class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentActivity
 
-    private val repo: RuleRepository by lazy { RuleRepository(this) } // 规则仓库，懒加载
-    private val gist: GistClient by lazy { GistClient() } // Gist 客户端，懒加载
+    private val repo: RuleRepository get() = App.get().repo // 规则仓库，使用全局共享单例
 
     override fun onCreate(savedInstanceState: Bundle?) { // Activity 创建回调
         super.onCreate(savedInstanceState) // 调用父类 onCreate
@@ -85,6 +85,15 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                     }
                     lifecycleOwner.lifecycle.addObserver(observer) // 注册观察者
                     onDispose { lifecycleOwner.lifecycle.removeObserver(observer) } // 离开时移除观察者
+                }
+
+                // 订阅自动更新排程：开关或间隔变化时重新排程（启动时也会执行一次，确保排程存在）
+                LaunchedEffect(Unit) { // 组件挂载即开始观察
+                    combine( // 合并自动更新开关与间隔
+                        app.settings.subscriptionEnabled, // 开关 Flow
+                        app.settings.subscriptionIntervalHours // 间隔 Flow
+                    ) { enabled, hours -> enabled to hours } // 任一变化都触发
+                        .collect { SubscriptionScheduler.reschedule(this@MainActivity) } // 重新排程/取消
                 }
 
                 var tab by remember { mutableIntStateOf(0) } // 当前选中的底部 Tab 索引
@@ -176,11 +185,11 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                 1 -> RulesScreen( // 规则页
                                     repo = repo, // 规则仓库
                                     settings = app.settings, // 设置存储
+                                    subscriptions = app.subscriptions, // 订阅源存储（多源）
                                     onAddNew = { RuleEditActivity.start(this@MainActivity) }, // 新增规则
                                     onEditRule = { id -> // 编辑规则回调
                                         RuleEditActivity.start(this@MainActivity, id) // 跳转编辑页
                                     },
-                                    onSyncSubscribed = { onDone -> syncSubscribed(onDone) }, // 同步订阅，带完成回调
                                     onImport = { // 导入回调
                                         importLauncher.launch(arrayOf("application/json", "text/plain")) // 启动选择器，仅 JSON/文本
                                     },
@@ -188,8 +197,7 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                     onExport = { // 导出回调
                                         exportLauncher.launch("ltt_rules_export.json") // 启动创建文档
                                     },
-                                    onPreviewBuiltIn = { name -> repo.readBuiltInRaw(name) }, // 预览内置规则
-                                    onGoToSettings = { tab = 2 } // 无订阅源时跳转到设置 Tab
+                                    onPreviewBuiltIn = { name -> repo.readBuiltInRaw(name) } // 预览内置规则
                                 )
                                 2 -> SettingsScreen( // 设置页
                                     settings = app.settings, // 设置存储
@@ -211,64 +219,13 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                                             Intent(this@MainActivity, // 当前 Activity 上下文
                                                 AppListActivity::class.java) // 目标类
                                         )
-                                    },
-                                    onSyncSubscribed = { onDone -> syncSubscribed(onDone) } // 同步订阅，带完成回调
+                                    }
                                 )
                             }
                         }
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * 拉取订阅规则到 filesDir/rules/subscribed/。
-     *
-     * 流程：校验 Gist ID → 拉取规则集与订阅数 → 清空旧订阅文件 →
-     * 写入新规则文件（标记来源为 SUBSCRIBED 并填充订阅数）→ 触发仓库 reload。
-     * 失败时通过 Toast 提示检查 Gist ID/Token/网络。
-     *
-     * @param onDone 同步完成回调，参数为是否成功（用于 UI 解除 loading 状态）。
-     */
-    private fun syncSubscribed(onDone: (Boolean) -> Unit = {}) { // 同步订阅规则，带完成回调
-        launchSafe { // 安全启动协程
-            val settings = App.get().settings // 取设置存储
-            val gistId = settings.gistId.first() // 取 Gist ID 首值
-            if (gistId.isEmpty()) { // 未配置 Gist ID
-                toast("未配置订阅源，请先在设置中填写 Gist ID") // 提示用户
-                onDone(false) // 回调失败
-                return@launchSafe // 中止
-            }
-            toast("正在同步订阅规则…") // 同步中提示
-            val ok = runCatching { // 尝试执行可能失败的代码块
-                val rsList = gist.fetchRuleSets(gistId) // 拉取规则集列表
-                if (rsList.isEmpty()) return@runCatching false // 没规则返回 false
-                val subs = gist.fetchSubscriberCount(gistId) // 拉取订阅者数
-                val subDir = repo.subscribedDirFile // 取订阅目录
-                subDir.listFiles { f -> f.name.endsWith(".json") }?.forEach { it.delete() } // 清空旧订阅文件
-                rsList.forEach { (fileName, ruleSet) -> // 遍历每个规则集
-                    val withSubs = ruleSet.copy( // 拷贝并修改规则
-                        rules = ruleSet.rules.map { r -> // 遍历每条规则
-                            r.copy(subscribers = subs, // 填充订阅者数
-                                source = com.ltt.gkd.data.rule.RuleSource.SUBSCRIBED) // 标记来源为订阅
-                        }
-                    )
-                    java.io.File(subDir, fileName).writeText( // 写入文件
-                        globalAdapter<RuleSet>().toJson(withSubs) // 序列化为 JSON
-                    )
-                }
-                repo.reload() // 触发仓库重新加载
-                true // 返回成功
-            }.getOrElse { // 捕获异常
-                Logger.w("同步订阅失败", it); false // 记录警告并返回 false
-            }
-            if (ok) { // 同步成功
-                toast("已同步订阅规则") // 提示成功
-            } else { // 同步失败
-                toast("同步失败，请重新检查订阅源（Gist ID / Token / 网络）") // 提示检查订阅源
-            }
-            onDone(ok) // 回调完成状态
         }
     }
 

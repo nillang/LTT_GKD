@@ -8,6 +8,8 @@ import android.os.Looper // 导入 Looper，用于判断是否主线程
 import com.ltt.gkd.data.app.WhitelistStore // 导入应用白名单存储
 import com.ltt.gkd.data.history.SkipHistoryStore // 导入跳过历史记录存储
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储（DataStore 偏好）
+import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
+import com.ltt.gkd.data.subscription.SubscriptionStore // 导入订阅源存储
 import com.ltt.gkd.util.Logger // 导入全局日志工具
 import kotlinx.coroutines.CoroutineScope // 导入协程作用域
 import kotlinx.coroutines.Dispatchers // 导入调度器，Default 用于 CPU 密集任务
@@ -17,9 +19,12 @@ import kotlinx.coroutines.SupervisorJob // 导入 SupervisorJob，子协程异�
  * LTT_GKD 应用入口。
  *
  * 职责：
- * - 初始化全局单例：SettingsStore、WhitelistStore、SkipHistoryStore、Logger
+ * - 初始化全局单例：SettingsStore、WhitelistStore、SkipHistoryStore、RuleRepository、SubscriptionStore、Logger
  * - 注册通知渠道（服务保活 + 跳过事件）
  * - 提供 appScope 供全局协程使用
+ *
+ * 说明：[repo] 收敛为全局唯一实例，界面、无障碍服务、后台订阅 Worker 共用同一个仓库，
+ * 这样后台同步写入的新规则能被运行中的服务即时看到（reload 后 StateFlow 对所有订阅者生效）。
  */
 class App : Application() { // 继承 Application，作为整个应用的全局上下文
 
@@ -38,6 +43,14 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
     lateinit var history: SkipHistoryStore // 声明延迟初始化的跳过历史存储属性
         private set // 私有 setter，外部只读
 
+    /** 全局规则仓库（三源合并），界面/服务/Worker 共用同一实例。 */
+    lateinit var repo: RuleRepository // 声明延迟初始化的规则仓库属性
+        private set // 私有 setter，外部只读
+
+    /** 全局订阅源存储（多源）。 */
+    lateinit var subscriptions: SubscriptionStore // 声明延迟初始化的订阅源存储属性
+        private set // 私有 setter，外部只读
+
     override fun onCreate() { // 应用启动时回调
         super.onCreate() // 调用父类 onCreate 完成基础初始化
         instance = this // 保存全局单例引用
@@ -45,6 +58,8 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
         settings = SettingsStore(this) // 初始化设置存储，传入 Context
         whitelist = WhitelistStore(this) // 初始化白名单存储
         history = SkipHistoryStore(this) // 初始化跳过历史存储
+        repo = RuleRepository(this) // 初始化全局规则仓库
+        subscriptions = SubscriptionStore(this) // 初始化订阅源存储
         Logger.init(this) // 初始化日志工具
         registerNotificationChannels() // 注册通知渠道
         setupCrashHandler() // 设置全局异常捕获，防止无障碍服务因未处理异常崩溃

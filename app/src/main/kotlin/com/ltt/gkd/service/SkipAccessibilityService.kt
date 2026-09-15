@@ -11,7 +11,6 @@ import com.ltt.gkd.ocr.OcrManager // 导入 OcrManager，OCR 管理器
 import com.ltt.gkd.data.prefs.SettingsStore // 导入 SettingsStore，设置存储
 import com.ltt.gkd.data.rule.RuleEngine // 导入 RuleEngine，规则引擎
 import com.ltt.gkd.data.rule.RuleMatcher // 导入 RuleMatcher，规则匹配器
-import com.ltt.gkd.data.rule.RuleRepository // 导入 RuleRepository，规则仓库
 import com.ltt.gkd.util.Logger // 导入 Logger，日志工具
 import kotlinx.coroutines.CoroutineScope // 导入 CoroutineScope，协程作用域
 import kotlinx.coroutines.Dispatchers // 导入 Dispatchers，调度器
@@ -75,7 +74,7 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
     private fun initComponents() { // 内部：装配业务组件
         val app = App.get() // 获取全局 App 实例
         val settings: SettingsStore = app.settings // 取出设置存储
-        val repo = RuleRepository(this) // 构造规则仓库（依赖 Service Context）
+        val repo = app.repo // 使用全局共享规则仓库（与界面/后台 Worker 同一实例）
         // 规则源 = 仓库规则 - 用户手动禁用的规则
         val rulesSource = combine(repo.rules, settings.disabledRuleIds) { rules, disabledIds -> // 合并规则流与禁用列表
             if (disabledIds.isEmpty()) rules else rules.filter { it.id !in disabledIds } // 禁用列表空则原样，否则过滤
