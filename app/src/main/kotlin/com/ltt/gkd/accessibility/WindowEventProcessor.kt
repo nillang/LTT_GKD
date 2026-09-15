@@ -103,6 +103,15 @@ class WindowEventProcessor(
             Logger.d("rootInActiveWindow 为 null") // 记录 debug
             return // 取不到直接返回
         }
+        // 关键一致性校验：事件来源包名（快照）必须与"当前活动窗口"的真实包名一致。
+        // 服务重连/窗口切换瞬间，event.packageName 可能指向旧窗口，而 rootInActiveWindow 已是新窗口，
+        // 二者错位会导致拿旧包名的规则去匹配新窗口的节点树（曾出现：拿微信/李跳跳的事件去匹配
+        // 小狐自己界面的"服务已开启，自动跳过广告中"里的"跳过"，误点并卡死 UI）。此处用 root 真实包名兜底，不一致则跳过。
+        val rootPkg = root.packageName?.toString() // 取活动窗口真实包名
+        if (rootPkg != pkg) { // 事件包名与窗口包名不一致
+            Logger.d("跳过错位事件：事件包名 $pkg 与窗口包名 ${rootPkg ?: "null"} 不一致") // 记录 debug
+            return // 直接跳过，避免跨窗口误点
+        }
 
         // 节点匹配
         try { // 保证 root 在 finally 中被回收

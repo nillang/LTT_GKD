@@ -30,7 +30,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LTT_GKD"
-        android:usesCleartextTraffic="false"
+        android:usesCleartextTraffic="true"
         tools:targetApi="34">
 
         <!-- 主界面 -->
