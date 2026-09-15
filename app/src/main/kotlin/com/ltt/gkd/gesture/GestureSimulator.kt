@@ -77,16 +77,42 @@ class GestureSimulator(private val service: AccessibilityService) { // 构造：
      */
     suspend fun clickNodeOrCoord(node: AccessibilityNodeInfo?): Boolean { // 入口：节点点击兜底
         if (node == null) return false // 节点为空直接失败
-        if (clickNode(node)) { // 语义点击
+        // 安全护栏：命中的文字节点若位于一个"占据大面积屏幕"的可点击容器(整张卡片/banner/列表项)内，
+        // 冒泡点击会触发导航(如京东跳"国家补贴"、淘宝跳"退款/售后")。此类过大目标一律拒绝，且不做坐标回退。
+        val target = NodeUtils.findClickableAncestor(node) ?: node // 找可点击祖先，无则用节点本身
+        if (isTooLargeToClick(target)) { // 目标过大 = 容器而非按钮
+            Logger.w("拒绝点击过大容器，避免误触导航") // 记录 warn
+            return false // 直接失败，不回退坐标（坐标也会落在同一大容器上）
+        }
+        if (target.performAction(AccessibilityNodeInfo.ACTION_CLICK)) { // 语义点击
             Logger.d("performAction(ACTION_CLICK) 成功") // 记录成功
             return true // 返回成功
         }
-        val rect = NodeUtils.nodeCenter(node) ?: run { // 取节点边界
+        val rect = NodeUtils.nodeCenter(node) ?: run { // 取命中节点自身边界
             Logger.w("节点无可点击坐标") // 打 warn 日志
             return false // 返回失败
         }
         Logger.d("performAction 失败，回退坐标手势") // 记录回退
-        return tapAt(rect) // 调用坐标手势
+        return tapAt(rect) // 点击命中节点自身中心（通常即按钮位置）
+    }
+
+    /**
+     * 判断可点击目标是否"过大"——占据屏幕过大比例者视为卡片/容器而非广告按钮，拒绝点击。
+     *
+     * 广告"跳过/关闭"按钮通常很小；而整张商品卡片、banner、列表项往往接近全屏宽且有相当高度，
+     * 冒泡点击它们会触发页面跳转（误点）。
+     *
+     * @param node 待判定的可点击目标
+     * @return 宽占比 ≥0.85 且 高占比 ≥0.35 时返回 true（过大，拒绝点击）
+     */
+    private fun isTooLargeToClick(node: AccessibilityNodeInfo?): Boolean { // 内部：判定目标是否过大
+        if (node == null) return false // 空节点不拦截（交由上游处理）
+        val r = Rect() // 复用矩形取屏幕坐标边界
+        runCatching { node.getBoundsInScreen(r) }.getOrElse { return false } // 取边界失败则不拦截
+        val dm = service.resources.displayMetrics // 屏幕尺寸
+        val wRatio = r.width().toFloat() / dm.widthPixels.coerceAtLeast(1) // 宽占屏比
+        val hRatio = r.height().toFloat() / dm.heightPixels.coerceAtLeast(1) // 高占屏比
+        return wRatio >= 0.85f && hRatio >= 0.35f // 接近全屏宽且有相当高度 → 视为大容器
     }
 
     /**

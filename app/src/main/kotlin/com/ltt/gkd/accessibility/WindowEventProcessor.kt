@@ -54,8 +54,11 @@ class WindowEventProcessor(
     private val appLabelCache = ConcurrentHashMap<String, String>() // 应用名缓存
 
     companion object {  // 静态常量
-        /** 通用兜底规则(packageName 为空)仅在应用切到前台后的该时间窗内生效，超时视为已进入正常界面。 */
-        private const val SPLASH_WINDOW_MS = 8000L  // 开屏窗口时长（毫秒）
+        /**
+         * 开屏窗口时长（毫秒）：所有"基于关键词"的规则只在应用切到前台后的该时间窗内生效。
+         * 开屏广告一般在冷启动数秒内出现，窗口取较短值以最大限度避免在应用内页误点。
+         */
+        private const val SPLASH_WINDOW_MS = 6000L  // 开屏窗口时长（毫秒）
     }
 
     suspend fun handle(pkg: String?, cls: String?) { // 入口：处理事件（接收同步快照，避免异步使用已被系统回收的 event）
@@ -88,10 +91,12 @@ class WindowEventProcessor(
         }
         val candidates = engine.candidates(pkg, cls, now) // 取出候选规则
         if (candidates.isEmpty()) return // 无候选直接返回
-        // 收敛通用兜底：packageName 为空的规则仅在"开屏窗口"内（刚切到前台且本次尚未跳过）才生效，
-        // 避免在应用首页/信息流上把"×、跳过、关闭"等正常文案误当广告点击（如京东"国家补贴×超级补贴"被误点）。
+        // 系统性收敛：所有"基于关键词"的规则(TEXT/DESC/OCR，含应用专用与通用)只在开屏窗口内生效——
+        // 即刚切到前台 SPLASH_WINDOW_MS 内、且本次尚未成功跳过。离开启动阶段后不再匹配任何文字，
+        // 避免在应用内页(淘宝"我的/订单"、京东首页等)把"关闭/已关闭/取消/×"等正常状态或功能文案误当广告点击。
+        // 只有精确的 ID 规则(match.type==ID，直指特定广告控件)不受时间窗限制。
         val inSplashWindow = (now - pkgForegroundAt) <= SPLASH_WINDOW_MS && !skippedThisLaunch // 是否仍处于开屏窗口
-        val effective = candidates.filter { it.packageName.isNotEmpty() || inSplashWindow } // 应用专用规则始终保留；通用规则仅开屏窗口内保留
+        val effective = candidates.filter { it.match.type == MatchType.ID || inSplashWindow } // 关键词规则仅开屏窗口内保留
         if (effective.isEmpty()) return // 过滤后无候选直接返回
 
         val root = service.rootInActiveWindow ?: run { // 取当前窗口根节点
