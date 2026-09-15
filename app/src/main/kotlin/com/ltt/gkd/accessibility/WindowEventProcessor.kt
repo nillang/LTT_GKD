@@ -45,9 +45,18 @@ class WindowEventProcessor(
     private val lock = Mutex() // 串行化事件处理，避免并发触发误点
     @Volatile // 保证多线程可见性
     private var lastPkg: String? = null // 上次事件包名，用于检测应用切换
+    @Volatile // 保证多线程可见性
+    private var pkgForegroundAt = 0L // 当前应用切到前台的时间戳，用于界定"开屏窗口"
+    @Volatile // 保证多线程可见性
+    private var skippedThisLaunch = false // 本次进入该应用是否已成功跳过（跳过后即关闭通用兜底，避免误点首页）
 
     /** 包名 → 应用名缓存（PackageManager 查询不便宜，跳过成功才查一次）。 */
     private val appLabelCache = ConcurrentHashMap<String, String>() // 应用名缓存
+
+    companion object {  // 静态常量
+        /** 通用兜底规则(packageName 为空)仅在应用切到前台后的该时间窗内生效，超时视为已进入正常界面。 */
+        private const val SPLASH_WINDOW_MS = 8000L  // 开屏窗口时长（毫秒）
+    }
 
     suspend fun handle(pkg: String?, cls: String?) { // 入口：处理事件（接收同步快照，避免异步使用已被系统回收的 event）
         lock.withLock { // 加锁避免并发处理
@@ -68,15 +77,22 @@ class WindowEventProcessor(
             Logger.d("$pkg 在白名单内，跳过处理") // 记录 debug 日志
             return // 直接返回
         }
-        // 应用切换时重置节流
+        // 应用切换时重置节流，并记录进入前台的时间（用于界定开屏窗口）
+        val now = System.currentTimeMillis() // 当前时间戳
         if (pkg != lastPkg) { // 包名变化代表切换应用
             engine.resetThrottle() // 重置规则引擎节流
             lastPkg = pkg // 更新上次包名
+            pkgForegroundAt = now // 记录本次进入前台时间
+            skippedThisLaunch = false // 新的一次进入，重置"已跳过"标记
             Logger.d("切换到 $pkg") // 记录切换
         }
-        val now = System.currentTimeMillis() // 当前时间戳
         val candidates = engine.candidates(pkg, cls, now) // 取出候选规则
         if (candidates.isEmpty()) return // 无候选直接返回
+        // 收敛通用兜底：packageName 为空的规则仅在"开屏窗口"内（刚切到前台且本次尚未跳过）才生效，
+        // 避免在应用首页/信息流上把"×、跳过、关闭"等正常文案误当广告点击（如京东"国家补贴×超级补贴"被误点）。
+        val inSplashWindow = (now - pkgForegroundAt) <= SPLASH_WINDOW_MS && !skippedThisLaunch // 是否仍处于开屏窗口
+        val effective = candidates.filter { it.packageName.isNotEmpty() || inSplashWindow } // 应用专用规则始终保留；通用规则仅开屏窗口内保留
+        if (effective.isEmpty()) return // 过滤后无候选直接返回
 
         val root = service.rootInActiveWindow ?: run { // 取当前窗口根节点
             Logger.d("rootInActiveWindow 为 null") // 记录 debug
@@ -85,7 +101,7 @@ class WindowEventProcessor(
 
         // 节点匹配
         try { // 保证 root 在 finally 中被回收
-            for (rule in candidates) { // 遍历候选规则
+            for (rule in effective) { // 遍历候选规则（已按开屏窗口收敛通用规则）
                 if (rule.match.type == MatchType.OCR) continue // OCR 兜底稍后统一处理
                 val hit = matcher.match(root, rule) ?: continue // 在控件树中匹配，无命中跳过
                 Logger.i("命中规则 ${rule.id} (${rule.name})") // 记录命中
@@ -106,7 +122,7 @@ class WindowEventProcessor(
             // OCR 兜底
             val ocrEnabled = settings.ocrEnabled.first() // 读 OCR 开关
             if (!ocrEnabled) return // 未开启直接返回
-            val ocrCandidates = candidates.filter { it.match.type == MatchType.OCR } // 取 OCR 类型候选
+            val ocrCandidates = effective.filter { it.match.type == MatchType.OCR } // 取 OCR 类型候选（同样受开屏窗口收敛）
             if (ocrCandidates.isEmpty()) return // 无 OCR 候选直接返回
             Logger.d("OCR 兜底启动 (${ocrCandidates.size} 条候选)") // 记录 OCR 启动
             val ocrHit = ocr.matchAndClick(ocrCandidates, pkg) // 调用 OCR 匹配并点击
@@ -120,6 +136,7 @@ class WindowEventProcessor(
     }
 
     private suspend fun onSkipSucceeded(pkg: String, rule: Rule, matchedText: String?) { // 内部：跳过成功后处理
+        skippedThisLaunch = true // 本次进入已成功跳过：关闭通用兜底，避免随后在首页/信息流误点
         settings.incrementTotalSkip() // 累计跳过计数
         history.record(resolveAppName(pkg), rule, rule.action.type, matchedText) // 写入历史记录
         val enableNoti = settings.skipNotificationEnabled.first() // 读通知开关

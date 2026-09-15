@@ -234,4 +234,38 @@ class RuleMatcherTest {
         val r = rule(MatchType.TEXT, text = listOf("跳过"))
         assertNull(matcher.match(root, r))
     }
+
+    // ---------- 精度护栏（防误点，见开发文档 §5.13）----------
+
+    @Test
+    fun `单字符×不命中含乘号的促销文案`() {
+        every { root.text } returns "国家补贴×超级补贴"
+        every { root.contentDescription } returns null
+        val r = rule(MatchType.TEXT, text = listOf("关闭", "×"))
+        assertNull(matcher.match(root, r))
+    }
+
+    @Test
+    fun `单字符×精确匹配独立关闭按钮`() {
+        every { root.text } returns "×"
+        every { root.contentDescription } returns null
+        val r = rule(MatchType.TEXT, text = listOf("×"))
+        assertSame(root, matcher.match(root, r))
+    }
+
+    @Test
+    fun `超长商品标题即含关键词也不命中（长度护栏）`() {
+        every { root.text } returns "自营 福临门玉米油6.18L×2, 价格: 134.9元 限时关闭促销"
+        every { root.contentDescription } returns null
+        val r = rule(MatchType.TEXT, text = listOf("关闭", "×"))
+        assertNull(matcher.match(root, r))
+    }
+
+    @Test
+    fun `短跳过按钮带倒计时仍命中`() {
+        every { root.text } returns "跳过 5"
+        every { root.contentDescription } returns null
+        val r = rule(MatchType.TEXT, text = listOf("跳过"))
+        assertSame(root, matcher.match(root, r))
+    }
 }
