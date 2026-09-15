@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.sankuai.meituan_popup",
-      "name": "美团弹窗",
-      "packageName": "com.sankuai.meituan",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "me.ele_splash",
       "name": "饿了么开屏",
       "packageName": "me.ele",
@@ -111,31 +86,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.sdu.didi.psnger_popup",
-      "name": "滴滴出行弹窗",
-      "packageName": "com.sdu.didi.psnger",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

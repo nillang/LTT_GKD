@@ -50,31 +50,6 @@
       }
     },
     {
-      "id": "com.dragon.read_popup",
-      "name": "番茄免费小说弹窗",
-      "packageName": "com.dragon.read",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.kmxs.reader_splash",
       "name": "七猫免费小说开屏",
       "packageName": "com.kmxs.reader",
@@ -134,31 +109,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.ximalaya.ting.android_popup",
-      "name": "喜马拉雅弹窗",
-      "packageName": "com.ximalaya.ting.android",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

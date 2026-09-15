@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.taobao.taobao_popup",
-      "name": "淘宝弹窗",
-      "packageName": "com.taobao.taobao",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.jingdong.app.mall_splash",
       "name": "京东开屏",
       "packageName": "com.jingdong.app.mall",
@@ -65,31 +40,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.jingdong.app.mall_popup",
-      "name": "京东弹窗",
-      "packageName": "com.jingdong.app.mall",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true
@@ -228,31 +178,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.eg.android.AlipayGphone_popup",
-      "name": "支付宝弹窗",
-      "packageName": "com.eg.android.AlipayGphone",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

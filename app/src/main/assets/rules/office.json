@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.kingsoft.office_popup",
-      "name": "WPS Office弹窗",
-      "packageName": "com.kingsoft.office",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.alibaba.android.rimet_splash",
       "name": "钉钉开屏",
       "packageName": "com.alibaba.android.rimet",
@@ -157,31 +132,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.baidu.netdisk_popup",
-      "name": "百度网盘弹窗",
-      "packageName": "com.baidu.netdisk",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

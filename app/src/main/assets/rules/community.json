@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.baidu.tieba_popup",
-      "name": "百度贴吧弹窗",
-      "packageName": "com.baidu.tieba",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.douban.frodo_splash",
       "name": "豆瓣开屏",
       "packageName": "com.douban.frodo",
@@ -88,31 +63,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.coolapk.market_popup",
-      "name": "酷安弹窗",
-      "packageName": "com.coolapk.market",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

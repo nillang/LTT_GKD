@@ -18,20 +18,6 @@
       "action": { "type": "CLICK_NODE", "delayMs": 0 }
     },
     {
-      "id": "universal_popup_close",
-      "name": "通用弹窗关闭",
-      "packageName": "",
-      "priority": 5,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": ["关闭广告", "关闭", "×"],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
       "id": "universal_ocr_splash",
       "name": "通用开屏 OCR 兜底",
       "packageName": "",

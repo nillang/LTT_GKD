@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.netease.cloudmusic_popup",
-      "name": "网易云音乐弹窗",
-      "packageName": "com.netease.cloudmusic",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.tencent.qqmusic_splash",
       "name": "QQ音乐开屏",
       "packageName": "com.tencent.qqmusic",

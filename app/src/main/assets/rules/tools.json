@@ -119,31 +119,6 @@
       }
     },
     {
-      "id": "com.qihoo360.mobilesafe_popup",
-      "name": "360手机卫士弹窗",
-      "packageName": "com.qihoo360.mobilesafe",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.cleanmaster.mguard_splash",
       "name": "猎豹清理大师开屏",
       "packageName": "com.cleanmaster.mguard",
@@ -157,31 +132,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.cleanmaster.mguard_popup",
-      "name": "猎豹清理大师弹窗",
-      "packageName": "com.cleanmaster.mguard",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true

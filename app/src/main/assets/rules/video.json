@@ -27,31 +27,6 @@
       }
     },
     {
-      "id": "com.qiyi.video_popup",
-      "name": "爱奇艺弹窗",
-      "packageName": "com.qiyi.video",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.youku.phone_splash",
       "name": "优酷开屏",
       "packageName": "com.youku.phone",
@@ -75,31 +50,6 @@
       }
     },
     {
-      "id": "com.youku.phone_popup",
-      "name": "优酷弹窗",
-      "packageName": "com.youku.phone",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
       "id": "com.tencent.qqlive_splash",
       "name": "腾讯视频开屏",
       "packageName": "com.tencent.qqlive",
@@ -113,31 +63,6 @@
           "跳过",
           "跳过广告",
           "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.qqlive_popup",
-      "name": "腾讯视频弹窗",
-      "packageName": "com.tencent.qqlive",
-      "activity": null,
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "关闭",
-          "关闭广告",
-          "以后再说",
-          "跳过",
-          "×"
         ],
         "regex": false,
         "caseInsensitive": true
