@@ -12,6 +12,7 @@ import com.ltt.gkd.data.prefs.SettingsStore // 导入 SettingsStore，设置存�
 import com.ltt.gkd.data.rule.RuleEngine // 导入 RuleEngine，规则引擎
 import com.ltt.gkd.data.rule.RuleMatcher // 导入 RuleMatcher，规则匹配器
 import com.ltt.gkd.util.Logger // 导入 Logger，日志工具
+import kotlinx.coroutines.CancellationException // 导入 CancellationException，区分正常取消与真异常
 import kotlinx.coroutines.CoroutineScope // 导入 CoroutineScope，协程作用域
 import kotlinx.coroutines.Dispatchers // 导入 Dispatchers，调度器
 import kotlinx.coroutines.SupervisorJob // 导入 SupervisorJob，子任务异常隔离
@@ -113,11 +114,18 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) { // 入口：事件回调
         if (event == null || !::processor.isInitialized) return // 空事件或处理器未就绪直接返回
-        // 单个事件处理异常就地兜底：记录 warn 后吞掉，避免异常冒泡触发全局崩溃处理器，
-        // 保证一次异常窗口事件不影响后续事件的正常处理。
+        // 同步取出所需字段：AccessibilityEvent 在回调返回后会被系统回收/复用，
+        // 不能在异步协程里再访问它，否则可能读到脏数据或抛异常。
+        val pkg = event.packageName?.toString() // 同步取包名快照
+        val cls = event.className?.toString() // 同步取类名快照
         scope.launch { // 在服务作用域中异步处理
-            runCatching { processor.handle(event) } // 处理事件，捕获异常
-                .onFailure { Logger.w("处理无障碍事件异常", it) } // 失败记录 warn 日志
+            try { // 兜底捕获处理异常
+                processor.handle(pkg, cls) // 传入快照处理
+            } catch (ce: CancellationException) { // 协程取消（如服务重绑时 scope.cancel）
+                throw ce // 属正常取消，向上重抛，不记为错误、不吞掉取消语义
+            } catch (t: Throwable) { // 其它异常
+                Logger.w("处理无障碍事件异常", t) // 记录 warn，不影响后续事件处理
+            }
         }
     }
 

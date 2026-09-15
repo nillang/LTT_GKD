@@ -19,6 +19,8 @@ import com.ltt.gkd.util.PatternUtils // 导入 PatternUtils，正则编译
 import kotlinx.coroutines.suspendCancellableCoroutine // 导入 suspendCancellableCoroutine，回调转挂起
 import kotlinx.coroutines.tasks.await // 导入 await，Task 转挂起
 import kotlin.coroutines.resume // 导入 resume，恢复协程
+import java.util.concurrent.ConcurrentHashMap // 导入 ConcurrentHashMap，按包名节流的时间戳表
+import java.util.concurrent.atomic.AtomicBoolean // 导入 AtomicBoolean，OCR in-flight 去重标志
 
 /**
  * OCR 兜底：当控件树中找不到"跳过"等文字时，截图识别文本坐标并点击。
@@ -42,10 +44,11 @@ class OcrManager(
         ChineseTextRecognizerOptions.Builder().build() // 中文识别器选项
     )
 
-    // 最近一次 OCR 时间戳，配合 ocrIntervalMs 做节流
-    @Volatile // 多线程可见
-    private var lastOcrTime = 0L // 上次 OCR 时间
-    private val ocrIntervalMs = 1500L // OCR 节流，避免高频截图
+    // 按包名节流：记录每个应用上次 OCR 时间，避免同一应用高频截图，不同应用之间互不阻塞
+    private val lastOcrTimeByPkg = ConcurrentHashMap<String, Long>() // 包名 → 上次 OCR 时间戳
+    private val ocrIntervalMs = 2000L // 同一应用两次 OCR 的最小间隔，避免高频截图耗电
+    // in-flight 去重：一次 OCR（截图+识别）未结束时跳过新请求，杜绝重叠 takeScreenshot
+    private val inFlight = AtomicBoolean(false) // 是否有 OCR 正在进行
 
     /**
      * 对候选 OCR 规则尝试匹配+点击。
@@ -59,38 +62,46 @@ class OcrManager(
     suspend fun matchAndClick(rules: List<Rule>, pkg: String): Rule? { // 入口：匹配+点击
         if (rules.isEmpty()) return null // 无规则直接返回
         val now = System.currentTimeMillis() // 当前时间
-        // 节流：距上次 OCR 不足 1.5s 则跳过，避免高频截图耗电
-        if (now - lastOcrTime < ocrIntervalMs) { // 距上次不足 1.5s
-            Logger.d("OCR 节流中，跳过本次") // 记录 debug
+        // 按包名节流：同一应用距上次 OCR 不足 ocrIntervalMs 则跳过，避免高频截图耗电
+        if (now - (lastOcrTimeByPkg[pkg] ?: 0L) < ocrIntervalMs) { // 距上次不足间隔
+            Logger.d("OCR 节流中($pkg)，跳过本次") // 记录 debug
             return null // 直接返回
         }
-        lastOcrTime = now // 更新上次 OCR 时间
+        // in-flight 去重：已有 OCR 进行中则跳过，杜绝重叠 takeScreenshot（系统会限流报错）
+        if (!inFlight.compareAndSet(false, true)) { // 抢不到执行权，说明有一次 OCR 未结束
+            Logger.d("OCR 进行中，跳过本次($pkg)") // 记录 debug
+            return null // 直接返回
+        }
+        lastOcrTimeByPkg[pkg] = now // 记录本次 OCR 时间（按包名）
+        try { // 保证无论成功/失败/取消都释放 in-flight 标志
+            val bitmap = captureScreen() ?: run { // 截图，失败时
+                Logger.w("截图失败（可能 Android <11 不支持无障碍截图）") // 打 warn 日志
+                return null // 直接返回
+            }
+            // 注意：必须保证下方 try/finally 中 bitmap 一定被 recycle
+            val text: Text? = try { // 识别文本，捕获异常
+                recognizeText(bitmap) // 调用 MLKit 识别
+            } catch (e: Exception) { // 出现异常
+                Logger.w("OCR 识别失败", e) // 打 warn 日志
+                null // 标记为 null
+            } finally {
+                // recognizeText 已完成（或抛异常），不再持有 bitmap
+                if (!bitmap.isRecycled) bitmap.recycle() // 未回收则回收
+            }
+            if (text == null || text.text.isBlank()) return null // 无识别结果或全空白直接返回
+            val recognized = text  // smart cast: 此后 recognized 一定非空
 
-        val bitmap = captureScreen() ?: run { // 截图，失败时
-            Logger.w("截图失败（可能 Android <11 不支持无障碍截图）") // 打 warn 日志
-            return null // 直接返回
-        }
-        // 注意：必须保证下方 try/finally 中 bitmap 一定被 recycle
-        val text: Text? = try { // 识别文本，捕获异常
-            recognizeText(bitmap) // 调用 MLKit 识别
-        } catch (e: Exception) { // 出现异常
-            Logger.w("OCR 识别失败", e) // 打 warn 日志
-            null // 标记为 null
+            for (rule in rules) { // 遍历候选规则
+                val target = rule.match // 取匹配目标
+                val point = findKeyword(recognized, target) ?: continue // 查找关键词，无命中跳过
+                Logger.i("OCR 命中规则 ${rule.id} 在 $point") // 记录命中
+                val ok = gesture.tapAt(point.x.toFloat(), point.y.toFloat()) // 在命中坐标点击
+                if (ok) return rule // 点击成功返回命中的规则
+            }
+            return null // 全部未命中返回 null
         } finally {
-            // recognizeText 已完成（或抛异常），不再持有 bitmap
-            if (!bitmap.isRecycled) bitmap.recycle() // 未回收则回收
+            inFlight.set(false) // 释放 in-flight 标志，允许下一次 OCR
         }
-        if (text == null || text.text.isBlank()) return null // 无识别结果或全空白直接返回
-        val recognized = text  // smart cast: 此后 recognized 一定非空
-
-        for (rule in rules) { // 遍历候选规则
-            val target = rule.match // 取匹配目标
-            val point = findKeyword(recognized, target) ?: continue // 查找关键词，无命中跳过
-            Logger.i("OCR 命中规则 ${rule.id} 在 $point") // 记录命中
-            val ok = gesture.tapAt(point.x.toFloat(), point.y.toFloat()) // 在命中坐标点击
-            if (ok) return rule // 点击成功返回命中的规则
-        }
-        return null // 全部未命中返回 null
     }
 
     /**

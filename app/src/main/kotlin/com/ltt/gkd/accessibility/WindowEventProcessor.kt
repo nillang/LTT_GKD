@@ -1,7 +1,6 @@
 package com.ltt.gkd.accessibility // 包声明：本文件属于无障碍处理包 com.ltt.gkd.accessibility
 
 import android.accessibilityservice.AccessibilityService // 导入 AccessibilityService，作为 service 字段类型
-import android.view.accessibility.AccessibilityEvent // 导入 AccessibilityEvent，系统事件
 import android.view.accessibility.AccessibilityNodeInfo // 导入 AccessibilityNodeInfo，无障碍节点
 import com.ltt.gkd.action.ActionExecutor // 导入 ActionExecutor，动作执行器
 import com.ltt.gkd.data.app.WhitelistStore // 导入 WhitelistStore，白名单存储
@@ -50,20 +49,19 @@ class WindowEventProcessor(
     /** 包名 → 应用名缓存（PackageManager 查询不便宜，跳过成功才查一次）。 */
     private val appLabelCache = ConcurrentHashMap<String, String>() // 应用名缓存
 
-    suspend fun handle(event: AccessibilityEvent) { // 入口：处理事件
+    suspend fun handle(pkg: String?, cls: String?) { // 入口：处理事件（接收同步快照，避免异步使用已被系统回收的 event）
         lock.withLock { // 加锁避免并发处理
-            processEvent(event) // 转交内部处理
+            processEvent(pkg, cls) // 转交内部处理
         }
     }
 
-    private suspend fun processEvent(event: AccessibilityEvent) { // 内部：实际处理逻辑
-        val pkg = event.packageName?.toString() ?: return // 取事件来源包名，无则返回
+    private suspend fun processEvent(pkgRaw: String?, cls: String?) { // 内部：实际处理逻辑
+        val pkg = pkgRaw ?: return // 取事件来源包名，无则返回
         // 白名单检查：O(1) HashSet 查询，必须在候选筛选前短路
         if (whitelist.isWhitelisted(pkg)) { // 包名在白名单
             Logger.d("$pkg 在白名单内，跳过处理") // 记录 debug 日志
             return // 直接返回
         }
-        val cls = event.className?.toString() // 取事件来源类名
         // 应用切换时重置节流
         if (pkg != lastPkg) { // 包名变化代表切换应用
             engine.resetThrottle() // 重置规则引擎节流
