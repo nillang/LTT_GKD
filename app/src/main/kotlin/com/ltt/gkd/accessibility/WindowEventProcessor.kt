@@ -15,7 +15,10 @@ import com.ltt.gkd.data.rule.RuleMatcher // 导入 RuleMatcher，规则匹配器
 import com.ltt.gkd.data.rule.RuleRepository // 导入 RuleRepository，规则仓库
 import com.ltt.gkd.util.Logger // 导入 Logger，日志
 import com.ltt.gkd.util.NodeUtils // 导入 NodeUtils，节点工具
-import kotlinx.coroutines.flow.first // 导入 first，取 Flow 首值
+import kotlinx.coroutines.CoroutineScope // 导入 CoroutineScope，常驻收集设置 Flow 用
+import kotlinx.coroutines.flow.SharingStarted // 导入 SharingStarted，StateFlow 共享策略
+import kotlinx.coroutines.flow.StateFlow // 导入 StateFlow，设置快照类型
+import kotlinx.coroutines.flow.stateIn // 导入 stateIn，把 Flow 转常驻 StateFlow
 import kotlinx.coroutines.sync.Mutex // 导入 Mutex，事件串行化
 import kotlinx.coroutines.sync.withLock // 导入 withLock，加锁执行
 import java.util.concurrent.ConcurrentHashMap // 导入 ConcurrentHashMap，线程安全缓存
@@ -39,8 +42,18 @@ class WindowEventProcessor(
     private val ocr: OcrManager, // OCR 管理器
     private val settings: SettingsStore, // 用户设置
     private val whitelist: WhitelistStore, // 应用白名单
-    private val history: SkipHistoryStore // 跳过历史
+    private val history: SkipHistoryStore, // 跳过历史
+    scope: CoroutineScope // 服务协程作用域：用于把设置 Flow 常驻收集为内存快照
 ) {
+
+    // 设置快照：把 DataStore Flow 以 Eagerly 常驻收集为 StateFlow，事件处理直接读内存 value。
+    // 此前 processEvent 在事件锁内对 settings.ocrEnabled / skipNotificationEnabled 调 first()，
+    // 每次都可能触发 DataStore 读取（首次为磁盘 I/O），白白占用 6s 开屏窗口的响应时间。
+    // 初始值与 DataStore 默认值一致（OCR 开/通知关），收集到位前的短暂窗口内行为等同默认值，安全。
+    private val ocrEnabledFlow: StateFlow<Boolean> = settings.ocrEnabled // OCR 开关快照
+        .stateIn(scope, SharingStarted.Eagerly, true) // 常驻收集，读内存零 I/O
+    private val skipNotiEnabledFlow: StateFlow<Boolean> = settings.skipNotificationEnabled // 跳过通知开关快照
+        .stateIn(scope, SharingStarted.Eagerly, false) // 常驻收集，读内存零 I/O
 
     private val lock = Mutex() // 串行化事件处理，避免并发触发误点
     @Volatile // 保证多线程可见性
@@ -134,7 +147,7 @@ class WindowEventProcessor(
             }
 
             // OCR 兜底
-            val ocrEnabled = settings.ocrEnabled.first() // 读 OCR 开关
+            val ocrEnabled = ocrEnabledFlow.value // 读内存快照（不再锁内 first() 读 DataStore）
             if (!ocrEnabled) return // 未开启直接返回
             val ocrCandidates = effective.filter { it.match.type == MatchType.OCR } // 取 OCR 类型候选（同样受开屏窗口收敛）
             if (ocrCandidates.isEmpty()) return // 无 OCR 候选直接返回
@@ -153,7 +166,7 @@ class WindowEventProcessor(
         skippedThisLaunch = true // 本次进入已成功跳过：关闭通用兜底，避免随后在首页/信息流误点
         settings.incrementTotalSkip() // 累计跳过计数
         history.record(resolveAppName(pkg), rule, rule.action.type, matchedText) // 写入历史记录
-        val enableNoti = settings.skipNotificationEnabled.first() // 读通知开关
+        val enableNoti = skipNotiEnabledFlow.value // 读内存快照（通知开关）
         if (enableNoti) { // 通知开启
             SkipNotifier.notify(service, rule.name) // 发送跳过通知
         }

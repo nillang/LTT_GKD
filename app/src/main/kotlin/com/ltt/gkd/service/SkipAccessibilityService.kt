@@ -97,7 +97,8 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
             ocr = ocrManager, // OCR 管理器
             settings = settings, // 设置
             whitelist = whitelist, // 白名单
-            history = app.history // 跳过历史
+            history = app.history, // 跳过历史
+            scope = scope // 传入服务作用域：事件处理器用它常驻缓存设置快照
         )
         scope.launch { // 启动后台协程加载规则
             repo.reload() // 异步加载本地 + 订阅的规则
