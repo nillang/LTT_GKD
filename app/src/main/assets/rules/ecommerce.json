@@ -1,5 +1,5 @@
 {
-  "name": "电商购物类",
+  "name": "电商购物",
   "version": 1,
   "author": "LTT_GKD builtin",
   "rules": [
@@ -7,92 +7,263 @@
       "id": "com.taobao.taobao_splash",
       "name": "淘宝开屏",
       "packageName": "com.taobao.taobao",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.taobao.taobao_popup",
-      "name": "淘宝弹窗广告",
+      "name": "淘宝弹窗",
       "packageName": "com.taobao.taobao",
+      "activity": null,
+      "enabled": true,
       "priority": 80,
       "throttleMs": 3000,
       "match": {
         "type": "TEXT",
-        "text": ["关闭", "不感兴趣", "我知道了"],
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.jingdong.app.mall_splash",
       "name": "京东开屏",
       "packageName": "com.jingdong.app.mall",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.jingdong.app.mall_popup",
+      "name": "京东弹窗",
+      "packageName": "com.jingdong.app.mall",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.xunmeng.pinduoduo_splash",
       "name": "拼多多开屏",
       "packageName": "com.xunmeng.pinduoduo",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.sankuai.meituan_splash",
-      "name": "美团开屏",
-      "packageName": "com.sankuai.meituan",
+      "id": "com.tmall.wireless_splash",
+      "name": "天猫开屏",
+      "packageName": "com.tmall.wireless",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "me.ele.android.app_splash",
-      "name": "饿了么开屏",
-      "packageName": "me.ele.android.app",
+      "id": "com.achievo.vipshop_splash",
+      "name": "唯品会开屏",
+      "packageName": "com.achievo.vipshop",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip", "关闭"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.suning.mobile.ebuy_splash",
+      "name": "苏宁易购开屏",
+      "packageName": "com.suning.mobile.ebuy",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.taobao.idlefish_splash",
+      "name": "闲鱼开屏",
+      "packageName": "com.taobao.idlefish",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.eg.android.AlipayGphone_splash",
+      "name": "支付宝开屏",
+      "packageName": "com.eg.android.AlipayGphone",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.eg.android.AlipayGphone_popup",
       "name": "支付宝弹窗",
       "packageName": "com.eg.android.AlipayGphone",
+      "activity": null,
+      "enabled": true,
       "priority": 80,
       "throttleMs": 3000,
       "match": {
         "type": "TEXT",
-        "text": ["关闭", "我知道了", "不了，谢谢"],
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

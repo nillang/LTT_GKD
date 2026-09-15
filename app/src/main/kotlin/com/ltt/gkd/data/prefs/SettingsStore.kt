@@ -54,6 +54,23 @@ class SettingsStore(private val context: Context) {  // 设置存储类
         prefs[KEY_DISABLED_RULES] = set  // 写回
     }
 
+    /**
+     * 批量切换多条规则的启用状态（用于"整个合集"一键启用/禁用）。
+     *
+     * 在一次 DataStore 编辑内完成全部增删，避免逐条写入触发多次磁盘 IO 与 Flow 抖动。
+     *
+     * @param ruleIds 目标规则 ID 集合；为空时直接返回不做任何写入。
+     * @param enabled true=全部启用（从禁用集合移除），false=全部禁用（加入禁用集合）。
+     */
+    suspend fun setRulesEnabled(ruleIds: Collection<String>, enabled: Boolean) {  // 批量切换规则启用状态方法
+        if (ruleIds.isEmpty()) return  // 空集合直接返回
+        context.dataStore.edit { prefs ->  // 单次编辑完成批量增删
+            val set = prefs[KEY_DISABLED_RULES]?.toMutableSet() ?: mutableSetOf()  // 取禁用集合或新建
+            if (enabled) set.removeAll(ruleIds) else set.addAll(ruleIds)  // 启用则批量移除，禁用则批量加入
+            prefs[KEY_DISABLED_RULES] = set  // 写回
+        }
+    }
+
     /** 设备 ID（作者标识，上传规则时追溯）。 */
     val deviceId: Flow<String> = context.dataStore.data.map { it[KEY_DEVICE_ID] ?: "" }  // 设备 ID Flow，默认空
     suspend fun setDeviceId(id: String) = context.dataStore.edit { it[KEY_DEVICE_ID] = id }  // 设置设备 ID 方法

@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp // 导入 dp 单位
 import androidx.compose.ui.unit.sp // 导入 sp 单位
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储
 import com.ltt.gkd.data.rule.Rule // 导入规则数据类
+import com.ltt.gkd.data.rule.RuleGroup // 导入规则合集数据类（内置分组）
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
 import com.ltt.gkd.data.rule.RuleSource // 导入规则来源枚举
 import com.ltt.gkd.ui.theme.AccentPurple // 导入主题强调紫色（亮色）
@@ -108,9 +109,9 @@ fun RulesScreen( // 规则管理主组件
     val local by repo.localRules.collectAsState() // 本地规则列表
     val subscribed by repo.subscribedRules.collectAsState() // 订阅规则列表
     val builtIn by repo.builtInRules.collectAsState() // 内置规则列表
+    val builtInGroups by repo.builtInGroups.collectAsState() // 内置规则合集分组（按合集展示）
     val disabledIds by settings.disabledRuleIds.collectAsState(initial = emptySet()) // 已禁用 ID 集合
     val gistId by settings.gistId.collectAsState(initial = "") // 订阅源 Gist ID
-    val builtInFiles = remember { repo.listBuiltInRuleFiles() } // 内置规则文件名列表
     // 订阅规则的 id -> 使用量映射：本地"已分享"规则据此联动显示社区使用量（同步后生效）
     val subscribedUsageById = remember(subscribed) { subscribed.associate { it.id to it.subscribers } } // id→使用量
 
@@ -220,11 +221,13 @@ fun RulesScreen( // 规则管理主组件
                     showUsage = true, // 展示作者与使用量（来源于 Gist 订阅数）
                     usageHeader = "共 ${subscribed.size} 条 · 使用量（订阅数）${formatCount(subscribed.maxOfOrNull { it.subscribers } ?: 0)}" // 使用量=订阅源的订阅数（Gist 级，非逐条累加；空列表安全）
                 )
-                2 -> BuiltInContent( // 内置规则列表
-                    files = builtInFiles, // 分类文件
-                    rules = builtIn, // 内置规则
+                2 -> BuiltInContent( // 内置规则列表（按合集分组）
+                    groups = builtInGroups, // 内置合集分组
                     disabledIds = disabledIds, // 禁用集合
-                    onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 开关切换
+                    onToggle = { r, on -> scope.launch { settings.setRuleEnabled(r.id, on) } }, // 单条开关切换
+                    onToggleGroup = { group, on -> // 整个合集一键启用/禁用
+                        scope.launch { settings.setRulesEnabled(group.rules.map { it.id }, on) } // 批量写入
+                    },
                     onPreview = { name -> preview = name to onPreviewBuiltIn(name) } // 触发预览
                 )
             }
@@ -367,65 +370,90 @@ private fun RuleListContent( // 规则列表内容
 }
 
 /**
- * 内置规则 Tab 内容：分类文件列表（可点击预览）+ 内置规则卡片列表。
+ * 内置规则 Tab 内容：按"合集"分组展示，每个合集可整体启用/禁用，也可切换单条规则。
  *
- * @param files 内置规则分类文件名列表。
- * @param rules 内置规则列表。
+ * @param groups 内置规则合集分组（每个 [RuleGroup] 对应一个 assets/rules 文件）。
  * @param disabledIds 已禁用规则 ID 集合。
- * @param onToggle 规则开关切换回调。
- * @param onPreview 点击分类文件回调，参数为文件名，触发预览弹窗。
+ * @param onToggle 单条规则开关切换回调。
+ * @param onToggleGroup 整个合集一键启用/禁用回调。
+ * @param onPreview 点击合集预览按钮回调，参数为合集来源文件名，触发原文预览弹窗。
  */
 @Composable // 标记为 Composable
-private fun BuiltInContent( // 内置规则内容
-    files: List<String>, // 文件名列表
-    rules: List<Rule>, // 规则列表
+private fun BuiltInContent( // 内置规则内容（按合集分组）
+    groups: List<RuleGroup>, // 合集分组列表
     disabledIds: Set<String>, // 禁用集合
-    onToggle: (Rule, Boolean) -> Unit, // 开关切换
+    onToggle: (Rule, Boolean) -> Unit, // 单条开关切换
+    onToggleGroup: (RuleGroup, Boolean) -> Unit, // 整组开关切换
     onPreview: (String) -> Unit // 预览回调
 ) {
+    if (groups.isEmpty()) { // 无合集
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { // 居中容器
+            Text("暂无内置规则合集", color = MaterialTheme.colorScheme.outline, fontSize = 13.sp) // 提示文案
+        }
+        return // 直接返回
+    }
     LazyColumn( // 懒加载列表
         Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 10.dp), // 内边距
-        verticalArrangement = Arrangement.spacedBy(8.dp) // 项间距
+        verticalArrangement = Arrangement.spacedBy(12.dp) // 合集间距
     ) {
-        item { // 第一项标题
-            Text("分类文件（共 ${files.size} 个）", fontSize = 12.sp, // 文案带数量
-                fontWeight = FontWeight.SemiBold, // 半粗体
-                color = MaterialTheme.colorScheme.primary, // 主色
-                modifier = Modifier.padding(bottom = 2.dp)) // 底部间距
-        }
-        items(files, key = { it }) { name -> // 文件名列表
-            Surface( // 卡片容器
-                modifier = Modifier.fillMaxWidth().clickable { onPreview(name) }, // 点击触发预览
-                shape = RoundedCornerShape(12.dp), // 圆角
-                color = MaterialTheme.colorScheme.surface, // 背景色
-                tonalElevation = 0.dp, // 无色调提升
-                shadowElevation = 0.dp // 无阴影
-            ) {
-                Row( // 横向行
-                    Modifier.fillMaxWidth().padding(12.dp), // 内边距
-                    verticalAlignment = Alignment.CenterVertically // 垂直居中
+        items(groups, key = { it.fileName }) { group -> // 每个合集一项
+            val total = group.rules.size // 合集规则总数
+            val enabledCount = group.rules.count { it.id !in disabledIds } // 已启用数量
+            val allOn = enabledCount == total // 是否全部启用
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { // 合集纵向容器
+                Surface( // 合集头部卡片
+                    modifier = Modifier.fillMaxWidth(), // 占满宽度
+                    shape = RoundedCornerShape(12.dp), // 圆角
+                    color = MaterialTheme.colorScheme.surfaceVariant // 头部底色（区别于规则卡片）
                 ) {
-                    Icon(Icons.Filled.Folder, contentDescription = null, // 文件夹图标
-                        tint = MaterialTheme.colorScheme.primary) // 主色
-                    Spacer(Modifier.width(12.dp)) // 横向间距
-                    Text(name, fontSize = 13.sp) // 文件名文本
+                    Row( // 头部横向布局
+                        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), // 内边距
+                        verticalAlignment = Alignment.CenterVertically // 垂直居中
+                    ) {
+                        Icon( // 合集图标
+                            Icons.Filled.Folder, contentDescription = null, // 文件夹图标
+                            tint = MaterialTheme.colorScheme.primary, // 主色
+                            modifier = Modifier.size(20.dp) // 图标尺寸
+                        )
+                        Spacer(Modifier.width(10.dp)) // 间距
+                        Column(Modifier.weight(1f)) { // 名称与计数列
+                            Text( // 合集名
+                                group.name, // 名称
+                                fontSize = 14.sp, // 字号
+                                fontWeight = FontWeight.SemiBold // 半粗体
+                            )
+                            Text( // 启用计数
+                                "已启用 $enabledCount / $total 条", // 文案
+                                fontSize = 11.sp, // 字号
+                                color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
+                            )
+                        }
+                        IconButton( // 预览原文按钮
+                            onClick = { onPreview(group.fileName) }, // 触发预览
+                            modifier = Modifier.size(32.dp) // 按钮尺寸
+                        ) {
+                            Icon( // 文档图标
+                                Icons.AutoMirrored.Filled.InsertDriveFile, contentDescription = "预览原文", // 无障碍描述
+                                tint = MaterialTheme.colorScheme.outline, // 灰色
+                                modifier = Modifier.size(18.dp) // 图标尺寸
+                            )
+                        }
+                        Switch( // 整组开关
+                            checked = allOn, // 全部启用时选中
+                            onCheckedChange = { onToggleGroup(group, it) } // 一键启用/禁用整个合集
+                        )
+                    }
+                }
+                group.rules.forEach { rule -> // 合集内每条规则
+                    RuleCard( // 规则卡片
+                        rule = rule, // 规则
+                        active = rule.enabled && rule.id !in disabledIds, // 是否激活
+                        onToggle = { on -> onToggle(rule, on) }, // 单条开关切换
+                        onClick = null, // 内置规则不可点击编辑
+                        onDelete = null // 内置规则不可删除
+                    )
                 }
             }
-        }
-        item { // 内置规则标题
-            Text("内置规则（共 ${rules.size} 条）", fontSize = 12.sp, // 文案带数量
-                fontWeight = FontWeight.SemiBold, // 半粗体
-                color = MaterialTheme.colorScheme.primary, // 主色
-                modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)) // 上下间距
-        }
-        items(rules, key = { "builtin_" + it.id }) { rule -> // 加前缀避免与本地 key 冲突
-            RuleCard( // 规则卡片
-                rule = rule, // 规则
-                active = rule.enabled && rule.id !in disabledIds, // 是否激活
-                onToggle = { on -> onToggle(rule, on) }, // 开关切换
-                onClick = null, // 内置规则不可点击编辑
-                onDelete = null // 内置规则不可删除
-            )
         }
     }
 }

@@ -56,6 +56,9 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
     private val _builtInRules = MutableStateFlow<List<Rule>>(emptyList())  // 内置规则的内部可变 StateFlow
     val builtInRules: StateFlow<List<Rule>> = _builtInRules.asStateFlow()  // 对外暴露内置规则的只读 StateFlow
 
+    private val _builtInGroups = MutableStateFlow<List<RuleGroup>>(emptyList())  // 内置合集分组的内部可变 StateFlow
+    val builtInGroups: StateFlow<List<RuleGroup>> = _builtInGroups.asStateFlow()  // 对外暴露内置合集分组的只读 StateFlow（UI 按合集展示）
+
     /**
      * 重新加载所有来源的规则并合并。
      *
@@ -72,12 +75,21 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
         val installedPkgs = runCatching {  // 获取已安装应用包名集合，失败则返回空集合（不过滤）
             context.packageManager.getInstalledPackages(0).map { it.packageName }.toSet()  // 取已安装包名集合
         }.getOrDefault(emptySet())  // 异常时返回空集合
-        val builtInRs = readBuiltInRules()  // 读取所有内置规则集
-        val builtInRules = builtInRs.flatMap { it.rules }  // 展平所有规则
-            .filter { it.packageName.isEmpty() || it.packageName in installedPkgs }  // 仅保留通用兜底或已安装应用的规则
-            .map { it.copy(source = RuleSource.BUILT_IN) }  // 标记为内置来源
+        val builtInRs = readBuiltInRules()  // 读取所有内置规则集（文件名 → RuleSet）
+        // 按合集（RuleSet）分组：每组仅保留通用兜底或已安装应用的规则，并标记为内置来源
+        val builtInGroups = builtInRs.map { (fileName, rs) ->  // 遍历每个内置规则集
+            RuleGroup(  // 构造合集分组
+                name = rs.name,  // 合集名取自规则集名
+                fileName = fileName,  // 来源文件名（预览用）
+                rules = rs.rules  // 该合集的规则
+                    .filter { it.packageName.isEmpty() || it.packageName in installedPkgs }  // 仅保留通用兜底或已安装应用
+                    .map { it.copy(source = RuleSource.BUILT_IN) }  // 标记为内置来源
+            )
+        }.filter { it.rules.isNotEmpty() }  // 过滤掉没有可见规则的合集
+        _builtInGroups.value = builtInGroups  // 更新内置合集分组 StateFlow
+        val builtInRules = builtInGroups.flatMap { it.rules }  // 展平各合集规则，得到内置规则总表
         _builtInRules.value = builtInRules  // 更新内置规则 StateFlow
-        Logger.d("加载内置规则 ${builtInRules.size} 条（过滤未安装应用后）")  // 输出调试日志
+        Logger.d("加载内置规则 ${builtInRules.size} 条 / ${builtInGroups.size} 个合集（过滤未安装应用后）")  // 输出调试日志
 
         // 2. 本地（按 createdAt 倒序）
         val localRs = readRulesFromDir(localDir)  // 读取本地目录下所有规则集
@@ -195,18 +207,19 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
      *
      * 单个文件解析失败不影响其它文件，错误会被记录到日志并跳过。
      *
-     * @return 解析成功的 RuleSet 列表（顺序由 assets.list 决定）
+     * @return 解析成功的 (文件名 → RuleSet) 列表，按文件名排序（顺序稳定）
      */
-    private fun readBuiltInRules(): List<RuleSet> {  // 读取所有内置规则集方法
+    private fun readBuiltInRules(): List<Pair<String, RuleSet>> {  // 读取所有内置规则集方法（保留文件名）
         val names = runCatching { context.assets.list("rules") ?: emptyArray() }.getOrDefault(emptyArray())  // 列出 assets/rules 目录下所有文件名
-        return names.filter { it.endsWith(".json") }.mapNotNull { name ->  // 只处理 .json 文件并跳过解析失败的
-            runCatching {  // 单文件解析捕获异常
+        return names.filter { it.endsWith(".json") }.sorted().mapNotNull { name ->  // 只处理 .json 文件，按文件名排序，跳过解析失败的
+            val rs = runCatching {  // 单文件解析捕获异常
                 context.assets.open("rules/$name").use {  // 打开 assets 输入流
                     ruleSetAdapter.fromJson(it.bufferedReader().readText())  // 读取并解析为 RuleSet
                 }
             }.getOrElse {  // 解析失败处理
                 Logger.w("读取内置规则 $name 失败", it); null  // 输出警告日志并返回 null 跳过
             }
+            rs?.let { name to it }  // 成功则返回 文件名→RuleSet 对
         }
     }
 

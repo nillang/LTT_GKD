@@ -121,3 +121,19 @@ data class RuleSet(  // 规则集数据类，一个文件对应一个 RuleSet
     val author: String = "",  // 作者标识
     val rules: List<Rule> = emptyList()  // 该集合下的所有规则列表
 )
+
+/**
+ * 规则合集（仅运行时用于 UI 分组，不参与序列化）。
+ *
+ * 一个内置规则文件（[RuleSet]）即一个"合集"，如"社交资讯类""视频直播类"。
+ * 内置 Tab 按合集分组展示，用户既可切换单条规则，也可一键启用/禁用整个合集。
+ *
+ * @param name 合集名称（取自 [RuleSet.name]，用于 UI 展示）
+ * @param fileName 合集来源文件名（assets/rules 下的 .json，用于原文预览）
+ * @param rules 该合集下（已按已安装应用过滤后的）规则列表
+ */
+data class RuleGroup(  // 规则合集数据类，运行时 UI 分组用
+    val name: String,  // 合集名称
+    val fileName: String = "",  // 来源文件名（预览用）
+    val rules: List<Rule> = emptyList()  // 合集内规则列表
+)

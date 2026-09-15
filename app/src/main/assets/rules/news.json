@@ -1,119 +1,220 @@
 {
-  "name": "新闻资讯类规则集",
+  "name": "新闻资讯",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
-      "id": "com.ifeng.news_splash",
-      "name": "凤凰新闻开屏",
-      "packageName": "com.ifeng.news",
+      "id": "com.ss.android.article.news_splash",
+      "name": "今日头条开屏",
+      "packageName": "com.ss.android.article.news",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.article.news_popup",
+      "name": "今日头条弹窗",
+      "packageName": "com.ss.android.article.news",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.tencent.news_splash",
       "name": "腾讯新闻开屏",
       "packageName": "com.tencent.news",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.netease.news_splash",
-      "name": "网易新闻开屏",
-      "packageName": "com.netease.news",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.sina.news_splash",
-      "name": "新浪新闻开屏",
-      "packageName": "com.sina.news",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "cn.cntvnews_splash",
-      "name": "央视新闻开屏",
-      "packageName": "cn.cntvnews",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.ss.android.article.news_splash",
-      "name": "今日头条开屏",
-      "packageName": "com.ss.android.article.news",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.tencent.news_popup",
       "name": "腾讯新闻弹窗",
       "packageName": "com.tencent.news",
+      "activity": null,
       "enabled": true,
       "priority": 80,
       "throttleMs": 3000,
       "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "×"],
-        "ids": [],
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.netease.news_splash",
+      "name": "网易新闻开屏",
+      "packageName": "com.netease.news",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.sina.news_splash",
+      "name": "新浪新闻开屏",
+      "packageName": "com.sina.news",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ifeng.news_splash",
+      "name": "凤凰新闻开屏",
+      "packageName": "com.ifeng.news",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.cntvnews_splash",
+      "name": "央视新闻开屏",
+      "packageName": "cn.cntvnews",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.wondertek.paper_splash",
+      "name": "澎湃新闻开屏",
+      "packageName": "com.wondertek.paper",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

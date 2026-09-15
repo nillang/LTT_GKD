@@ -1,103 +1,174 @@
 {
-  "name": "社区类规则集",
+  "name": "社区论坛",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
       "id": "com.baidu.tieba_splash",
       "name": "百度贴吧开屏",
       "packageName": "com.baidu.tieba",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.soul_splash",
-      "name": "Soul开屏",
-      "packageName": "cn.soulapp.android",
+      "id": "com.baidu.tieba_popup",
+      "name": "百度贴吧弹窗",
+      "packageName": "com.baidu.tieba",
+      "activity": null,
       "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
+      "priority": 80,
+      "throttleMs": 3000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.douban.frodo_splash",
       "name": "豆瓣开屏",
       "packageName": "com.douban.frodo",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.coolapk.market_splash",
       "name": "酷安开屏",
       "packageName": "com.coolapk.market",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.okex.splash",
-      "name": "即刻开屏",
-      "packageName": "com.okex",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.coolapk.market_popup",
       "name": "酷安弹窗",
       "packageName": "com.coolapk.market",
+      "activity": null,
       "enabled": true,
       "priority": 80,
       "throttleMs": 3000,
       "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "×"],
-        "ids": [],
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.smzdm.client.android_splash",
+      "name": "什么值得买开屏",
+      "packageName": "com.smzdm.client.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.hupu.games_splash",
+      "name": "虎扑开屏",
+      "packageName": "com.hupu.games",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

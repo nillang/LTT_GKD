@@ -1,5 +1,5 @@
 {
-  "name": "社交资讯类",
+  "name": "社交通讯",
   "version": 1,
   "author": "LTT_GKD builtin",
   "rules": [
@@ -13,115 +13,280 @@
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.tencent.mobileqq_splash",
-      "name": "QQ 开屏",
+      "name": "QQ开屏",
       "packageName": "com.tencent.mobileqq",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "关闭广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.tencent.wblog_splash",
+      "id": "com.tencent.mobileqq_popup",
+      "name": "QQ弹窗",
+      "packageName": "com.tencent.mobileqq",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.sina.weibo_splash",
       "name": "微博开屏",
       "packageName": "com.sina.weibo",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.zhihu.android_splash",
-      "name": "知乎开屏",
-      "packageName": "com.zhihu.android",
-      "priority": 100,
-      "throttleMs": 5000,
+      "id": "com.sina.weibo_popup",
+      "name": "微博弹窗",
+      "packageName": "com.sina.weibo",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.ss.android.ugc.aweme_splash",
       "name": "抖音开屏",
       "packageName": "com.ss.android.ugc.aweme",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.smile.gifmaker_splash",
       "name": "快手开屏",
       "packageName": "com.smile.gifmaker",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.ss.android.article.news_splash",
-      "name": "今日头条开屏",
-      "packageName": "com.ss.android.article.news",
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.netease.newsreader.activity_splash",
-      "name": "网易新闻开屏",
-      "packageName": "com.netease.newsreader.activity",
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.xingin.xhs_splash",
       "name": "小红书开屏",
       "packageName": "com.xingin.xhs",
+      "activity": null,
+      "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.xingin.xhs_popup",
+      "name": "小红书弹窗",
+      "packageName": "com.xingin.xhs",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.zhihu.android_splash",
+      "name": "知乎开屏",
+      "packageName": "com.zhihu.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.immomo.momo_splash",
+      "name": "陌陌开屏",
+      "packageName": "com.immomo.momo",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.soulapp.android_splash",
+      "name": "Soul开屏",
+      "packageName": "cn.soulapp.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

@@ -1,103 +1,292 @@
 {
-  "name": "视频类规则集",
+  "name": "视频直播",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
       "id": "com.qiyi.video_splash",
       "name": "爱奇艺开屏",
       "packageName": "com.qiyi.video",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.qiyi.video_popup",
+      "name": "爱奇艺弹窗",
+      "packageName": "com.qiyi.video",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.youku.phone_splash",
       "name": "优酷开屏",
       "packageName": "com.youku.phone",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.youku.phone_popup",
+      "name": "优酷弹窗",
+      "packageName": "com.youku.phone",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.tencent.qqlive_splash",
       "name": "腾讯视频开屏",
       "packageName": "com.tencent.qqlive",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.qqlive_popup",
+      "name": "腾讯视频弹窗",
+      "packageName": "com.tencent.qqlive",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "tv.danmaku.bili_splash",
       "name": "哔哩哔哩开屏",
       "packageName": "tv.danmaku.bili",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.hunantv.imgo.activity_splash",
-      "name": "MangoTV开屏",
+      "name": "芒果TV开屏",
       "packageName": "com.hunantv.imgo.activity",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.ystenjyt.saohuo.svip_splash",
-      "name": "央视频开屏",
-      "packageName": "com.ystenjyt.saohuo.svip",
+      "id": "com.sohu.sohuvideo_splash",
+      "name": "搜狐视频开屏",
+      "packageName": "com.sohu.sohuvideo",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.huya.live_splash",
+      "name": "虎牙直播开屏",
+      "packageName": "com.huya.live",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "air.tv.douyu.android_splash",
+      "name": "斗鱼开屏",
+      "packageName": "air.tv.douyu.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.ugc.live_splash",
+      "name": "抖音火山版开屏",
+      "packageName": "com.ss.android.ugc.live",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

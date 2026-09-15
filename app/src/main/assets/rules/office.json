@@ -1,12 +1,12 @@
 {
-  "name": "音乐",
+  "name": "办公网盘",
   "version": 1,
   "author": "LTT_GKD builtin",
   "rules": [
     {
-      "id": "com.netease.cloudmusic_splash",
-      "name": "网易云音乐开屏",
-      "packageName": "com.netease.cloudmusic",
+      "id": "com.kingsoft.office_splash",
+      "name": "WPS Office开屏",
+      "packageName": "com.kingsoft.office",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -27,9 +27,9 @@
       }
     },
     {
-      "id": "com.netease.cloudmusic_popup",
-      "name": "网易云音乐弹窗",
-      "packageName": "com.netease.cloudmusic",
+      "id": "com.kingsoft.office_popup",
+      "name": "WPS Office弹窗",
+      "packageName": "com.kingsoft.office",
       "activity": null,
       "enabled": true,
       "priority": 80,
@@ -53,9 +53,9 @@
       }
     },
     {
-      "id": "com.tencent.qqmusic_splash",
-      "name": "QQ音乐开屏",
-      "packageName": "com.tencent.qqmusic",
+      "id": "com.alibaba.android.rimet_splash",
+      "name": "钉钉开屏",
+      "packageName": "com.alibaba.android.rimet",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -76,9 +76,9 @@
       }
     },
     {
-      "id": "com.kugou.android_splash",
-      "name": "酷狗音乐开屏",
-      "packageName": "com.kugou.android",
+      "id": "com.tencent.wework_splash",
+      "name": "企业微信开屏",
+      "packageName": "com.tencent.wework",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -99,9 +99,9 @@
       }
     },
     {
-      "id": "cn.kuwo.player_splash",
-      "name": "酷我音乐开屏",
-      "packageName": "cn.kuwo.player",
+      "id": "com.ss.android.lark_splash",
+      "name": "飞书开屏",
+      "packageName": "com.ss.android.lark",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -122,9 +122,9 @@
       }
     },
     {
-      "id": "com.luna.music_splash",
-      "name": "汽水音乐开屏",
-      "packageName": "com.luna.music",
+      "id": "com.tencent.wemeet.app_splash",
+      "name": "腾讯会议开屏",
+      "packageName": "com.tencent.wemeet.app",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -145,9 +145,58 @@
       }
     },
     {
-      "id": "cmccwm.musicstore_splash",
-      "name": "咪咕音乐开屏",
-      "packageName": "cmccwm.musicstore",
+      "id": "com.baidu.netdisk_splash",
+      "name": "百度网盘开屏",
+      "packageName": "com.baidu.netdisk",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.baidu.netdisk_popup",
+      "name": "百度网盘弹窗",
+      "packageName": "com.baidu.netdisk",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.xuexi.android_splash",
+      "name": "学习强国开屏",
+      "packageName": "cn.xuexi.android",
       "activity": null,
       "enabled": true,
       "priority": 100,

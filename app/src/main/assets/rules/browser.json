@@ -1,87 +1,145 @@
 {
-  "name": "浏览器类规则集",
+  "name": "浏览器搜索",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
       "id": "com.quark.browser_splash",
-      "name": "夸克浏览器开屏",
+      "name": "夸克开屏",
       "packageName": "com.quark.browser",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.UCMobile_splash",
       "name": "UC浏览器开屏",
       "packageName": "com.UCMobile",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.android.chrome_banner",
-      "name": "Chrome首页Banner",
-      "packageName": "com.android.chrome",
+      "id": "com.tencent.mtt_splash",
+      "name": "QQ浏览器开屏",
+      "packageName": "com.tencent.mtt",
+      "activity": null,
       "enabled": true,
-      "priority": 60,
-      "throttleMs": 3000,
+      "priority": 100,
+      "throttleMs": 5000,
       "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "不感兴趣"],
-        "ids": [],
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.microsoft.emmx_banner",
-      "name": "Edge首页Banner",
-      "packageName": "com.microsoft.emmx",
+      "id": "mark.via_splash",
+      "name": "Via浏览器开屏",
+      "packageName": "mark.via",
+      "activity": null,
       "enabled": true,
-      "priority": 60,
-      "throttleMs": 3000,
+      "priority": 100,
+      "throttleMs": 5000,
       "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "不感兴趣"],
-        "ids": [],
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.baidu.searchbox_splash",
+      "name": "百度开屏",
+      "packageName": "com.baidu.searchbox",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.baidu.browser.apps_splash",
       "name": "百度浏览器开屏",
       "packageName": "com.baidu.browser.apps",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

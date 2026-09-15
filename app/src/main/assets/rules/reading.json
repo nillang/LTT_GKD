@@ -1,103 +1,220 @@
 {
-  "name": "阅读类规则集",
+  "name": "阅读听书",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
-      "id": "com.qidian.YDReader_splash",
+      "id": "com.qidian.QDReader_splash",
       "name": "起点读书开屏",
-      "packageName": "com.qidian.YDReader",
+      "packageName": "com.qidian.QDReader",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.dragon.read_splash",
       "name": "番茄免费小说开屏",
       "packageName": "com.dragon.read",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.dragon.read_popup",
-      "name": "番茄小说弹窗",
+      "name": "番茄免费小说弹窗",
       "packageName": "com.dragon.read",
+      "activity": null,
       "enabled": true,
       "priority": 80,
       "throttleMs": 3000,
       "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "不再显示"],
-        "ids": [],
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.ximalaya.ting.android_splash",
-      "name": "喜马拉雅开屏",
-      "packageName": "com.ximalaya.ting.android",
+      "id": "com.kmxs.reader_splash",
+      "name": "七猫免费小说开屏",
+      "packageName": "com.kmxs.reader",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.tencent.weread_splash",
       "name": "微信读书开屏",
       "packageName": "com.tencent.weread",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.douban.frodo_splash",
-      "name": "豆瓣开屏",
-      "packageName": "com.douban.frodo",
+      "id": "com.ximalaya.ting.android_splash",
+      "name": "喜马拉雅开屏",
+      "packageName": "com.ximalaya.ting.android",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ximalaya.ting.android_popup",
+      "name": "喜马拉雅弹窗",
+      "packageName": "com.ximalaya.ting.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 80,
+      "throttleMs": 3000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "关闭",
+          "关闭广告",
+          "取消",
+          "以后再说",
+          "跳过",
+          "×"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.chaozh.iReaderFree_splash",
+      "name": "掌阅开屏",
+      "packageName": "com.chaozh.iReaderFree",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.duokan.reader_splash",
+      "name": "多看阅读开屏",
+      "packageName": "com.duokan.reader",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }

@@ -1,151 +1,122 @@
 {
-  "name": "游戏类规则集",
+  "name": "游戏",
   "version": 1,
-  "author": "ltt_gkd",
+  "author": "LTT_GKD builtin",
   "rules": [
     {
       "id": "com.taptap.app_splash",
       "name": "TapTap开屏",
       "packageName": "com.taptap.app",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.taptap.global_splash",
       "name": "TapTap国际版开屏",
       "packageName": "com.taptap.global",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["Skip", "跳过"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.valvesoftware.steam_splash",
-      "name": "Steam移动开屏",
-      "packageName": "com.valvesoftware.steam",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "Skip", "skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.bbk.kuaitong.gamecenter_splash",
-      "name": "4399游戏中心开屏",
-      "packageName": "com.bbk.kuaitong.gamecenter",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.netease.games_splash",
-      "name": "网易游戏开屏",
-      "packageName": "com.netease.games",
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "com.mihoyo.hoyolab_splash",
       "name": "米游社开屏",
       "packageName": "com.mihoyo.hoyolab",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.huya.live_splash",
-      "name": "虎牙直播开屏",
-      "packageName": "com.huya.live",
+      "id": "com.valvesoftware.steam_splash",
+      "name": "Steam开屏",
+      "packageName": "com.valvesoftware.steam",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
-      "id": "com.douya.live_splash",
-      "name": "斗鱼直播开屏",
-      "packageName": "com.douya.live",
+      "id": "com.xmcy.hykb_splash",
+      "name": "好游快爆开屏",
+      "packageName": "com.xmcy.hykb",
+      "activity": null,
       "enabled": true,
       "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip"],
-        "ids": [],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
-    },
-    {
-      "id": "com.kingsoft.shanxi.telecom.sptel.ahww.sxlfn.popup",
-      "name": "虎牙弹窗广告",
-      "packageName": "com.huya.live",
-      "enabled": true,
-      "priority": 80,
-      "throttleMs": 3000,
-      "match": {
-        "type": "DESC",
-        "text": ["关闭", "关闭广告", "×"],
-        "ids": [],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     }
   ]
 }
