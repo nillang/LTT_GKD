@@ -57,6 +57,12 @@ class WindowEventProcessor(
 
     private suspend fun processEvent(pkgRaw: String?, cls: String?) { // 内部：实际处理逻辑
         val pkg = pkgRaw ?: return // 取事件来源包名，无则返回
+        // 绝不处理本应用自身窗口：否则通用兜底规则会匹配到小狐自己界面上的"跳过/关闭/关闭服务"等文字，
+        // 自动点击电源按钮（contentDescription="关闭服务"）→ 跳系统无障碍设置 → 返回后再次自点 → 无限跳转死循环。
+        if (pkg == service.packageName) { // 事件来自本应用自身
+            Logger.d("忽略本应用自身窗口事件") // 记录 debug
+            return // 直接短路，不做任何匹配/点击
+        }
         // 白名单检查：O(1) HashSet 查询，必须在候选筛选前短路
         if (whitelist.isWhitelisted(pkg)) { // 包名在白名单
             Logger.d("$pkg 在白名单内，跳过处理") // 记录 debug 日志
