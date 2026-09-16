@@ -78,7 +78,6 @@ fun SettingsScreen( // 设置主组件
     onOpenWhitelist: () -> Unit // 打开白名单
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
-    val log by settings.logEnabled.collectAsState(initial = false) // 日志开关
     val ocr by settings.ocrEnabled.collectAsState(initial = true) // OCR 兜底
     val sub by settings.subscriptionEnabled.collectAsState(initial = false) // 订阅开关
     val skipNoti by settings.skipNotificationEnabled.collectAsState(initial = false) // 跳过通知
@@ -139,34 +138,15 @@ fun SettingsScreen( // 设置主组件
                 onCheckedChange = { v -> scope.launch { settings.setOcr(v) } } // 异步保存
             )
             CardDivider() // 分隔线
-            // 日志：整行点击查看日志，右侧 Switch 控制是否记录日志
-            Row( // 日志行
-                Modifier.fillMaxWidth().clickable(onClick = onOpenLogs) // 整行点击
-                    .padding(horizontal = 14.dp, vertical = 10.dp), // 内边距
-                verticalAlignment = Alignment.CenterVertically // 垂直居中
-            ) {
-                IconBadge( // 图标徽章
-                    Icons.AutoMirrored.Filled.Article, // 文章图标
-                    if (dark) DarkOrangeBadgeBg else OrangeBadgeBg, // 橙色背景（深色适配）
-                    if (dark) DarkAccentOrange else AccentOrange // 橙色前景（深色适配）
-                )
-                Spacer(Modifier.size(10.dp)) // 间距
-                Column(Modifier.weight(1f)) { // 文本列
-                    Text("日志", fontSize = 13.sp, fontWeight = FontWeight.Medium) // 标题
-                    Text( // 副标题
-                        if (log) "记录中，点击查看" else "已关闭，点击查看", // 状态文案
-                        fontSize = 11.sp, // 字号
-                        color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
-                    )
-                }
-                Switch( // 日志开关
-                    checked = log, // 当前状态
-                    onCheckedChange = { v -> // 切换回调
-                        Logger.refresh(v) // 立即刷新日志记录
-                        scope.launch { settings.setLog(v) } // 异步保存
-                    }
-                )
-            }
+            // 日志：纯入口项，点击进入日志查看页（记录始终开启，无需开关）
+            ClickItem( // 点击设置项
+                icon = Icons.AutoMirrored.Filled.Article, // 文章图标
+                iconBg = if (dark) DarkOrangeBadgeBg else OrangeBadgeBg, // 橙色背景（深色适配）
+                iconTint = if (dark) DarkAccentOrange else AccentOrange, // 橙色前景（深色适配）
+                title = "日志", // 标题
+                subtitle = "查看运行日志", // 副标题
+                onClick = onOpenLogs // 点击进入日志查看页
+            )
             CardDivider() // 分隔线
             ClickItem( // 应用白名单项
                 icon = Icons.Filled.Checklist, // 清单图标

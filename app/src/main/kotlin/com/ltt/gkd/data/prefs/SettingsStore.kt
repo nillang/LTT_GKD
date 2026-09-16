@@ -29,7 +29,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class SettingsStore(private val context: Context) {  // 设置存储类
 
     /** 日志开关：控制 Logger V/D 级输出（I/W/E 始终输出）。 */
-    val logEnabled: Flow<Boolean> = context.dataStore.data.map { it[KEY_LOG] ?: false }  // 日志开关 Flow，默认 false
+    val logEnabled: Flow<Boolean> = context.dataStore.data.map { it[KEY_LOG] ?: true }  // 日志开关 Flow，默认 true（设置页已改为纯日志入口，无开关，保证日志内容可用）
     /** OCR 兜底开关：控件树找不到时截图识别。 */
     val ocrEnabled: Flow<Boolean> = context.dataStore.data.map { it[KEY_OCR] ?: true }  // OCR 开关 Flow，默认 true
     /** 自动订阅更新开关。 */

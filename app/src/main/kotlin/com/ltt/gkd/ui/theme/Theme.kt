@@ -15,14 +15,14 @@ import androidx.compose.ui.platform.LocalContext // 导入本地上下文
  * LTT_GKD 主主题入口（UI v5 深青色调色板）。
  *
  * 策略：
- * - Android 12+（API 31+）：优先使用 dynamicColor（Material You 取色）
- * - 旧版：使用硬编码 DayNight 配色
- * - 深青绿 = 品牌主色（自动跳过、清爽）
+ * - 统一使用硬编码 DayNight 品牌配色（primary = #007070 深青绿，见开发文档 §4.1 / 约束 U1）
+ * - 禁用 Android 12+ 的 Material You 动态取色：动态色会随壁纸改变而覆盖品牌色，
+ *   导致真机上主题色与文档规定不符（此前默认开启即此问题），故 dynamicColor 默认关闭。
  */
 @Composable // 标记为 Composable
 fun LTTGKDTheme( // 主题入口函数
     darkTheme: Boolean = isSystemInDarkTheme(), // 是否深色主题，默认跟随系统
-    dynamicColor: Boolean = true, // 是否启用动态取色，默认开
+    dynamicColor: Boolean = false, // 动态取色默认关闭：保证品牌主题色 #007070 全局生效
     content: @Composable () -> Unit // 主题包裹的内容
 ) {
     val colorScheme = when { // 选择配色方案
