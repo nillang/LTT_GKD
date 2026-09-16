@@ -1,0 +1,17 @@
+{
+  "name": "小狐官方规则库",
+  "version": 1,
+  "author": "ltt_gkd",
+  "rules": [
+    {
+      "id": "com.tencent.mm_splash",
+      "name": "微信-开屏跳过",
+      "packageName": "com.tencent.mm",
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": { "type": "TEXT", "text": ["跳过", "跳过广告", "Skip"], "ids": [], "regex": false, "caseInsensitive": true },
+      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+    }
+  ]
+}

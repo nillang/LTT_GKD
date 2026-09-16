@@ -28,3 +28,6 @@ __pycache__/
 
 # WorkBuddy 项目记忆（本地工作数据，不入库）
 .workbuddy/
+
+# 官方规则库上传产生的 Gist ID（视为本地敏感信息，不入库）
+official_rules/.gist_id

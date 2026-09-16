@@ -9,13 +9,16 @@ import com.ltt.gkd.data.app.WhitelistStore // 导入应用白名单存储
 import com.ltt.gkd.data.history.SkipHistoryStore // 导入跳过历史记录存储
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储（DataStore 偏好）
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
+import com.ltt.gkd.data.subscription.OfficialSource // 导入官方规则源配置（默认订阅源）
 import com.ltt.gkd.data.subscription.SubscriptionStore // 导入订阅源存储
+import com.ltt.gkd.data.subscription.SubscriptionSyncer // 导入订阅同步器（官方源播种后立即同步）
 import com.ltt.gkd.service.ServiceWatchdog // 导入服务看门狗（崩溃自恢复兜底）
 import com.ltt.gkd.util.CrashGuard // 导入崩溃守护（主线程崩溃落盘 + 下次启动提示）
 import com.ltt.gkd.util.Logger // 导入全局日志工具
 import kotlinx.coroutines.CoroutineScope // 导入协程作用域
 import kotlinx.coroutines.Dispatchers // 导入调度器，Default 用于 CPU 密集任务
 import kotlinx.coroutines.SupervisorJob // 导入 SupervisorJob，子协程异常不传播
+import kotlinx.coroutines.flow.first // 导入 first，取 Flow 首值
 import kotlinx.coroutines.launch // 导入 launch，启动协程
 
 /**
@@ -71,6 +74,26 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
         ServiceWatchdog.ensureScheduled(this) // 排程看门狗周期任务（15 分钟）
         appScope.launch { // 启动即检查一次（用户打开小狐即可发现服务未运行）
             ServiceWatchdog.checkOnce(this@App) // 复用周期任务的检查逻辑
+        }
+        seedOfficialSource() // 播种官方规则源（首次启动自动添加默认订阅地址并同步）
+    }
+
+    /**
+     * 播种官方规则源：首次启动时自动添加开发者维护的默认订阅地址并同步一次。
+     *
+     * 仅在 [OfficialSource.isReady]（地址已配置）且从未播种过时执行；播种后置标记，
+     * 用户之后手动删除官方源不会再被自动加回（尊重用户选择）。
+     */
+    private fun seedOfficialSource() { // 播种官方源方法
+        appScope.launch { // 异步执行，不阻塞启动
+            runCatching { // 全程兜底，播种失败不影响应用启动
+                if (!OfficialSource.isReady) return@launch // 官方地址未配置（占位），跳过
+                if (settings.officialSourceSeeded.first()) return@launch // 已播种过，跳过
+                val source = subscriptions.add(OfficialSource.NAME, OfficialSource.ADDRESS) // 添加官方源（同 URL 自动去重）
+                settings.setOfficialSourceSeeded(true) // 先标记已播种，避免重复
+                Logger.i("已播种官方规则源：${OfficialSource.NAME}") // 记录日志
+                SubscriptionSyncer().syncAndPersist(source, subscriptions, repo) // 立即同步一次官方规则
+            }.onFailure { Logger.w("播种官方规则源失败", it) } // 失败记日志
         }
     }
 

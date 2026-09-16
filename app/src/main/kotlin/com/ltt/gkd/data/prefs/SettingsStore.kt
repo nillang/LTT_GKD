@@ -43,6 +43,9 @@ class SettingsStore(private val context: Context) {  // 设置存储类
     /** 累计跳过总次数（仅增不减，除非用户手动重置）。 */
     val totalSkipCount: Flow<Int> = context.dataStore.data.map { it[KEY_TOTAL_SKIP] ?: 0 }  // 累计跳过次数 Flow，默认 0
 
+    /** 官方规则源是否已播种（首次启动自动添加一次，用户删除后不再自动加回）。 */
+    val officialSourceSeeded: Flow<Boolean> = context.dataStore.data.map { it[KEY_OFFICIAL_SEEDED] ?: false }  // 官方源播种标记 Flow，默认 false
+
     /** 用户手动禁用的规则 ID 集合（适用于所有来源；未在集合内视为启用）。 */
     val disabledRuleIds: Flow<Set<String>> =  // 禁用规则 ID 集合 Flow
         context.dataStore.data.map { it[KEY_DISABLED_RULES] ?: emptySet() }  // 取集合，缺失则空集合
@@ -100,6 +103,8 @@ class SettingsStore(private val context: Context) {  // 设置存储类
     }
     /** 重置累计跳过计数为 0（用户手动触发）。 */
     suspend fun resetTotalSkip() = context.dataStore.edit { it[KEY_TOTAL_SKIP] = 0 }  // 重置跳过计数方法
+    /** 标记官方规则源已播种（首次启动自动添加官方源后置 true）。 */
+    suspend fun setOfficialSourceSeeded(v: Boolean) = context.dataStore.edit { it[KEY_OFFICIAL_SEEDED] = v }  // 设置官方源播种标记
 
     companion object {  // 静态键定义
         private val KEY_LOG = booleanPreferencesKey("log_enabled")  // 日志开关键
@@ -109,6 +114,7 @@ class SettingsStore(private val context: Context) {  // 设置存储类
         private val KEY_SUB_INTERVAL = intPreferencesKey("subscription_interval_hours")  // 更新间隔键
         private val KEY_NOTI_SKIP = booleanPreferencesKey("skip_notification_enabled")  // 跳过通知开关键
         private val KEY_TOTAL_SKIP = intPreferencesKey("total_skip_count")  // 累计跳过次数键
+        private val KEY_OFFICIAL_SEEDED = booleanPreferencesKey("official_source_seeded")  // 官方源播种标记键
         private val KEY_DISABLED_RULES = stringSetPreferencesKey("disabled_rule_ids")  // 禁用规则 ID 集合键
         private val KEY_DEVICE_ID = stringPreferencesKey("device_id")  // 设备 ID 键
         private val KEY_GH_TOKEN = stringPreferencesKey("github_token")  // GitHub Token 键（加密存储）
