@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons // 导入 Material 图标集合
 import androidx.compose.material.icons.automirrored.filled.List // 导入自动镜像的列表图标
 import androidx.compose.material.icons.filled.Home // 导入首页图标
 import androidx.compose.material.icons.filled.Settings // 导入设置图标
+import androidx.compose.material3.AlertDialog // 导入 AlertDialog，崩溃恢复提示弹窗
 import androidx.compose.material3.Icon // 导入 Icon 组件
 import androidx.compose.material3.MaterialTheme // 导入 MaterialTheme，访问颜色/字体/形状
 import androidx.compose.material3.NavigationBar // 导入底部导航栏组件
@@ -23,6 +24,7 @@ import androidx.compose.material3.NavigationBarItem // 导入导航栏单项
 import androidx.compose.material3.NavigationBarItemDefaults // 导入导航栏默认样式
 import androidx.compose.material3.Scaffold // 导入 Scaffold，提供页面骨架
 import androidx.compose.material3.Text // 导入 Text 组件
+import androidx.compose.material3.TextButton // 导入 TextButton，弹窗按钮
 import androidx.compose.runtime.DisposableEffect // 导入 DisposableEffect，生命周期相关副作用
 import androidx.compose.runtime.LaunchedEffect // 导入 LaunchedEffect，挂载时启动协程
 import androidx.compose.runtime.collectAsState // 导入 collectAsState，把 Flow 收集为 Compose 状态
@@ -48,6 +50,7 @@ import com.ltt.gkd.ui.rule.RuleEditActivity // 导入规则编辑 Activity
 import com.ltt.gkd.ui.rule.RulesScreen // 导入规则管理 Composable
 import com.ltt.gkd.ui.settings.SettingsScreen // 导入设置页 Composable
 import com.ltt.gkd.ui.theme.LTTGKDTheme // 导入应用主题
+import com.ltt.gkd.util.CrashGuard // 导入崩溃守护，启动时检测上次异常退出
 import com.ltt.gkd.util.globalAdapter // 导入全局 JSON 适配器
 import com.ltt.gkd.util.launchSafe // 导入安全启动协程的辅助函数
 import kotlinx.coroutines.flow.combine // 导入 combine，合并多个 Flow
@@ -99,6 +102,31 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
 
                 var tab by remember { mutableIntStateOf(0) } // 当前选中的底部 Tab 索引
                 var showHistory by remember { mutableStateOf(false) } // 是否覆盖显示跳过记录页
+
+                // ---- 崩溃恢复提示：上次主线程崩溃/进程被系统杀死后，本次启动弹窗引导重开服务 ----
+                var crashInfo by remember { mutableStateOf<String?>(null) } // 上次崩溃堆栈（null=无崩溃）
+                LaunchedEffect(Unit) { // 组件挂载即检测
+                    crashInfo = CrashGuard.consumeCrash(this@MainActivity) // 读取并清除崩溃标记
+                }
+                crashInfo?.let { info -> // 存在崩溃标记时弹窗
+                    AlertDialog( // 提示弹窗
+                        onDismissRequest = { crashInfo = null }, // 点外部关闭
+                        title = { Text("小狐上次异常退出") }, // 标题
+                        text = { Text("应用可能被系统终止（崩溃或被清理），无障碍服务或已停止。\n请重新开启以确保广告跳过正常。") }, // 正文
+                        confirmButton = { // 确认按钮
+                            TextButton(onClick = { // 点击跳无障碍设置
+                                crashInfo = null // 关闭弹窗
+                                startActivity( // 跳转无障碍设置
+                                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS) // 无障碍 Action
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // 新任务栈
+                                )
+                            }) { Text("去开启") } // 文案
+                        },
+                        dismissButton = { // 取消按钮
+                            TextButton(onClick = { crashInfo = null }) { Text("知道了") } // 关闭
+                        }
+                    )
+                }
 
                 // ---- 导入/导出文件选择 ----
                 val exportLauncher = rememberLauncherForActivityResult( // 创建导出文件选择器

@@ -244,7 +244,7 @@ class GistClient(  // Gist 客户端类
         return JSONObject().apply {  // 顶层请求体 JSON
             if (isCreate) {  // 创建新 Gist 分支
                 put("description", "LTT_GKD shared rules")  // 描述
-                put("public", false) // 私有 Gist，避免被随机爬
+                put("public", true) // 公开 Gist：订阅端无 Token 匿名拉取（D1 零配置），私有 Gist 匿名会 404 导致共享链路断裂
             }
             put("files", files)  // 放入 files 字段
         }.toString()  // 序列化为字符串

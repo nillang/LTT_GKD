@@ -11,6 +11,7 @@ import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储（DataStore �
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
 import com.ltt.gkd.data.subscription.SubscriptionStore // 导入订阅源存储
 import com.ltt.gkd.service.ServiceWatchdog // 导入服务看门狗（崩溃自恢复兜底）
+import com.ltt.gkd.util.CrashGuard // 导入崩溃守护（主线程崩溃落盘 + 下次启动提示）
 import com.ltt.gkd.util.Logger // 导入全局日志工具
 import kotlinx.coroutines.CoroutineScope // 导入协程作用域
 import kotlinx.coroutines.Dispatchers // 导入调度器，Default 用于 CPU 密集任务
@@ -78,7 +79,8 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
      *
      * 目的：当无障碍服务所在线程发生未捕获异常时，记录日志并吞掉异常，
      * 避免进程崩溃导致无障碍服务被系统停止。系统重启服务后可继续工作。
-     * 仅处理非致命异常；主线程致命异常仍交由系统默认处理器（避免 ANR）。
+     * 仅处理非致命异常；主线程致命异常先同步落盘崩溃堆栈（CrashGuard，供排查 +
+     * 下次启动弹窗提示），再交系统默认处理器（避免 ANR）。
      */
     private fun setupCrashHandler() { // 设置全局异常处理器
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler() // 保存系统默认处理器
@@ -88,6 +90,9 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
             if (thread != Looper.getMainLooper().thread) { // 非主线程
                 // 子线程异常不杀进程，服务可继续工作
             } else { // 主线程异常
+                // 先同步落盘崩溃堆栈：既解决"logcat 轮转后异常源无法定位"的排查难题，
+                // 又作为下次启动"异常退出"的弹窗标记（见 CrashGuard.consumeCrash）。
+                CrashGuard.markCrash(this, throwable) // 同步写崩溃标记
                 // 主线程异常仍交系统默认处理器，避免界面卡住导致 ANR
                 defaultHandler?.uncaughtException(thread, throwable) // 调用默认处理器
             }

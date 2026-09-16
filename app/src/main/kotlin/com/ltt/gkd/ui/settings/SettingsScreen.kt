@@ -140,6 +140,16 @@ fun SettingsScreen( // 设置主组件
                 onCheckedChange = { v -> scope.launch { settings.setOcr(v) } } // 异步保存
             )
             CardDivider() // 分隔线
+            ToggleItem( // 跳过通知
+                icon = Icons.Filled.Notifications, // 通知图标
+                iconBg = MaterialTheme.colorScheme.primaryContainer, // 主容器色
+                iconTint = MaterialTheme.colorScheme.primary, // 主色
+                title = "跳过通知", // 标题
+                subtitle = "成功跳过时在通知栏提示", // 副标题
+                checked = skipNoti, // 开关状态
+                onCheckedChange = { v -> scope.launch { settings.setSkipNotification(v) } } // 异步保存
+            )
+            CardDivider() // 分隔线
             // 日志：纯入口项，点击进入日志查看页（记录始终开启，无需开关）
             ClickItem( // 点击设置项
                 icon = Icons.AutoMirrored.Filled.Article, // 文章图标
@@ -157,16 +167,6 @@ fun SettingsScreen( // 设置主组件
                 title = "应用白名单", // 标题
                 subtitle = "管理不执行跳过的应用", // 副标题
                 onClick = onOpenWhitelist // 点击跳转
-            )
-            CardDivider() // 分隔线
-            ToggleItem( // 跳过通知
-                icon = Icons.Filled.Notifications, // 通知图标
-                iconBg = MaterialTheme.colorScheme.primaryContainer, // 主容器色
-                iconTint = MaterialTheme.colorScheme.primary, // 主色
-                title = "跳过通知", // 标题
-                subtitle = "成功跳过时在通知栏提示", // 副标题
-                checked = skipNoti, // 开关状态
-                onCheckedChange = { v -> scope.launch { settings.setSkipNotification(v) } } // 异步保存
             )
         }
 
