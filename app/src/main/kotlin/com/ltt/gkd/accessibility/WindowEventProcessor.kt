@@ -165,7 +165,7 @@ class WindowEventProcessor(
     private suspend fun onSkipSucceeded(pkg: String, rule: Rule, matchedText: String?) { // 内部：跳过成功后处理
         skippedThisLaunch = true // 本次进入已成功跳过：关闭通用兜底，避免随后在首页/信息流误点
         settings.incrementTotalSkip() // 累计跳过计数
-        history.record(resolveAppName(pkg), rule, rule.action.type, matchedText) // 写入历史记录
+        history.record(resolveAppName(pkg), rule, rule.action.type, matchedText, pkg) // 写入历史记录（传实际事件包名，修复通用规则落库空包名）
         val enableNoti = skipNotiEnabledFlow.value // 读内存快照（通知开关）
         if (enableNoti) { // 通知开启
             SkipNotifier.notify(service, rule.name) // 发送跳过通知

@@ -34,7 +34,7 @@ class SkipHistoryStoreInstrumentedTest {  // 跳过历史存储真机测试类
 
     @Before  // 标记测试前置方法
     fun setup() {  // 测试前置初始化
-        val ctx = InstrumentationRegistry.getTargetContext()  // 取被测应用上下文
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext  // 取被测应用上下文（新版 androidx.test 移除了 getTargetContext）
         // 清理可能残留的历史文件，保证每次测试起点一致
         historyFile = File(File(ctx.filesDir, "history"), "history.jsonl")  // 计算历史文件路径
         historyFile.delete()  // 删除残留历史文件

@@ -10,10 +10,12 @@ import com.ltt.gkd.data.history.SkipHistoryStore // 导入跳过历史记录存�
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储（DataStore 偏好）
 import com.ltt.gkd.data.rule.RuleRepository // 导入规则仓库
 import com.ltt.gkd.data.subscription.SubscriptionStore // 导入订阅源存储
+import com.ltt.gkd.service.ServiceWatchdog // 导入服务看门狗（崩溃自恢复兜底）
 import com.ltt.gkd.util.Logger // 导入全局日志工具
 import kotlinx.coroutines.CoroutineScope // 导入协程作用域
 import kotlinx.coroutines.Dispatchers // 导入调度器，Default 用于 CPU 密集任务
 import kotlinx.coroutines.SupervisorJob // 导入 SupervisorJob，子协程异常不传播
+import kotlinx.coroutines.launch // 导入 launch，启动协程
 
 /**
  * LTT_GKD 应用入口。
@@ -63,6 +65,12 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
         Logger.init(this) // 初始化日志工具
         registerNotificationChannels() // 注册通知渠道
         setupCrashHandler() // 设置全局异常捕获，防止无障碍服务因未处理异常崩溃
+        // 看门狗：服务崩溃/被系统回收后可能不再自动重绑（真机实测 ColorOS 上 Crashed 常驻甚至被移除），
+        // 启动时立即检查一次 + 每 15 分钟周期检查，掉绑时发"点击重新开启"通知——G7 崩溃自恢复的最后兜底。
+        ServiceWatchdog.ensureScheduled(this) // 排程看门狗周期任务（15 分钟）
+        appScope.launch { // 启动即检查一次（用户打开小狐即可发现服务未运行）
+            ServiceWatchdog.checkOnce(this@App) // 复用周期任务的检查逻辑
+        }
     }
 
     /**
@@ -104,12 +112,20 @@ class App : Application() { // 继承 Application，作为整个应用的全局�
                     NotificationManager.IMPORTANCE_DEFAULT // 默认重要性，有声音
                 )
             )
+            nm.createNotificationChannel( // 创建看门狗渠道（服务掉绑恢复引导，需要用户注意）
+                NotificationChannel(
+                    CHANNEL_WATCHDOG, // 渠道 ID
+                    getString(R.string.notification_channel_watchdog), // 渠道名称
+                    NotificationManager.IMPORTANCE_HIGH // 高重要性，有提示音/横幅
+                )
+            )
         }
     }
 
     companion object { // 伴生对象，提供静态成员
         const val CHANNEL_SERVICE = "service" // 服务保活通知渠道 ID 常量
         const val CHANNEL_SKIP_EVENT = "skip_event" // 跳过事件通知渠道 ID 常量
+        const val CHANNEL_WATCHDOG = "watchdog" // 服务看门狗通知渠道 ID 常量
 
         @Volatile // 保证多线程可见性
         private var instance: App? = null // 全局单例实例

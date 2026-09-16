@@ -28,7 +28,7 @@ class WhitelistStoreInstrumentedTest {  // 白名单存储真机测试类
 
     @Before  // 标记测试前置方法
     fun setup() {  // 测试前置初始化
-        val ctx = InstrumentationRegistry.getTargetContext()  // 取被测应用上下文
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext  // 取被测应用上下文（新版 androidx.test 移除了 getTargetContext）
         store = WhitelistStore(ctx)  // 用目标上下文创建白名单存储
     }
 

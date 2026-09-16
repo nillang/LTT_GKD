@@ -60,11 +60,13 @@ class SkipHistoryStore(private val context: Context) {  // 跳过历史存储类
         scope.launch { load() }  // 启动协程加载历史文件
     }
 
-    /** 记录一次成功跳过。应用名由调用方解析后传入（避免在无障碍线程查 PackageManager）。 */
-    fun record(appName: String, rule: Rule, action: ActionType, matchedText: String? = null) {  // 记录一次跳过方法
+    /** 记录一次成功跳过。应用名由调用方解析后传入（避免在无障碍线程查 PackageManager）；
+     *  [pkg] 为实际事件包名：通用兜底规则的 rule.packageName 为空串，必须用实际包名落库，
+     *  否则历史里"跳过了哪个 App"无法追溯（曾出现 appName=小蚕惠生活 而 packageName="" 的记录）。 */
+    fun record(appName: String, rule: Rule, action: ActionType, matchedText: String? = null, pkg: String = "") {  // 记录一次跳过方法
         val rec = SkipRecord(  // 构造 SkipRecord
-            appName = appName.ifEmpty { rule.packageName },  // 应用名为空则用包名
-            packageName = rule.packageName,  // 包名
+            appName = appName.ifEmpty { pkg.ifEmpty { rule.packageName } },  // 应用名为空则依次回退实际包名/规则包名
+            packageName = pkg.ifEmpty { rule.packageName },  // 包名优先取实际事件包名，通用规则回退规则包名
             scene = inferScene(rule),  // 推断场景
             matchedText = matchedText ?: rule.match.text.firstOrNull().orEmpty(),  // 命中文本，缺省取规则首关键词
             action = action.name,  // 动作名
