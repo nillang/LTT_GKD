@@ -96,6 +96,8 @@ fun SettingsScreen( // 设置主组件
 
     // 订阅卡片展开状态
     var subExpanded by remember { mutableStateOf(false) } // 订阅卡片展开
+    // 贡献者卡片展开状态
+    var contribExpanded by remember { mutableStateOf(false) } // 贡献者卡片展开
 
     Column( // 滚动纵向容器
         Modifier
@@ -249,61 +251,82 @@ fun SettingsScreen( // 设置主组件
         // ---------- 贡献者 ----------
         SectionTitle("贡献者") // 分区标题
         SettingsCard { // 卡片容器
-            Row(Modifier.fillMaxWidth().padding(14.dp), // 内边距
-                verticalAlignment = Alignment.CenterVertically) { // 垂直居中
+            Row( // 标题行（可点击展开，与"规则订阅"一致的下拉展示）
+                Modifier.fillMaxWidth().clickable { contribExpanded = !contribExpanded }.padding(14.dp), // 占满、点击切换、内边距
+                verticalAlignment = Alignment.CenterVertically // 垂直居中
+            ) {
                 Icon(Icons.Filled.Shield, contentDescription = null, // 盾牌图标
                     tint = MaterialTheme.colorScheme.primary) // 主色
                 Spacer(Modifier.size(12.dp)) // 间距
-                Column { // 文本列
+                Column(Modifier.weight(1f)) { // 文本列
                     Text("设备 ID", fontSize = 13.sp, fontWeight = FontWeight.Medium) // 标题
                     Text( // 副标题
-                        deviceId.ifEmpty { "（上传规则时自动生成）" }, // 空时提示
+                        "上传规则标识与 GitHub 配置", // 文案
                         fontSize = 11.sp, // 字号
                         color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
                     )
                 }
-            }
-            CardDivider() // 分隔线
-            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { // Token 列
-                Text("GitHub Token", fontSize = 11.sp, // 标签
-                    color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
-                OutlinedTextField( // Token 输入框
-                    value = localGhToken, // 本地状态值
-                    onValueChange = { v -> // 输入回调
-                        localGhToken = v // 立即更新本地状态
-                        scope.launch { settings.setGithubToken(v) } // 异步保存
-                    },
-                    placeholder = { Text("ghp_xxxxxxxx") }, // 占位
-                    modifier = Modifier.fillMaxWidth(), // 占满
-                    singleLine = true, // 单行
-                    visualTransformation = PasswordVisualTransformation() // 密码掩码
+                Icon( // 展开/收起图标
+                    if (contribExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, // 切换图标
+                    contentDescription = if (contribExpanded) "收起" else "展开", // 无障碍描述
+                    tint = MaterialTheme.colorScheme.outline // 描边色
                 )
             }
-            Column(Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp), // 底部列
-                verticalArrangement = Arrangement.spacedBy(4.dp)) { // 间距
-                Text("Gist ID（上传后自动生成）", fontSize = 11.sp, // 标签
-                    color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
-                OutlinedTextField( // Gist ID 输入框
-                    value = localGistId, // 本地状态值
-                    onValueChange = { v -> // 输入回调
-                        localGistId = v // 立即更新本地状态
-                        scope.launch { settings.setGistId(v) } // 异步保存
-                    },
-                    placeholder = { Text("自动生成") }, // 占位
-                    modifier = Modifier.fillMaxWidth(), // 占满
-                    singleLine = true // 单行
-                )
-            }
-            Surface( // 安全提示卡片
-                color = MaterialTheme.colorScheme.secondaryContainer, // 次容器色
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp) // 内边距
-            ) {
-                Text( // 安全说明
-                    "Token 使用 Android Keystore + AES-GCM 加密，Gist 设为私有，仅本地存储", // 文案
-                    fontSize = 10.sp, // 小字号
-                    color = MaterialTheme.colorScheme.onSecondaryContainer, // 次容器前景
-                    modifier = Modifier.padding(10.dp) // 内边距
-                )
+            if (contribExpanded) { // 展开时显示详情
+                CardDivider() // 分隔线
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { // 详情列
+                    Row(verticalAlignment = Alignment.CenterVertically) { // 设备 ID 值行
+                        Column(Modifier.weight(1f)) { // 文本列
+                            Text("设备 ID", fontSize = 11.sp, // 标签
+                                color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
+                            Text( // 设备 ID 值
+                                deviceId.ifEmpty { "（上传规则时自动生成）" }, // 空时提示
+                                fontSize = 13.sp, // 字号
+                                fontWeight = FontWeight.Medium // 中粗体
+                            )
+                        }
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { // Token 列
+                        Text("GitHub Token", fontSize = 11.sp, // 标签
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
+                        OutlinedTextField( // Token 输入框
+                            value = localGhToken, // 本地状态值
+                            onValueChange = { v -> // 输入回调
+                                localGhToken = v // 立即更新本地状态
+                                scope.launch { settings.setGithubToken(v) } // 异步保存
+                            },
+                            placeholder = { Text("ghp_xxxxxxxx") }, // 占位
+                            modifier = Modifier.fillMaxWidth(), // 占满
+                            singleLine = true, // 单行
+                            visualTransformation = PasswordVisualTransformation() // 密码掩码
+                        )
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { // Gist ID 列
+                        Text("Gist ID（上传后自动生成）", fontSize = 11.sp, // 标签
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) // 次要色
+                        OutlinedTextField( // Gist ID 输入框
+                            value = localGistId, // 本地状态值
+                            onValueChange = { v -> // 输入回调
+                                localGistId = v // 立即更新本地状态
+                                scope.launch { settings.setGistId(v) } // 异步保存
+                            },
+                            placeholder = { Text("自动生成") }, // 占位
+                            modifier = Modifier.fillMaxWidth(), // 占满
+                            singleLine = true // 单行
+                        )
+                    }
+                    Surface( // 安全提示卡片
+                        color = MaterialTheme.colorScheme.secondaryContainer, // 次容器色
+                        modifier = Modifier.fillMaxWidth() // 占满
+                    ) {
+                        Text( // 安全说明
+                            "Token 使用 Android Keystore + AES-GCM 加密，Gist 设为私有，仅本地存储", // 文案
+                            fontSize = 10.sp, // 小字号
+                            color = MaterialTheme.colorScheme.onSecondaryContainer, // 次容器前景
+                            modifier = Modifier.padding(10.dp) // 内边距
+                        )
+                    }
+                }
             }
         }
 

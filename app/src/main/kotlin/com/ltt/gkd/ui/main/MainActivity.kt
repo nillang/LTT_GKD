@@ -7,6 +7,7 @@ import android.provider.Settings // 导入系统 Settings，用于跳转无障�
 import android.view.accessibility.AccessibilityManager // 导入无障碍管理器，检测服务启用状态
 import android.widget.Toast // 导入 Toast，用于底部短提示
 import androidx.activity.ComponentActivity // 导入 ComponentActivity，Jetpack Activity 基类
+import androidx.activity.compose.BackHandler // 导入 BackHandler，拦截系统返回键
 import androidx.activity.compose.rememberLauncherForActivityResult // 导入 Compose 中启动 Activity 结果的辅助函数
 import androidx.activity.compose.setContent // 导入 setContent，挂载 Compose 树
 import androidx.activity.result.contract.ActivityResultContracts // 导入标准 Activity 结果契约
@@ -112,6 +113,7 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                 }
 
                 if (showHistory) { // 显示跳过记录页
+                    BackHandler { showHistory = false } // 拦截系统返回键/侧滑：关闭历史页回首页，而非退出 Activity
                     HistoryScreen( // 挂载跳过记录页
                         history = app.history, // 传入跳过历史存储
                         totalSkipFlow = app.settings.totalSkipCount, // 传入累计跳过流
