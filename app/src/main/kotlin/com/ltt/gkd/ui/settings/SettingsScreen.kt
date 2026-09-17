@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height // 导入高度
 import androidx.compose.foundation.layout.padding // 导入内边距
 import androidx.compose.foundation.layout.size // 导入尺寸
 import androidx.compose.foundation.rememberScrollState // 导入滚动状态
+import androidx.compose.foundation.shape.CircleShape // 导入圆形 Shape（保活提示序号徽章）
 import androidx.compose.foundation.shape.RoundedCornerShape // 导入圆角 Shape
 import androidx.compose.foundation.verticalScroll // 导入纵向滚动修饰符
 import androidx.compose.material.icons.Icons // 导入图标集合
@@ -168,6 +169,21 @@ fun SettingsScreen( // 设置主组件
                 subtitle = "管理不执行跳过的应用", // 副标题
                 onClick = onOpenWhitelist // 点击跳转
             )
+        }
+
+        // ---------- 后台保活引导 ----------
+        SectionTitle("后台保活") // 分区标题
+        SettingsCard { // 卡片容器
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { // 内容列
+                Text( // 说明文字
+                    "为避免服务被系统回收导致偶发漏跳，建议完成以下设置：", // 文案
+                    fontSize = 11.sp, // 字号
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
+                )
+                KeepAliveTip("1", "最近任务界面给小狐加锁（下拉锁定，防一键清理）") // 保活提示 1
+                KeepAliveTip("2", "电池/电源：小狐设为「允许后台活动」或「无限制」") // 保活提示 2
+                KeepAliveTip("3", "允许小狐自启动（ColorOS：设置 → 应用管理 → 小狐 → 自动启动）") // 保活提示 3
+            }
         }
 
         // ---------- 规则订阅（折叠卡片） ----------
@@ -337,6 +353,32 @@ fun SettingsScreen( // 设置主组件
             fontSize = 13.sp, // 字号
             color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
             modifier = Modifier.padding(start = 4.dp, bottom = 12.dp) // 内边距
+        )
+    }
+}
+
+/** 后台保活提示项：圆形序号徽章 + 提示文字。 */
+@Composable // 标记为 Composable
+private fun KeepAliveTip(index: String, text: String) { // 保活提示项
+    Row( // 横向布局
+        verticalAlignment = Alignment.CenterVertically, // 垂直居中
+        horizontalArrangement = Arrangement.spacedBy(8.dp) // 水平间距
+    ) {
+        Box( // 序号徽章
+            Modifier.size(18.dp).background(MaterialTheme.colorScheme.primary, CircleShape), // 圆形主色背景
+            contentAlignment = Alignment.Center // 居中
+        ) {
+            Text( // 序号文字
+                index, // 序号
+                fontSize = 10.sp, // 小号字
+                fontWeight = FontWeight.Bold, // 加粗
+                color = MaterialTheme.colorScheme.onPrimary // 前景色
+            )
+        }
+        Text( // 提示文字
+            text, // 文案
+            fontSize = 12.sp, // 字号
+            color = MaterialTheme.colorScheme.onSurface // 文字色
         )
     }
 }

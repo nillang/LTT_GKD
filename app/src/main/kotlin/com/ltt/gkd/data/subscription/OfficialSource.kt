@@ -21,11 +21,16 @@ object OfficialSource {  // 官方规则源配置对象
     /**
      * 官方默认订阅地址。
      *
-     * 当前为占位空串：开发者运行 `official_rules/upload.py` 把官方规则上传到 Gist 后，
-     * 把得到的 32 位 Gist ID 填到这里（或未来直接填自建服务器的 http(s) 直链）。
-     * 空串表示"尚未配置"，[isReady] 为 false，APP 不会播种。
+     * 推荐方案（免费 + 国内加速）：把规则 JSON 推到一个公开 GitHub 仓库后，
+     * 用 jsDelivr 生成稳定直链，例如：
+     * `https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/official_rules/<文件名>.json`
+     * 该直链会被 [SubscriptionUrls.detectType] 自动识别为 URL 类型，国内有 CDN 节点更稳。
+     *
+     * 备选方案：运行 `official_rules/upload.py` 把官方规则上传到公开 Gist，填 32 位 Gist ID。
+     *
+     * 当前为空串表示"尚未配置"，[isReady] 为 false，APP 不会播种；填入真实直链后即可开箱即用。
      */
-    const val ADDRESS: String = ""  // TODO: 填入官方 Gist ID 或服务器 URL
+    const val ADDRESS: String = ""  // TODO: 填入官方 jsDelivr 直链或 Gist ID
 
     /** 是否已配置官方源（ADDRESS 非空才播种，避免占位值导致同步失败）。 */
     val isReady: Boolean get() = ADDRESS.isNotBlank()  // 非空即就绪
