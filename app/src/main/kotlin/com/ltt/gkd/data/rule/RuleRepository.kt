@@ -50,8 +50,11 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
     private val _localRules = MutableStateFlow<List<Rule>>(emptyList())  // 本地规则的内部可变 StateFlow
     val localRules: StateFlow<List<Rule>> = _localRules.asStateFlow()  // 对外暴露本地规则的只读 StateFlow
 
-    private val _subscribedRules = MutableStateFlow<List<Rule>>(emptyList())  // 订阅规则的内部可变 StateFlow
+    private val _subscribedRules = MutableStateFlow<List<Rule>>(emptyList())  // 订阅规则（已安装应用 + 通用兜底）的内部可变 StateFlow
     val subscribedRules: StateFlow<List<Rule>> = _subscribedRules.asStateFlow()  // 对外暴露订阅规则的只读 StateFlow
+
+    private val _subscribedInactive = MutableStateFlow<List<Rule>>(emptyList())  // 未安装应用订阅规则的内部可变 StateFlow（仅展示，不参与匹配）
+    val subscribedInactive: StateFlow<List<Rule>> = _subscribedInactive.asStateFlow()  // 对外暴露未安装订阅规则的只读 StateFlow
 
     private val _builtInRules = MutableStateFlow<List<Rule>>(emptyList())  // 内置规则的内部可变 StateFlow
     val builtInRules: StateFlow<List<Rule>> = _builtInRules.asStateFlow()  // 对外暴露内置规则的只读 StateFlow
@@ -100,10 +103,13 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
 
         // 3. 订阅（按 subscribers 倒序）
         val subscribedRs = readRulesFromDir(subscribedDir)  // 读取订阅目录下所有规则集
-        val subscribedRules = subscribedRs.flatMap { it.rules }.map { it.copy(source = RuleSource.SUBSCRIBED) }  // 展平并标记为订阅来源
+        val allSubscribed = subscribedRs.flatMap { it.rules }.map { it.copy(source = RuleSource.SUBSCRIBED) }  // 展平并标记为订阅来源
             .sortedByDescending { it.subscribers }  // 按订阅数倒序
+        // 按已安装应用过滤：已安装 + 通用兜底进入生效列表，未安装的归入待激活列表（新装应用后下次 reload 自动激活）
+        val subscribedRules = allSubscribed.filter { it.packageName.isEmpty() || it.packageName in installedPkgs }  // 已安装应用或通用兜底
         _subscribedRules.value = subscribedRules  // 更新订阅规则 StateFlow
-        Logger.d("加载订阅规则 ${subscribedRules.size} 条")  // 输出调试日志
+        _subscribedInactive.value = allSubscribed.filter { it.packageName.isNotEmpty() && it.packageName !in installedPkgs }  // 未安装应用
+        Logger.d("加载订阅规则 ${subscribedRules.size} 条 / 未安装 ${_subscribedInactive.value.size} 条")  // 输出调试日志
 
         // 合并（后者覆盖前者）：BUILT_IN → LOCAL → SUBSCRIBED
         val merged = LinkedHashMap<String, Rule>()  // 合并用的有序 Map，按 ID 去重

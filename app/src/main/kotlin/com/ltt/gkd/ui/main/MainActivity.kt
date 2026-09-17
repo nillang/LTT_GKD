@@ -85,6 +85,8 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                     val observer = LifecycleEventObserver { _, e -> // 创建事件观察者
                         if (e == Lifecycle.Event.ON_RESUME) { // 当事件为 ON_RESUME
                             serviceOn = isAccessibilityEnabled() // 刷新服务运行状态
+                            // 重新加载规则：重新读取设备应用列表，让"新安装应用"的规则从待激活状态自动进入生效列表
+                            app.appScope.launch { repo.reload() } // 异步重载规则（含已安装应用过滤）
                         }
                     }
                     lifecycleOwner.lifecycle.addObserver(observer) // 注册观察者

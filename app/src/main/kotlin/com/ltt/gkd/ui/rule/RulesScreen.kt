@@ -120,7 +120,8 @@ fun RulesScreen( // 规则管理主组件
     val scope = rememberCoroutineScope() // 协程作用域
     val context = LocalContext.current // 本地上下文，用于同步结果 Toast 提示
     val local by repo.localRules.collectAsState() // 本地规则列表
-    val subscribed by repo.subscribedRules.collectAsState() // 订阅规则列表
+    val subscribed by repo.subscribedRules.collectAsState() // 订阅规则列表（已安装应用 + 通用兜底）
+    val subscribedInactive by repo.subscribedInactive.collectAsState() // 未安装应用订阅规则列表（折叠展示）
     val builtIn by repo.builtInRules.collectAsState() // 内置规则列表
     val builtInGroups by repo.builtInGroups.collectAsState() // 内置规则合集分组（按合集展示）
     val disabledIds by settings.disabledRuleIds.collectAsState(initial = emptySet()) // 已禁用 ID 集合
@@ -135,6 +136,7 @@ fun RulesScreen( // 规则管理主组件
     var preview by remember { mutableStateOf<Pair<String, String?>?>(null) } // 内置规则预览内容
     var syncingAll by remember { mutableStateOf(false) } // 全部同步中状态
     var syncingId by remember { mutableStateOf<String?>(null) } // 单源同步中的源 ID
+    var inactiveExpanded by remember { mutableStateOf(false) } // 未安装应用折叠区展开状态
     var addSourceOpen by remember { mutableStateOf(false) } // 添加订阅源对话框展开状态
     var addName by remember { mutableStateOf("") } // 添加订阅源：名称输入
     var addUrl by remember { mutableStateOf("") } // 添加订阅源：链接输入
@@ -268,6 +270,11 @@ fun RulesScreen( // 规则管理主组件
                             usageHeader = "共 ${subscribed.size} 条 · 使用量（订阅数）${formatCount(subscribed.maxOfOrNull { it.subscribers } ?: 0)}" // 使用量=订阅源的订阅数
                         )
                     }
+                    InactiveSubscribedSection( // 未安装应用折叠区
+                        inactive = subscribedInactive, // 未安装规则列表
+                        expanded = inactiveExpanded, // 展开状态
+                        onToggleExpanded = { inactiveExpanded = !inactiveExpanded } // 切换展开
+                    )
                 }
                 2 -> BuiltInContent( // 内置规则列表（按合集分组）
                     groups = builtInGroups, // 内置合集分组
@@ -958,6 +965,62 @@ private fun SubscriptionSourceManager( // 订阅源管理区
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 未安装应用的订阅规则折叠区。
+ *
+ * 设计：规则库全量下发，但部分应用用户尚未安装。这些规则的 packageName 不在当前
+ * 已安装应用列表中，暂不参与匹配；折叠在此统一展示，等用户安装对应应用后，
+ * 下次进入规则页重新 reload 会自动把这些规则移入"已安装"列表并生效。
+ *
+ * @param inactive 未安装应用的订阅规则列表。
+ * @param expanded 折叠区是否展开。
+ * @param onToggleExpanded 点击标题行切换展开状态的回调。
+ */
+@Composable // 标记为 Composable
+private fun InactiveSubscribedSection( // 未安装应用折叠区
+    inactive: List<Rule>, // 未安装规则列表
+    expanded: Boolean, // 展开状态
+    onToggleExpanded: () -> Unit // 切换展开回调
+) {
+    if (inactive.isEmpty()) return // 无未安装规则则不显示
+    Surface( // 折叠卡片容器
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp), // 外边距
+        shape = RoundedCornerShape(10.dp), // 圆角
+        color = MaterialTheme.colorScheme.surfaceVariant // 浅灰底，区分于已安装规则
+    ) {
+        Column { // 纵向布局
+            Row( // 标题行（可点击展开）
+                Modifier.fillMaxWidth().clickable(onClick = onToggleExpanded).padding(horizontal = 12.dp, vertical = 10.dp), // 占满、可点击、内边距
+                verticalAlignment = Alignment.CenterVertically // 垂直居中
+            ) {
+                Text( // 标题文字
+                    "未安装应用（${inactive.size} 条）", // 文案
+                    fontSize = 12.sp, // 字号
+                    fontWeight = FontWeight.Medium, // 中等粗细
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
+                    modifier = Modifier.weight(1f) // 占满剩余宽度
+                )
+                Text( // 展开箭头
+                    if (expanded) "▾" else "▸", // 展开/收起箭头字符
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // 次要色
+                )
+            }
+            if (expanded) { // 展开时显示列表
+                inactive.forEach { rule -> // 遍历每条未安装规则
+                    Text( // 规则行（只读灰显，不可操作）
+                        "${rule.name} · ${rule.packageName}", // 应用名 + 包名
+                        fontSize = 11.sp, // 字号
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色（灰显）
+                        maxLines = 1, // 单行
+                        overflow = TextOverflow.Ellipsis, // 超出省略号
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp) // 内边距
+                    )
                 }
             }
         }
