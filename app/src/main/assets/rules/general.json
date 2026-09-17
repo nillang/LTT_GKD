@@ -7,7 +7,7 @@
       "id": "universal_splash_skip",
       "name": "通用开屏跳过",
       "packageName": "",
-      "priority": 10,
+      "priority": 1,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",

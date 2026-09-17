@@ -86,7 +86,7 @@ fun RuleTemplate.toRule(  // 模板转 Rule 的扩展函数
             priority = 80,  // 弹窗优先级
             throttleMs = 3000L,  // 节流 3 秒
             match = MatchTarget(  // 匹配目标
-                type = MatchType.TEXT,  // 文本匹配
+                type = MatchType.DESC,  // 描述匹配：弹窗关闭按钮常在 contentDescription 中
                 text = listOf("关闭", "关闭广告", "×", "不再提示"),  // 关闭关键词
                 caseInsensitive = true  // 大小写不敏感
             ),
