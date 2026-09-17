@@ -28,9 +28,9 @@ object OfficialSource {  // 官方规则源配置对象
      *
      * 备选方案：运行 `official_rules/upload.py` 把官方规则上传到公开 Gist，填 32 位 Gist ID。
      *
-     * 当前为空串表示"尚未配置"，[isReady] 为 false，APP 不会播种；填入真实直链后即可开箱即用。
+     * 当前已配置为 jsDelivr 直链，[isReady] 为 true，APP 首次启动会自动播种并同步官方规则。
      */
-    const val ADDRESS: String = ""  // TODO: 填入官方 jsDelivr 直链或 Gist ID
+    const val ADDRESS: String = "https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/official_rules.json"  // 官方规则库 jsDelivr 直链（国内 CDN 加速，URL 类型自动识别）
 
     /** 是否已配置官方源（ADDRESS 非空才播种，避免占位值导致同步失败）。 */
     val isReady: Boolean get() = ADDRESS.isNotBlank()  // 非空即就绪
