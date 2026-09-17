@@ -213,6 +213,17 @@ class OcrManager(
         PatternUtils.compile(raw, target) // 委托 PatternUtils
 
     /**
+     * 清空按包名 OCR 节流时间戳。
+     *
+     * 由 [com.ltt.gkd.accessibility.WindowEventProcessor] 在应用切换（pkg 变更）时调用，
+     * 与 [com.ltt.gkd.data.rule.RuleEngine.resetThrottle] 保持对称：避免冷启动/快速切回时
+     * 因上一次 OCR 留下的时间戳在 2 秒内被误判为"节流中"，导致开屏广告完全失去 OCR 兜底机会。
+     */
+    fun resetThrottle() { // 入口：重置 OCR 节流
+        lastOcrTimeByPkg.clear() // 清空所有包名的上次 OCR 时间戳
+    }
+
+    /**
      * 释放 MLKit TextRecognizer 资源。
      * 由 [com.ltt.gkd.service.SkipAccessibilityService.onUnbind] 调用。
      */

@@ -97,6 +97,7 @@ class WindowEventProcessor(
         val now = System.currentTimeMillis() // 当前时间戳
         if (pkg != lastPkg) { // 包名变化代表切换应用
             engine.resetThrottle() // 重置规则引擎节流
+            ocr.resetThrottle() // 重置 OCR 按包名节流，避免冷启动被历史时间戳误拦
             lastPkg = pkg // 更新上次包名
             pkgForegroundAt = now // 记录本次进入前台时间
             skippedThisLaunch = false // 新的一次进入，重置"已跳过"标记

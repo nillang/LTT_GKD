@@ -1,5 +1,6 @@
 package com.ltt.gkd.ui.rule // 声明包名，对应规则界面目录
 
+import android.widget.Toast // 导入 Toast，同步成功/失败提示
 import androidx.compose.foundation.background // 导入背景修饰符
 import androidx.compose.foundation.clickable // 导入点击修饰符
 import androidx.compose.foundation.rememberScrollState // 导入滚动状态（订阅源列表）
@@ -60,6 +61,7 @@ import androidx.compose.runtime.rememberCoroutineScope // 导入协程作用域
 import androidx.compose.runtime.setValue // 导入 setValue 委托
 import androidx.compose.ui.Alignment // 导入对齐
 import androidx.compose.ui.Modifier // 导入修饰符
+import androidx.compose.ui.platform.LocalContext // 导入本地上下文，用于显示 Toast
 import androidx.compose.ui.text.font.FontWeight // 导入字体粗细
 import androidx.compose.ui.text.style.TextOverflow // 导入文本溢出省略（订阅源链接）
 import androidx.compose.ui.unit.dp // 导入 dp 单位
@@ -116,6 +118,7 @@ fun RulesScreen( // 规则管理主组件
     onPreviewBuiltIn: (String) -> String? // 预览内置规则回调
 ) {
     val scope = rememberCoroutineScope() // 协程作用域
+    val context = LocalContext.current // 本地上下文，用于同步结果 Toast 提示
     val local by repo.localRules.collectAsState() // 本地规则列表
     val subscribed by repo.subscribedRules.collectAsState() // 订阅规则列表
     val builtIn by repo.builtInRules.collectAsState() // 内置规则列表
@@ -221,8 +224,14 @@ fun RulesScreen( // 规则管理主组件
                             if (!syncingAll && sources.any { it.enabled }) { // 有空闲且有启用源
                                 syncingAll = true // 标记同步中
                                 scope.launch { // 异步执行
-                                    syncer.syncAll(sources.filter { it.enabled }, subscriptions, repo) // 同步所有启用源
+                                    val (ok, total) = syncer.syncAll(sources.filter { it.enabled }, subscriptions, repo) // 同步所有启用源
                                     syncingAll = false // 解除
+                                    val msg = when { // 按结果生成提示文案
+                                        ok == total && total > 0 -> "全部同步成功：$ok 个源" // 全部成功
+                                        ok == 0 -> "同步失败，请检查网络与订阅链接" // 全部失败
+                                        else -> "同步完成：成功 $ok / $total 个源" // 部分成功
+                                    }
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show() // 主线程 Toast 提示结果
                                 }
                             }
                         },
@@ -230,8 +239,10 @@ fun RulesScreen( // 规则管理主组件
                             if (syncingId == null) { // 空闲时
                                 syncingId = s.id // 标记该源同步中
                                 scope.launch { // 异步执行
-                                    syncer.syncAndPersist(s, subscriptions, repo) // 同步并持久化
+                                    val r = syncer.syncAndPersist(s, subscriptions, repo) // 同步并持久化
                                     syncingId = null // 解除
+                                    val msg = if (r.success) "同步成功：${r.ruleCount} 条规则" else "同步失败：${r.error}" // 结果文案
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show() // 主线程 Toast 提示结果
                                 }
                             }
                         },
@@ -376,8 +387,10 @@ fun RulesScreen( // 规则管理主组件
                             val src = subscriptions.add(addName.trim(), addUrl.trim()) // 新增源（自动识别类型）
                             addSourceOpen = false // 关闭对话框
                             syncingId = src.id // 标记该源同步中
-                            syncer.syncAndPersist(src, subscriptions, repo) // 立即同步一次
+                            val r = syncer.syncAndPersist(src, subscriptions, repo) // 立即同步一次
                             syncingId = null // 解除
+                            val msg = if (r.success) "添加成功，同步 ${r.ruleCount} 条规则" else "添加失败：${r.error}" // 结果文案
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show() // 主线程 Toast 提示结果
                         }
                     },
                     enabled = SubscriptionUrls.isValid(addUrl) // 链接合法才可点
