@@ -37,7 +37,7 @@ import androidx.compose.material3.AlertDialog // 导入对话框
 import androidx.compose.material3.DropdownMenu // 导入下拉菜单
 import androidx.compose.material3.DropdownMenuItem // 导入下拉菜单项
 import androidx.compose.material3.ExperimentalMaterial3Api // 导入实验性 Material3 API
-import androidx.compose.material3.FloatingActionButton // 导入悬浮按钮
+
 import androidx.compose.material3.Icon // 导入图标组件
 import androidx.compose.material3.IconButton // 导入图标按钮
 import androidx.compose.material3.MaterialTheme // 导入主题
@@ -179,21 +179,21 @@ fun RulesScreen( // 规则管理主组件
                 }
             )
         },
-        floatingActionButton = { // 悬浮按钮
+        floatingActionButton = { // 悬浮按钮（圆角方形）
             // FAB 随当前 Tab 切换：本地 Tab 显示新增规则，订阅 Tab 显示添加订阅源，内置 Tab 无 FAB
             when (tabIndex) { // 按 Tab 显示不同 FAB
-                0 -> FloatingActionButton(onClick = onAddNew) { // 新增按钮
-                    Icon(Icons.Filled.Add, contentDescription = "新增规则") // 加号图标
-                }
-                1 -> FloatingActionButton( // 添加订阅源按钮
+                0 -> RoundedSquareFab( // 圆角方形 FAB
+                    onClick = onAddNew, // 点击回调
+                    contentDescription = "新增规则" // 无障碍描述
+                )
+                1 -> RoundedSquareFab( // 圆角方形 FAB
                     onClick = { // 点击添加
                         addName = "" // 清空名称
                         addUrl = "" // 清空链接
                         addSourceOpen = true // 打开添加对话框
-                    }
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = "添加订阅源") // 加号图标
-                }
+                    },
+                    contentDescription = "添加订阅源" // 无障碍描述
+                )
             }
         }
     ) { inner -> // 内容区，inner 为顶部栏占位
@@ -1023,6 +1023,35 @@ private fun InactiveSubscribedSection( // 未安装应用折叠区
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * 圆角方形 FAB：使用 primaryContainer 浅青绿底色 + primary 色加号图标，
+ * 替代标准圆形 FAB，更贴合设计稿的柔和风格。
+ *
+ * @param onClick 点击回调。
+ * @param contentDescription 无障碍描述。
+ */
+@Composable // 标记为 Composable
+private fun RoundedSquareFab( // 圆角方形悬浮按钮
+    onClick: () -> Unit, // 点击回调
+    contentDescription: String // 无障碍描述
+) {
+    Surface( // Surface 容器提供阴影
+        onClick = onClick, // 点击回调
+        shape = RoundedCornerShape(20.dp), // 大圆角方形（类胶囊）
+        color = MaterialTheme.colorScheme.primaryContainer, // 浅青绿底色
+        shadowElevation = 6.dp, // 阴影高度
+        modifier = Modifier.size(56.dp) // 尺寸
+    ) {
+        Box(contentAlignment = Alignment.Center) { // 居中容器
+            Icon( // 加号图标
+                Icons.Filled.Add, contentDescription = contentDescription, // 图标与描述
+                tint = MaterialTheme.colorScheme.primary, // 主色图标
+                modifier = Modifier.size(28.dp) // 图标尺寸
+            )
         }
     }
 }

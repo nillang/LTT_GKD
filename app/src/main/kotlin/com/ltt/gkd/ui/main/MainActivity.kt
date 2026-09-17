@@ -11,7 +11,17 @@ import androidx.activity.compose.BackHandler // 导入 BackHandler，拦截系�
 import androidx.activity.compose.rememberLauncherForActivityResult // 导入 Compose 中启动 Activity 结果的辅助函数
 import androidx.activity.compose.setContent // 导入 setContent，挂载 Compose 树
 import androidx.activity.result.contract.ActivityResultContracts // 导入标准 Activity 结果契约
+import androidx.compose.foundation.background // 导入背景修饰符
+import androidx.compose.foundation.clickable // 导入点击修饰符
+import androidx.compose.foundation.layout.Arrangement // 导入排列方向
+import androidx.compose.foundation.layout.Box // 导入 Box 容器
+import androidx.compose.foundation.layout.Column // 导入 Column 纵向容器
+import androidx.compose.foundation.layout.Row // 导入 Row 横向容器
+import androidx.compose.foundation.layout.fillMaxHeight // 导入填满高度修饰符
+import androidx.compose.foundation.layout.fillMaxWidth // 导入填满宽度修饰符
 import androidx.compose.foundation.layout.padding // 导入 padding 修饰符
+import androidx.compose.foundation.layout.size // 导入 size 修饰符
+import androidx.compose.foundation.shape.RoundedCornerShape // 导入圆角形状
 import androidx.compose.material.icons.Icons // 导入 Material 图标集合
 import androidx.compose.material.icons.automirrored.filled.List // 导入自动镜像的列表图标
 import androidx.compose.material.icons.filled.Home // 导入首页图标
@@ -19,10 +29,8 @@ import androidx.compose.material.icons.filled.Settings // 导入设置图标
 import androidx.compose.material3.AlertDialog // 导入 AlertDialog，崩溃恢复提示弹窗
 import androidx.compose.material3.Icon // 导入 Icon 组件
 import androidx.compose.material3.MaterialTheme // 导入 MaterialTheme，访问颜色/字体/形状
-import androidx.compose.material3.NavigationBar // 导入底部导航栏组件
-import androidx.compose.material3.NavigationBarItem // 导入导航栏单项
-import androidx.compose.material3.NavigationBarItemDefaults // 导入导航栏默认样式
 import androidx.compose.material3.Scaffold // 导入 Scaffold，提供页面骨架
+import androidx.compose.material3.Surface // 导入 Surface 容器
 import androidx.compose.material3.Text // 导入 Text 组件
 import androidx.compose.material3.TextButton // 导入 TextButton，弹窗按钮
 import androidx.compose.runtime.DisposableEffect // 导入 DisposableEffect，生命周期相关副作用
@@ -33,7 +41,10 @@ import androidx.compose.runtime.mutableIntStateOf // 导入可变 Int 状态
 import androidx.compose.runtime.mutableStateOf // 导入可变状态
 import androidx.compose.runtime.remember // 导入 remember，跨重组保留状态
 import androidx.compose.runtime.setValue // 导入 setValue 操作符重载
+import androidx.compose.ui.Alignment // 导入对齐方式
 import androidx.compose.ui.Modifier // 导入 Modifier 修饰符
+import androidx.compose.ui.unit.dp // 导入 dp 单位
+import androidx.compose.ui.unit.sp // 导入 sp 单位
 import androidx.lifecycle.Lifecycle // 导入生命周期枚举
 import androidx.lifecycle.LifecycleEventObserver // 导入生命周期事件观察者
 import androidx.lifecycle.compose.LocalLifecycleOwner // 导入当前生命周期所有者
@@ -152,48 +163,25 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
                 } else { // 否则显示主框架
                     Scaffold( // 使用 Scaffold 搭建骨架
                         containerColor = MaterialTheme.colorScheme.surface, // 背景色用 surface
-                        bottomBar = { // 底部导航栏
-                            NavigationBar { // 导航栏容器
-                                // Tab 0：首页（电源按钮 + 累计统计）
-                                NavigationBarItem( // 首页 Tab
-                                    selected = tab == 0, // 是否选中
-                                    onClick = { tab = 0 }, // 点击切换
-                                    icon = { Icon(Icons.Filled.Home, contentDescription = null) }, // 首页图标
-                                    label = { Text("首页") }, // 标签文字
-                                    colors = NavigationBarItemDefaults.colors( // 自定义颜色
-                                        selectedIconColor = MaterialTheme.colorScheme.primary, // 选中图标色
-                                        selectedTextColor = MaterialTheme.colorScheme.primary, // 选中文字色
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer // 指示色
+                        bottomBar = { // 底部导航栏（胶囊形选中指示器）
+                            PillBottomNavigation( // 自定义胶囊导航
+                                selectedTab = tab, // 当前选中 Tab
+                                onTabSelected = { tab = it }, // 切换 Tab 回调
+                                items = listOf( // 导航项列表
+                                    BottomNavItem( // 首页
+                                        icon = Icons.Filled.Home, // 图标
+                                        label = "首页" // 标签
+                                    ),
+                                    BottomNavItem( // 规则
+                                        icon = Icons.AutoMirrored.Filled.List, // 图标
+                                        label = "规则" // 标签
+                                    ),
+                                    BottomNavItem( // 设置
+                                        icon = Icons.Filled.Settings, // 图标
+                                        label = "设置" // 标签
                                     )
                                 )
-                                // Tab 1：规则（本地/订阅/内置管理）
-                                NavigationBarItem( // 规则 Tab
-                                    selected = tab == 1, // 是否选中
-                                    onClick = { tab = 1 }, // 点击切换
-                                    icon = { // 图标
-                                        Icon(Icons.AutoMirrored.Filled.List, // 镜像列表图标
-                                            contentDescription = null) // 无障碍描述留空
-                                    },
-                                    label = { Text("规则") }, // 标签文字
-                                    colors = NavigationBarItemDefaults.colors( // 颜色
-                                        selectedIconColor = MaterialTheme.colorScheme.primary, // 选中图标色
-                                        selectedTextColor = MaterialTheme.colorScheme.primary, // 选中文字色
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer // 指示色
-                                    )
-                                )
-                                // Tab 2：设置（基础/订阅/贡献者/关于）
-                                NavigationBarItem( // 设置 Tab
-                                    selected = tab == 2, // 是否选中
-                                    onClick = { tab = 2 }, // 点击切换
-                                    icon = { Icon(Icons.Filled.Settings, contentDescription = null) }, // 设置图标
-                                    label = { Text("设置") }, // 标签文字
-                                    colors = NavigationBarItemDefaults.colors( // 颜色
-                                        selectedIconColor = MaterialTheme.colorScheme.primary, // 选中图标色
-                                        selectedTextColor = MaterialTheme.colorScheme.primary, // 选中文字色
-                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer // 指示色
-                                    )
-                                )
-                            }
+                            )
                         }
                     ) { inner -> // 内容区，inner 为底部栏占位
                         val totalSkip by app.settings.totalSkipCount // 收集累计跳过次数
@@ -360,6 +348,86 @@ class MainActivity : ComponentActivity() { // 主 Activity，继承 ComponentAct
         ) ?: emptyList() // 为空时返回空列表
         return enabledServices.any { info -> // 只要有一个匹配本应用包名即视为启用
             info.resolveInfo.serviceInfo.packageName == packageName // 匹配包名
+        }
+    }
+}
+
+// ---- 自定义底部导航（胶囊形选中指示器） ----
+
+/**
+ * 底部导航项数据类。
+ *
+ * @param icon 图标矢量。
+ * @param label 标签文字。
+ */
+private data class BottomNavItem( // 底部导航项
+    val icon: androidx.compose.ui.graphics.vector.ImageVector, // 图标
+    val label: String // 标签
+)
+
+/**
+ * 自定义底部导航栏：胶囊形选中指示器。
+ *
+ * 选中项使用 primaryContainer 色胶囊背景包裹图标+文字，
+ * 未选中项为灰色 outline 色，整体风格更柔和现代。
+ *
+ * @param selectedTab 当前选中 Tab 索引。
+ * @param onTabSelected Tab 选中回调，参数为索引。
+ * @param items 导航项列表。
+ */
+@androidx.compose.runtime.Composable // 标记为 Composable
+private fun PillBottomNavigation( // 胶囊形底部导航
+    selectedTab: Int, // 选中 Tab 索引
+    onTabSelected: (Int) -> Unit, // 选中回调
+    items: List<BottomNavItem> // 导航项列表
+) {
+    val scheme = MaterialTheme.colorScheme // 取当前颜色方案
+    Surface( // 导航栏容器
+        color = scheme.surface, // 背景色
+        shadowElevation = 4.dp // 顶部阴影
+    ) {
+        Row( // 横向布局
+            modifier = Modifier
+                .fillMaxWidth() // 占满宽度
+                .padding(horizontal = 8.dp, vertical = 6.dp), // 内边距
+            horizontalArrangement = Arrangement.spacedBy(4.dp), // 项间距
+            verticalAlignment = Alignment.CenterVertically // 垂直居中
+        ) {
+            items.forEachIndexed { index, item -> // 遍历每个导航项
+                val selected = selectedTab == index // 是否选中
+                Box( // 单项容器
+                    modifier = Modifier
+                        .weight(1f) // 平均分配宽度
+                        .fillMaxHeight() // 填满高度
+                        .then( // 条件修饰符
+                            if (selected) Modifier.background( // 选中时胶囊背景
+                                color = scheme.primaryContainer, // 主容器色
+                                shape = RoundedCornerShape(24.dp) // 大圆角胶囊形
+                            ) else Modifier // 未选中无背景
+                        )
+                        .clickable { onTabSelected(index) } // 点击切换
+                        .padding(vertical = 8.dp), // 垂直内边距
+                    contentAlignment = Alignment.Center // 内容居中
+                ) {
+                    Column( // 纵向排列图标+文字
+                        horizontalAlignment = Alignment.CenterHorizontally, // 水平居中
+                        verticalArrangement = Arrangement.spacedBy(2.dp) // 垂直间距
+                    ) {
+                        Icon( // 图标
+                            item.icon, contentDescription = item.label, // 图标与描述
+                            tint = if (selected) scheme.primary else scheme.outline, // 选中主色，未选中灰色
+                            modifier = Modifier.size(24.dp) // 图标尺寸
+                        )
+                        Text( // 标签文字
+                            item.label, // 文案
+                            fontSize = 12.sp, // 字号
+                            color = if (selected) scheme.primary else scheme.outline, // 选中主色，未选中灰色
+                            fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.SemiBold // 选中半粗
+                            else androidx.compose.ui.text.font.FontWeight.Normal // 未选中常规
+                        )
+                    }
+                }
+            }
         }
     }
 }
