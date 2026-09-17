@@ -117,6 +117,10 @@ fun SettingsScreen( // 设置主组件
             modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 2.dp) // 内边距
         )
 
+        if (!serviceOn) { // 服务未运行时显示醒目的保活引导横幅
+            KeepAliveBanner(onClick = onOpenAccessibility) // 点击跳无障碍设置
+        }
+
         // ---------- 基础设置 ----------
         SectionTitle("基础设置") // 分区标题
         SettingsCard { // 卡片容器
@@ -354,6 +358,38 @@ fun SettingsScreen( // 设置主组件
             color = MaterialTheme.colorScheme.onSurfaceVariant, // 次要色
             modifier = Modifier.padding(start = 4.dp, bottom = 12.dp) // 内边距
         )
+    }
+}
+
+/** 服务未运行时的醒目保活引导横幅：提示服务可能被系统回收，引导用户开启并做保活设置。 */
+@Composable // 标记为 Composable
+private fun KeepAliveBanner(onClick: () -> Unit) { // 保活引导横幅
+    Surface( // 横幅容器
+        color = MaterialTheme.colorScheme.errorContainer, // 醒目背景色（错误容器）
+        shape = RoundedCornerShape(12.dp), // 圆角
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick) // 占满 + 整体可点击
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { // 内容列
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { // 标题行
+                Icon( // 信息图标
+                    Icons.Filled.Info, // 图标
+                    contentDescription = null, // 无障碍描述
+                    tint = MaterialTheme.colorScheme.onErrorContainer, // 前景色
+                    modifier = Modifier.size(18.dp) // 尺寸
+                )
+                Text( // 标题
+                    "广告跳过服务未运行", // 文案
+                    fontSize = 14.sp, // 字号
+                    fontWeight = FontWeight.Bold, // 加粗
+                    color = MaterialTheme.colorScheme.onErrorContainer // 前景色
+                )
+            }
+            Text( // 说明
+                "服务可能被系统回收。建议：最近任务给小狐加锁、允许后台活动与自启动。点击前往开启。", // 文案
+                fontSize = 12.sp, // 字号
+                color = MaterialTheme.colorScheme.onErrorContainer // 前景色
+            )
+        }
     }
 }
 
