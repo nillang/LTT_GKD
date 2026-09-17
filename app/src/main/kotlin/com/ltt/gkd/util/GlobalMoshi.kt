@@ -13,7 +13,9 @@ import com.squareup.moshi.adapter // 导入 reified 泛型 adapter 扩展函数
  *
  * 使用方式：通过 [globalAdapter] 获取指定类型的适配器进行 JSON 解析。
  */
-val globalMoshi: Moshi = Moshi.Builder().build() // 全局 Moshi 单例，使用默认配置构建
+val globalMoshi: Moshi = Moshi.Builder() // 开始构建全局 Moshi 实例
+    .add(GeneratedAdaptersFactory) // 注册所有 KSP 生成的数据类适配器（Rule/RuleSet/MatchTarget 等）
+    .build() // 完成构建
 
 /**
  * 反射式获取 [globalMoshi] 中指定类型 [T] 的 Json 适配器。

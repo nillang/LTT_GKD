@@ -67,12 +67,16 @@
             android:label="@string/title_log_viewer"
             android:parentActivityName=".ui.main.MainActivity" />
 
-        <!-- 无障碍服务：核心 -->
+        <!-- 无障碍服务：核心，前台服务保活（防止 ColorOS/OPPO 等国产 ROM 周期性杀进程） -->
         <service
             android:name=".service.SkipAccessibilityService"
             android:exported="true"
+            android:foregroundServiceType="specialUse"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="广告自动跳过辅助服务" />
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>

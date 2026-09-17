@@ -55,11 +55,13 @@ object ServiceWatchdog { // 看门狗对象：检查逻辑 + 排程入口
      * KEEP 策略：重复调用不覆盖已有排程。
      */
     fun ensureScheduled(context: Context) { // 排程方法
-        val request = PeriodicWorkRequestBuilder<ServiceWatchdogWorker>(15, TimeUnit.MINUTES) // 15 分钟周期
-            .build() // 构建请求
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork( // 排程唯一周期任务
-            WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request // KEEP：已排程则不重排
-        )
+        runCatching { // 全程兜底：WorkManager 未初始化（Robolectric 测试）、进程被杀后重建等场景均静默跳过
+            val request = PeriodicWorkRequestBuilder<ServiceWatchdogWorker>(15, TimeUnit.MINUTES) // 15 分钟周期
+                .build() // 构建请求
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork( // 排程唯一周期任务
+                WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request // KEEP：已排程则不重排
+            )
+        }.onFailure { Logger.w("看门狗排程失败（可能 WorkManager 未初始化）", it) } // 失败记日志但不抛
     }
 
     /**

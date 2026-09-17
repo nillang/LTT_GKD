@@ -57,6 +57,9 @@ android {
         unitTests {
             // android.util.Log 等 Android stub 方法默认返回 0/null 而非抛 RuntimeException
             isReturnDefaultValues = true
+            // Robolectric 测试需要加载 APK 的 assets/rules/*.json（内置规则文件）
+            // 否则 context.assets.list("rules") 返回空，所有规则加载静默失败
+            isIncludeAndroidResources = true
         }
     }
 }

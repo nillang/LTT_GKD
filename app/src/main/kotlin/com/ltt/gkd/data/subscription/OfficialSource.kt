@@ -23,14 +23,14 @@ object OfficialSource {  // 官方规则源配置对象
      *
      * 推荐方案（免费 + 国内加速）：把规则 JSON 推到一个公开 GitHub 仓库后，
      * 用 jsDelivr 生成稳定直链，例如：
-     * `https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/XH_rules/all.json`
+     * `https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/static/rules/all.json`
      * 该直链会被 [SubscriptionUrls.detectType] 自动识别为 URL 类型，国内有 CDN 节点更稳。
      *
      * 备选方案：运行 `official_rules/upload.py` 把官方规则上传到公开 Gist，填 32 位 Gist ID。
      *
      * 当前已配置为 jsDelivr 直链，[isReady] 为 true，APP 首次启动会自动播种并同步官方规则。
      */
-    const val ADDRESS: String = "https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/XH_rules/all.json"  // 官方规则库 jsDelivr 直链（国内 CDN 加速，URL 类型自动识别）
+    const val ADDRESS: String = "https://cdn.jsdelivr.net/gh/nillang/LTT_GKD@main/static/rules/all.json"  // 官方规则库 jsDelivr 直链（国内 CDN 加速，URL 类型自动识别）
 
     /** 是否已配置官方源（ADDRESS 非空才播种，避免占位值导致同步失败）。 */
     val isReady: Boolean get() = ADDRESS.isNotBlank()  // 非空即就绪

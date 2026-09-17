@@ -52,6 +52,9 @@
     <string name="notification_skip_title">跳过成功</string>
     <string name="notification_watchdog_title">小狐服务未运行</string>
     <string name="notification_watchdog_text">广告自动跳过已失效，点击重新开启无障碍服务</string>
+    <!-- 前台常驻通知（无障碍服务保活用，低重要性静默） -->
+    <string name="notification_foreground_title">小狐运行中</string>
+    <string name="notification_foreground_text">广告自动跳过服务正在监听应用窗口</string>
 
     <!-- 应用列表/白名单 -->
     <string name="app_list_all">全部</string>

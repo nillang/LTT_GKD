@@ -3,7 +3,9 @@ package com.ltt.gkd.service // 包声明：本文件属于服务包 com.ltt.gkd.
 import android.accessibilityservice.AccessibilityService // 导入 AccessibilityService，无障碍服务基类
 import android.content.Intent // 导入 Intent，用于 onUnbind 参数
 import android.view.accessibility.AccessibilityEvent // 导入 AccessibilityEvent，系统无障碍事件
+import androidx.core.app.NotificationCompat // 导入 NotificationCompat，构建前台通知
 import com.ltt.gkd.App // 导入 App，获取全局应用实例
+import com.ltt.gkd.R // 导入 R，前台通知文案资源
 import com.ltt.gkd.accessibility.WindowEventProcessor // 导入 WindowEventProcessor，窗口事件处理器
 import com.ltt.gkd.action.ActionExecutor // 导入 ActionExecutor，动作执行器
 import com.ltt.gkd.gesture.GestureSimulator // 导入 GestureSimulator，手势模拟器
@@ -32,6 +34,8 @@ import kotlinx.coroutines.launch // 导入 launch，启动协程
 class SkipAccessibilityService : AccessibilityService() { // 继承 AccessibilityService 实现
 
     companion object { // 伴生对象：持有静态 instance 引用
+        /** 前台常驻通知 ID（startForeground 使用，需固定避免通知堆积） */
+        private const val FOREGROUND_NOTIFY_ID = 1001 // 固定通知 ID
         /**
          * 当前运行中的服务实例引用。
          *
@@ -59,12 +63,32 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
     override fun onServiceConnected() { // 入口：服务连接成功回调
         super.onServiceConnected() // 调用父类初始化
         instance = this // 置位静态实例引用
+        // 启动前台服务保活：Android 12+ 要求无障碍服务声明 foregroundServiceType 才能启动前台，
+        // 前台服务不会被系统轻易杀掉（即使 ColorOS/OPPO 等国产 ROM 也会优先保留），
+        // 配合 Manifest 中的 FOREGROUND_SERVICE_SPECIAL_USE 权限。
+        runCatching { startForeground(FOREGROUND_NOTIFY_ID, buildForegroundNotification()) }
+            .onFailure { Logger.w("前台服务启动失败（可能未声明权限），不影响跳过功能", it) }
         // 整体包一层 runCatching：任一组件初始化失败（如设备不支持 OCR）时仅记录日志，
         // 不让异常冒泡导致无障碍服务被系统停止。失败时 processor 保持未初始化，
         // onAccessibilityEvent 会因 ::processor.isInitialized 为 false 而安全忽略事件。
         runCatching { initComponents() } // 初始化业务组件
             .onFailure { Logger.e("无障碍服务初始化失败，跳过功能暂不可用", it) } // 失败记录 error 日志
     }
+
+    /**
+     * 构建前台常驻通知。
+     *
+     * 使用 [App.CHANNEL_SERVICE]（跳过服务通知渠道，低重要性），
+     * 保证用户能看到小狐在运行但不会被频繁打扰。
+     */
+    private fun buildForegroundNotification() = // 构建前台通知
+        NotificationCompat.Builder(this, App.CHANNEL_SERVICE) // 使用跳过服务通知渠道
+            .setContentTitle(getString(R.string.notification_foreground_title)) // 标题：小狐运行中
+            .setContentText(getString(R.string.notification_foreground_text)) // 正文：正在监听应用窗口
+            .setSmallIcon(android.R.drawable.ic_menu_compass) // 小图标（系统内置指南针，简洁）
+            .setOngoing(true) // 常驻通知，用户无法手动划掉
+            .setPriority(NotificationCompat.PRIORITY_LOW) // 低重要性，静默不打扰
+            .build() // 构建完成
 
     /**
      * 初始化所有业务组件：构造规则仓库、规则引擎、匹配器、手势执行器、OCR 管理器，
@@ -147,6 +171,7 @@ class SkipAccessibilityService : AccessibilityService() { // 继承 Accessibilit
      */
     override fun onUnbind(intent: Intent?): Boolean { // 入口：解绑回调
         instance = null // 清空静态引用
+        runCatching { stopForeground(STOP_FOREGROUND_REMOVE) } // 清理前台通知
         runCatching { ocr?.close() } // 关闭 OCR 资源，忽略异常
         scope.cancel() // 取消服务作用域内所有协程
         Logger.i("无障碍服务已断开") // 记录日志

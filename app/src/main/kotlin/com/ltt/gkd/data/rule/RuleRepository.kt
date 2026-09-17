@@ -4,7 +4,7 @@ package com.ltt.gkd.data.rule  // 声明包名，规则仓库所在的包
 
 import android.content.Context  // 导入 Context 类，用于访问应用上下文与资源
 import com.ltt.gkd.util.Logger  // 导入日志工具类
-import com.squareup.moshi.Moshi  // 导入 Moshi JSON 库的主类
+import com.ltt.gkd.util.globalMoshi  // 导入全局 Moshi 单例（已注册所有 KSP adapter）
 import com.squareup.moshi.adapter  // 导入 Moshi 的扩展函数 adapter，用于生成/获取适配器
 import kotlinx.coroutines.Dispatchers  // 导入协程调度器，用于切换 IO 线程
 import kotlinx.coroutines.flow.MutableStateFlow  // 导入可变 StateFlow，用于内部状态更新
@@ -35,11 +35,16 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
         const val LOCAL_FILE_PREFIX = "manual_"  // 本地规则文件名前缀常量
     }
 
-    private val moshi: Moshi = Moshi.Builder().build()  // 构建 Moshi 实例
-    private val ruleSetAdapter = moshi.adapter<RuleSet>()  // 获取 RuleSet 的 JSON 适配器
+    private val ruleSetAdapter = globalMoshi.adapter<RuleSet>()  // 从全局 Moshi 获取 RuleSet 的 JSON 适配器（已注册所有 KSP adapter）
 
-    private val localDir = File(context.filesDir, LOCAL_DIR_PATH).apply { mkdirs() }  // 本地规则目录，不存在则创建
-    private val subscribedDir = File(context.filesDir, SUBSCRIBED_DIR_PATH).apply { mkdirs() }  // 订阅规则目录，不存在则创建
+    private val localDir = File(context.filesDir, LOCAL_DIR_PATH).apply { // 本地规则目录，不存在则创建
+        context.filesDir.mkdirs() // 确保根 filesDir 存在（Robolectric 等测试环境可能未预创建）
+        mkdirs() // 创建子目录
+    }
+    private val subscribedDir = File(context.filesDir, SUBSCRIBED_DIR_PATH).apply { // 订阅规则目录，不存在则创建
+        context.filesDir.mkdirs() // 确保根 filesDir 存在（Robolectric 等测试环境可能未预创建）
+        mkdirs() // 创建子目录
+    }
 
     /** 订阅目录（用于 RuleListActivity、RuleSubscriptionService 等外部写文件）。 */
     val subscribedDirFile: File get() = subscribedDir  // 暴露订阅目录的只读属性
@@ -139,7 +144,8 @@ open class RuleRepository(private val context: Context) {  // 规则仓库类，
                 author = rule.author,  // 作者
                 rules = listOf(rule)  // 仅含该单条规则
             )
-            File(localDir, fileName).writeText(ruleSetAdapter.toJson(rs))  // 写入 JSON 文件
+            localDir.mkdirs()  // 双保险：写入前确保目录存在（Robolectric 下构造函数时 mkdirs 可能未生效）
+            File(localDir, fileName).writeText(ruleSetAdapter.toJson(rs))  // 序列化为 JSON 并写入文件
             reload()  // 触发重新加载合并
             Logger.i("本地规则已保存 -> $fileName")  // 输出信息日志
             true  // 返回保存成功

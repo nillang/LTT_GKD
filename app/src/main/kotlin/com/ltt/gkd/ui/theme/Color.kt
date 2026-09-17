@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color // 导入 Compose 颜色
  * LTT_GKD 品牌色（UI v5 设计稿）。
  *
  * 设计理念：深青绿（Teal）象征"自动跳过、清爽无广告"，
- * 取自 UI设计/ui_design_v5.html 设计规范。
+ * 取自 static/design/ui_design_v5.html 设计规范。
  */
 
 // ---- 主品牌色（深青绿 Teal） ----

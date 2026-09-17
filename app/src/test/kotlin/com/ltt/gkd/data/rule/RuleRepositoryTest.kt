@@ -35,10 +35,15 @@ class RuleRepositoryTest {  // 测试类
     @Before  // 每个测试前执行
     fun setUp() {  // 初始化方法
         context = ApplicationProvider.getApplicationContext()  // 获取 Robolectric Context
+        // Robolectric 4.13 的临时文件目录在 deleteRecursively 后父目录可能被清理，
+        // 需要在构造 RuleRepository 前确保 filesDir 及其子目录存在
+        context.filesDir.mkdirs()  // 确保根 filesDir 存在
+        File(context.filesDir, RuleRepository.LOCAL_DIR_PATH).mkdirs()  // 提前创建本地规则目录
+        File(context.filesDir, RuleRepository.SUBSCRIBED_DIR_PATH).mkdirs()  // 提前创建订阅规则目录
         repo = RuleRepository(context)  // 构造仓库
         // 清空本地/订阅目录，避免上次测试残留
-        File(context.filesDir, RuleRepository.LOCAL_DIR_PATH).deleteRecursively()  // 清空本地目录
-        File(context.filesDir, RuleRepository.SUBSCRIBED_DIR_PATH).deleteRecursively()  // 清空订阅目录
+        File(context.filesDir, RuleRepository.LOCAL_DIR_PATH).listFiles()?.forEach { it.delete() }  // 只删文件，保留目录结构
+        File(context.filesDir, RuleRepository.SUBSCRIBED_DIR_PATH).listFiles()?.forEach { it.delete() }  // 只删文件，保留目录结构
     }
 
     @Test  // 测试方法
@@ -72,11 +77,11 @@ class RuleRepositoryTest {  // 测试类
 
     @Test  // 测试方法
     fun `subscribed rule overrides local with same id`() = runBlocking {  // 同 ID 订阅覆盖本地
-        // 准备本地
+        // 测试 packageName 设为空字符串（通用兜底），避免 Robolectric 已安装应用列表过滤
         val local = Rule(
             id = "com.test.splash",  // 规则 ID
             name = "本地版",  // 名称
-            packageName = "com.test",  // 包名
+            packageName = "",  // 空包名（通用兜底，不参与已安装过滤）
             priority = 50,  // 优先级
             author = "local",  // 作者
             createdAt = 100L,  // 创建时间
