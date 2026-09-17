@@ -1,7 +1,7 @@
 {
-  "name": "新闻资讯",
+  "name": "news",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.ss.android.article.news_splash",
@@ -50,9 +50,32 @@
       }
     },
     {
-      "id": "com.netease.news_splash",
+      "id": "com.netease.newsreader.activity_splash",
       "name": "网易新闻开屏",
-      "packageName": "com.netease.news",
+      "packageName": "com.netease.newsreader.activity",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.sohu.newsclient_splash",
+      "name": "搜狐新闻开屏",
+      "packageName": "com.sohu.newsclient",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -96,9 +119,9 @@
       }
     },
     {
-      "id": "com.ifeng.news_splash",
+      "id": "com.ifeng.news2_splash",
       "name": "凤凰新闻开屏",
-      "packageName": "com.ifeng.news",
+      "packageName": "com.ifeng.news2",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,32 +142,9 @@
       }
     },
     {
-      "id": "cn.cntvnews_splash",
-      "name": "央视新闻开屏",
-      "packageName": "cn.cntvnews",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.wondertek.paper_splash",
-      "name": "澎湃新闻开屏",
-      "packageName": "com.wondertek.paper",
+      "id": "com.baidu.searchbox_splash",
+      "name": "百度开屏",
+      "packageName": "com.baidu.searchbox",
       "activity": null,
       "enabled": true,
       "priority": 100,

@@ -1,12 +1,12 @@
 {
-  "name": "video",
+  "name": "shopping",
   "version": 1,
   "author": "ltt_gkd",
   "rules": [
     {
-      "id": "tv.danmaku.bili_splash",
-      "name": "哔哩哔哩开屏",
-      "packageName": "tv.danmaku.bili",
+      "id": "com.taobao.taobao_splash",
+      "name": "淘宝开屏",
+      "packageName": "com.taobao.taobao",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -27,9 +27,9 @@
       }
     },
     {
-      "id": "com.qiyi.video_splash",
-      "name": "爱奇艺开屏",
-      "packageName": "com.qiyi.video",
+      "id": "com.jingdong.app.mall_splash",
+      "name": "京东开屏",
+      "packageName": "com.jingdong.app.mall",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -50,9 +50,9 @@
       }
     },
     {
-      "id": "com.tencent.qqlive_splash",
-      "name": "腾讯视频开屏",
-      "packageName": "com.tencent.qqlive",
+      "id": "com.xunmeng.pinduoduo_splash",
+      "name": "拼多多开屏",
+      "packageName": "com.xunmeng.pinduoduo",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -73,9 +73,9 @@
       }
     },
     {
-      "id": "com.youku.phone_splash",
-      "name": "优酷视频开屏",
-      "packageName": "com.youku.phone",
+      "id": "com.tmall.wireless_splash",
+      "name": "天猫开屏",
+      "packageName": "com.tmall.wireless",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -96,9 +96,9 @@
       }
     },
     {
-      "id": "com.hunantv.imgo.activity_splash",
-      "name": "芒果TV开屏",
-      "packageName": "com.hunantv.imgo.activity",
+      "id": "com.achievo.vipshop_splash",
+      "name": "唯品会开屏",
+      "packageName": "com.achievo.vipshop",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,9 +119,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.aweme_splash",
-      "name": "抖音开屏",
-      "packageName": "com.ss.android.ugc.aweme",
+      "id": "com.suning.mobile.ebuy_splash",
+      "name": "苏宁易购开屏",
+      "packageName": "com.suning.mobile.ebuy",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -142,9 +142,9 @@
       }
     },
     {
-      "id": "com.smile.gifmaker_splash",
-      "name": "快手开屏",
-      "packageName": "com.smile.gifmaker",
+      "id": "com.taobao.idlefish_splash",
+      "name": "闲鱼开屏",
+      "packageName": "com.taobao.idlefish",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -165,9 +165,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.aweme.lite_splash",
-      "name": "抖音极速版开屏",
-      "packageName": "com.ss.android.ugc.aweme.lite",
+      "id": "com.shizhuang.duapp_splash",
+      "name": "得物开屏",
+      "packageName": "com.shizhuang.duapp",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -188,9 +188,9 @@
       }
     },
     {
-      "id": "com.kuaishou.nebula_splash",
-      "name": "快手极速版开屏",
-      "packageName": "com.kuaishou.nebula",
+      "id": "com.wuba.zhuanzhuan_splash",
+      "name": "转转开屏",
+      "packageName": "com.wuba.zhuanzhuan",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -211,9 +211,9 @@
       }
     },
     {
-      "id": "com.ss.android.article.video_splash",
-      "name": "西瓜视频开屏",
-      "packageName": "com.ss.android.article.video",
+      "id": "com.dangdang.buy2_splash",
+      "name": "当当开屏",
+      "packageName": "com.dangdang.buy2",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -234,9 +234,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.live_splash",
-      "name": "抖音火山版开屏",
-      "packageName": "com.ss.android.ugc.live",
+      "id": "com.jingdong.pdj_splash",
+      "name": "京东到家开屏",
+      "packageName": "com.jingdong.pdj",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -257,9 +257,9 @@
       }
     },
     {
-      "id": "cn.cntv_splash",
-      "name": "央视频开屏",
-      "packageName": "cn.cntv",
+      "id": "com.taobao.litetao_splash",
+      "name": "淘宝特价版开屏",
+      "packageName": "com.taobao.litetao",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -280,9 +280,9 @@
       }
     },
     {
-      "id": "com.bilibili.comic_splash",
-      "name": "哔哩哔哩漫画开屏",
-      "packageName": "com.bilibili.comic",
+      "id": "com.mogujie_splash",
+      "name": "蘑菇街开屏",
+      "packageName": "com.mogujie",
       "activity": null,
       "enabled": true,
       "priority": 100,

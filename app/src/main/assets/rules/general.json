@@ -1,7 +1,7 @@
 {
-  "name": "通用兜底规则",
+  "name": "通用兜底",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "universal_splash_skip",
@@ -11,11 +11,19 @@
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
-        "text": ["跳过", "跳过广告", "Skip", "skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip",
+          "skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "CLICK_NODE", "delayMs": 0 }
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
     },
     {
       "id": "universal_ocr_splash",
@@ -25,11 +33,19 @@
       "throttleMs": 5000,
       "match": {
         "type": "OCR",
-        "text": ["跳过", "跳过广告", "Skip", "skip"],
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip",
+          "skip"
+        ],
         "regex": false,
         "caseInsensitive": true
       },
-      "action": { "type": "GESTURE_TAP", "delayMs": 0 }
+      "action": {
+        "type": "GESTURE_TAP",
+        "delayMs": 0
+      }
     }
   ]
 }

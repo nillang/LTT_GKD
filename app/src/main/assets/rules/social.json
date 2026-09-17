@@ -1,7 +1,7 @@
 {
-  "name": "社交通讯",
+  "name": "social",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.tencent.mm_splash",
@@ -73,32 +73,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.aweme_splash",
-      "name": "抖音开屏",
-      "packageName": "com.ss.android.ugc.aweme",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.smile.gifmaker_splash",
-      "name": "快手开屏",
-      "packageName": "com.smile.gifmaker",
+      "id": "com.zhihu.android_splash",
+      "name": "知乎开屏",
+      "packageName": "com.zhihu.android",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -142,9 +119,55 @@
       }
     },
     {
-      "id": "com.zhihu.android_splash",
-      "name": "知乎开屏",
-      "packageName": "com.zhihu.android",
+      "id": "com.douban.frodo_splash",
+      "name": "豆瓣开屏",
+      "packageName": "com.douban.frodo",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.baidu.tieba_splash",
+      "name": "百度贴吧开屏",
+      "packageName": "com.baidu.tieba",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.tim_splash",
+      "name": "TIM开屏",
+      "packageName": "com.tencent.tim",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -168,6 +191,29 @@
       "id": "com.immomo.momo_splash",
       "name": "陌陌开屏",
       "packageName": "com.immomo.momo",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.p1.mobile.putong_splash",
+      "name": "探探开屏",
+      "packageName": "com.p1.mobile.putong",
       "activity": null,
       "enabled": true,
       "priority": 100,

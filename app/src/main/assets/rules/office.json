@@ -1,81 +1,12 @@
 {
-  "name": "办公网盘",
+  "name": "office",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
-      "id": "com.kingsoft.office_splash",
+      "id": "cn.wps.moffice_eng_splash",
       "name": "WPS Office开屏",
-      "packageName": "com.kingsoft.office",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.alibaba.android.rimet_splash",
-      "name": "钉钉开屏",
-      "packageName": "com.alibaba.android.rimet",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.wework_splash",
-      "name": "企业微信开屏",
-      "packageName": "com.tencent.wework",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.ss.android.lark_splash",
-      "name": "飞书开屏",
-      "packageName": "com.ss.android.lark",
+      "packageName": "cn.wps.moffice_eng",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,9 +50,9 @@
       }
     },
     {
-      "id": "com.baidu.netdisk_splash",
-      "name": "百度网盘开屏",
-      "packageName": "com.baidu.netdisk",
+      "id": "com.ss.android.lark_splash",
+      "name": "飞书开屏",
+      "packageName": "com.ss.android.lark",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -142,9 +73,78 @@
       }
     },
     {
-      "id": "cn.xuexi.android_splash",
-      "name": "学习强国开屏",
-      "packageName": "cn.xuexi.android",
+      "id": "com.alibaba.android.rimet_splash",
+      "name": "钉钉开屏",
+      "packageName": "com.alibaba.android.rimet",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.yinxiang_splash",
+      "name": "印象笔记开屏",
+      "packageName": "com.yinxiang",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.youdao.note_splash",
+      "name": "有道云笔记开屏",
+      "packageName": "com.youdao.note",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.baidu.netdisk_splash",
+      "name": "百度网盘开屏",
+      "packageName": "com.baidu.netdisk",
       "activity": null,
       "enabled": true,
       "priority": 100,

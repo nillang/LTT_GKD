@@ -1,7 +1,7 @@
 {
-  "name": "音乐",
+  "name": "music",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.netease.cloudmusic_splash",
@@ -96,9 +96,9 @@
       }
     },
     {
-      "id": "com.luna.music_splash",
-      "name": "汽水音乐开屏",
-      "packageName": "com.luna.music",
+      "id": "com.ximalaya.ting.android_splash",
+      "name": "喜马拉雅开屏",
+      "packageName": "com.ximalaya.ting.android",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,9 +119,32 @@
       }
     },
     {
-      "id": "cmccwm.musicstore_splash",
-      "name": "咪咕音乐开屏",
-      "packageName": "cmccwm.musicstore",
+      "id": "fm.qingting.qtradio_splash",
+      "name": "蜻蜓FM开屏",
+      "packageName": "fm.qingting.qtradio",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.galaxy.qbb_splash",
+      "name": "荔枝FM开屏",
+      "packageName": "com.galaxy.qbb",
       "activity": null,
       "enabled": true,
       "priority": 100,

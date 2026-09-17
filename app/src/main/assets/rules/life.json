@@ -1,7 +1,7 @@
 {
-  "name": "生活出行",
+  "name": "life",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.sankuai.meituan_splash",
@@ -73,9 +73,9 @@
       }
     },
     {
-      "id": "com.sdu.didi.psnger_splash",
-      "name": "滴滴出行开屏",
-      "packageName": "com.sdu.didi.psnger",
+      "id": "com.sankuai.meituan.takeoutnew_splash",
+      "name": "美团外卖开屏",
+      "packageName": "com.sankuai.meituan.takeoutnew",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -96,9 +96,9 @@
       }
     },
     {
-      "id": "com.autonavi.minimap_splash",
-      "name": "高德地图开屏",
-      "packageName": "com.autonavi.minimap",
+      "id": "com.yek.android.kfc.activitys_splash",
+      "name": "肯德基开屏",
+      "packageName": "com.yek.android.kfc.activitys",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,9 +119,9 @@
       }
     },
     {
-      "id": "com.baidu.BaiduMap_splash",
-      "name": "百度地图开屏",
-      "packageName": "com.baidu.BaiduMap",
+      "id": "com.mcdonalds.gma.cn_splash",
+      "name": "麦当劳开屏",
+      "packageName": "com.mcdonalds.gma.cn",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -142,78 +142,9 @@
       }
     },
     {
-      "id": "com.MobileTicket_splash",
-      "name": "铁路12306开屏",
-      "packageName": "com.MobileTicket",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "ctrip.android.view_splash",
-      "name": "携程旅行开屏",
-      "packageName": "ctrip.android.view",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.Qunar_splash",
-      "name": "去哪儿旅行开屏",
-      "packageName": "com.Qunar",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.taobao.trip_splash",
-      "name": "飞猪旅行开屏",
-      "packageName": "com.taobao.trip",
+      "id": "com.lucky.luckyclients_splash",
+      "name": "瑞幸咖啡开屏",
+      "packageName": "com.lucky.luckyclients",
       "activity": null,
       "enabled": true,
       "priority": 100,

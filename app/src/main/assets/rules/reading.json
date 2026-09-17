@@ -1,7 +1,7 @@
 {
-  "name": "阅读听书",
+  "name": "reading",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.qidian.QDReader_splash",
@@ -76,29 +76,6 @@
       "id": "com.tencent.weread_splash",
       "name": "微信读书开屏",
       "packageName": "com.tencent.weread",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.ximalaya.ting.android_splash",
-      "name": "喜马拉雅开屏",
-      "packageName": "com.ximalaya.ting.android",
       "activity": null,
       "enabled": true,
       "priority": 100,

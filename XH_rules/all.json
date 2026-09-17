@@ -4,9 +4,53 @@
   "author": "ltt_gkd",
   "rules": [
     {
-      "id": "com.quark.browser_splash",
-      "name": "夸克开屏",
-      "packageName": "com.quark.browser",
+      "id": "universal_splash_skip",
+      "name": "通用开屏跳过",
+      "packageName": "",
+      "priority": 1,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip",
+          "skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "universal_ocr_splash",
+      "name": "通用开屏 OCR 兜底",
+      "packageName": "",
+      "priority": 1,
+      "throttleMs": 5000,
+      "match": {
+        "type": "OCR",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip",
+          "skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "GESTURE_TAP",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.mm_splash",
+      "name": "微信开屏",
+      "packageName": "com.tencent.mm",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -27,9 +71,9 @@
       }
     },
     {
-      "id": "com.UCMobile_splash",
-      "name": "UC浏览器开屏",
-      "packageName": "com.UCMobile",
+      "id": "com.tencent.mobileqq_splash",
+      "name": "QQ开屏",
+      "packageName": "com.tencent.mobileqq",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -50,9 +94,9 @@
       }
     },
     {
-      "id": "com.tencent.mtt_splash",
-      "name": "QQ浏览器开屏",
-      "packageName": "com.tencent.mtt",
+      "id": "com.sina.weibo_splash",
+      "name": "微博开屏",
+      "packageName": "com.sina.weibo",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -73,9 +117,9 @@
       }
     },
     {
-      "id": "mark.via_splash",
-      "name": "Via浏览器开屏",
-      "packageName": "mark.via",
+      "id": "com.zhihu.android_splash",
+      "name": "知乎开屏",
+      "packageName": "com.zhihu.android",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -96,55 +140,9 @@
       }
     },
     {
-      "id": "com.baidu.searchbox_splash",
-      "name": "百度开屏",
-      "packageName": "com.baidu.searchbox",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.baidu.browser.apps_splash",
-      "name": "百度浏览器开屏",
-      "packageName": "com.baidu.browser.apps",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.baidu.tieba_splash",
-      "name": "百度贴吧开屏",
-      "packageName": "com.baidu.tieba",
+      "id": "com.xingin.xhs_splash",
+      "name": "小红书开屏",
+      "packageName": "com.xingin.xhs",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -188,9 +186,9 @@
       }
     },
     {
-      "id": "com.coolapk.market_splash",
-      "name": "酷安开屏",
-      "packageName": "com.coolapk.market",
+      "id": "com.baidu.tieba_splash",
+      "name": "百度贴吧开屏",
+      "packageName": "com.baidu.tieba",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -211,9 +209,9 @@
       }
     },
     {
-      "id": "com.smzdm.client.android_splash",
-      "name": "什么值得买开屏",
-      "packageName": "com.smzdm.client.android",
+      "id": "com.tencent.tim_splash",
+      "name": "TIM开屏",
+      "packageName": "com.tencent.tim",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -234,9 +232,515 @@
       }
     },
     {
-      "id": "com.hupu.games_splash",
-      "name": "虎扑开屏",
-      "packageName": "com.hupu.games",
+      "id": "com.immomo.momo_splash",
+      "name": "陌陌开屏",
+      "packageName": "com.immomo.momo",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.p1.mobile.putong_splash",
+      "name": "探探开屏",
+      "packageName": "com.p1.mobile.putong",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.soulapp.android_splash",
+      "name": "Soul开屏",
+      "packageName": "cn.soulapp.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "tv.danmaku.bili_splash",
+      "name": "哔哩哔哩开屏",
+      "packageName": "tv.danmaku.bili",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.qiyi.video_splash",
+      "name": "爱奇艺开屏",
+      "packageName": "com.qiyi.video",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.qqlive_splash",
+      "name": "腾讯视频开屏",
+      "packageName": "com.tencent.qqlive",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.youku.phone_splash",
+      "name": "优酷视频开屏",
+      "packageName": "com.youku.phone",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.hunantv.imgo.activity_splash",
+      "name": "芒果TV开屏",
+      "packageName": "com.hunantv.imgo.activity",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.ugc.aweme_splash",
+      "name": "抖音开屏",
+      "packageName": "com.ss.android.ugc.aweme",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.smile.gifmaker_splash",
+      "name": "快手开屏",
+      "packageName": "com.smile.gifmaker",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.ugc.aweme.lite_splash",
+      "name": "抖音极速版开屏",
+      "packageName": "com.ss.android.ugc.aweme.lite",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.kuaishou.nebula_splash",
+      "name": "快手极速版开屏",
+      "packageName": "com.kuaishou.nebula",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.article.video_splash",
+      "name": "西瓜视频开屏",
+      "packageName": "com.ss.android.article.video",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ss.android.ugc.live_splash",
+      "name": "抖音火山版开屏",
+      "packageName": "com.ss.android.ugc.live",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.cntv_splash",
+      "name": "央视频开屏",
+      "packageName": "cn.cntv",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.bilibili.comic_splash",
+      "name": "哔哩哔哩漫画开屏",
+      "packageName": "com.bilibili.comic",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.netease.cloudmusic_splash",
+      "name": "网易云音乐开屏",
+      "packageName": "com.netease.cloudmusic",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.qqmusic_splash",
+      "name": "QQ音乐开屏",
+      "packageName": "com.tencent.qqmusic",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.kugou.android_splash",
+      "name": "酷狗音乐开屏",
+      "packageName": "com.kugou.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.kuwo.player_splash",
+      "name": "酷我音乐开屏",
+      "packageName": "cn.kuwo.player",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.ximalaya.ting.android_splash",
+      "name": "喜马拉雅开屏",
+      "packageName": "com.ximalaya.ting.android",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "fm.qingting.qtradio_splash",
+      "name": "蜻蜓FM开屏",
+      "packageName": "fm.qingting.qtradio",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.galaxy.qbb_splash",
+      "name": "荔枝FM开屏",
+      "packageName": "com.galaxy.qbb",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -418,6 +922,144 @@
       }
     },
     {
+      "id": "com.shizhuang.duapp_splash",
+      "name": "得物开屏",
+      "packageName": "com.shizhuang.duapp",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.wuba.zhuanzhuan_splash",
+      "name": "转转开屏",
+      "packageName": "com.wuba.zhuanzhuan",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.dangdang.buy2_splash",
+      "name": "当当开屏",
+      "packageName": "com.dangdang.buy2",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.jingdong.pdj_splash",
+      "name": "京东到家开屏",
+      "packageName": "com.jingdong.pdj",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.taobao.litetao_splash",
+      "name": "淘宝特价版开屏",
+      "packageName": "com.taobao.litetao",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.mogujie_splash",
+      "name": "蘑菇街开屏",
+      "packageName": "com.mogujie",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
       "id": "com.eg.android.AlipayGphone_splash",
       "name": "支付宝开屏",
       "packageName": "com.eg.android.AlipayGphone",
@@ -441,9 +1083,9 @@
       }
     },
     {
-      "id": "com.taptap.app_splash",
-      "name": "TapTap开屏",
-      "packageName": "com.taptap.app",
+      "id": "com.unionpay_splash",
+      "name": "云闪付开屏",
+      "packageName": "com.unionpay",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -464,9 +1106,9 @@
       }
     },
     {
-      "id": "com.taptap.global_splash",
-      "name": "TapTap国际版开屏",
-      "packageName": "com.taptap.global",
+      "id": "com.jd.jrapp_splash",
+      "name": "京东金融开屏",
+      "packageName": "com.jd.jrapp",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -487,9 +1129,9 @@
       }
     },
     {
-      "id": "com.mihoyo.hoyolab_splash",
-      "name": "米游社开屏",
-      "packageName": "com.mihoyo.hoyolab",
+      "id": "cmb.pb_splash",
+      "name": "招商银行开屏",
+      "packageName": "cmb.pb",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -510,9 +1152,9 @@
       }
     },
     {
-      "id": "com.valvesoftware.steam_splash",
-      "name": "Steam开屏",
-      "packageName": "com.valvesoftware.steam",
+      "id": "com.chinamworld.main_splash",
+      "name": "建设银行开屏",
+      "packageName": "com.chinamworld.main",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -533,9 +1175,9 @@
       }
     },
     {
-      "id": "com.xmcy.hykb_splash",
-      "name": "好游快爆开屏",
-      "packageName": "com.xmcy.hykb",
+      "id": "com.10jqka_splash",
+      "name": "同花顺开屏",
+      "packageName": "com.10jqka",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -556,18 +1198,19 @@
       }
     },
     {
-      "id": "universal_splash_skip",
-      "name": "通用开屏跳过",
-      "packageName": "",
-      "priority": 1,
+      "id": "com.autonavi.minimap_splash",
+      "name": "高德地图开屏",
+      "packageName": "com.autonavi.minimap",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
       "throttleMs": 5000,
       "match": {
         "type": "TEXT",
         "text": [
           "跳过",
           "跳过广告",
-          "Skip",
-          "skip"
+          "Skip"
         ],
         "regex": false,
         "caseInsensitive": true
@@ -578,24 +1221,232 @@
       }
     },
     {
-      "id": "universal_ocr_splash",
-      "name": "通用开屏 OCR 兜底",
-      "packageName": "",
-      "priority": 1,
+      "id": "com.baidu.BaiduMap_splash",
+      "name": "百度地图开屏",
+      "packageName": "com.baidu.BaiduMap",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
       "throttleMs": 5000,
       "match": {
-        "type": "OCR",
+        "type": "TEXT",
         "text": [
           "跳过",
           "跳过广告",
-          "Skip",
-          "skip"
+          "Skip"
         ],
         "regex": false,
         "caseInsensitive": true
       },
       "action": {
-        "type": "GESTURE_TAP",
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tencent.map_splash",
+      "name": "腾讯地图开屏",
+      "packageName": "com.tencent.map",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.sdu.didi.psnger_splash",
+      "name": "滴滴出行开屏",
+      "packageName": "com.sdu.didi.psnger",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.jingyao.easybike_splash",
+      "name": "哈啰开屏",
+      "packageName": "com.jingyao.easybike",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.huaxiaozhu.rider_splash",
+      "name": "花小猪打车开屏",
+      "packageName": "com.huaxiaozhu.rider",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "ctrip.android.view_splash",
+      "name": "携程旅行开屏",
+      "packageName": "ctrip.android.view",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.Qunar_splash",
+      "name": "去哪儿开屏",
+      "packageName": "com.Qunar",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.taobao.trip_splash",
+      "name": "飞猪开屏",
+      "packageName": "com.taobao.trip",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.MobileTicket_splash",
+      "name": "铁路12306开屏",
+      "packageName": "com.MobileTicket",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.tmri.app.main_splash",
+      "name": "交管12123开屏",
+      "packageName": "com.tmri.app.main",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
         "delayMs": 0
       }
     },
@@ -669,9 +1520,9 @@
       }
     },
     {
-      "id": "com.sdu.didi.psnger_splash",
-      "name": "滴滴出行开屏",
-      "packageName": "com.sdu.didi.psnger",
+      "id": "com.sankuai.meituan.takeoutnew_splash",
+      "name": "美团外卖开屏",
+      "packageName": "com.sankuai.meituan.takeoutnew",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -692,9 +1543,9 @@
       }
     },
     {
-      "id": "com.autonavi.minimap_splash",
-      "name": "高德地图开屏",
-      "packageName": "com.autonavi.minimap",
+      "id": "com.yek.android.kfc.activitys_splash",
+      "name": "肯德基开屏",
+      "packageName": "com.yek.android.kfc.activitys",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -715,9 +1566,9 @@
       }
     },
     {
-      "id": "com.baidu.BaiduMap_splash",
-      "name": "百度地图开屏",
-      "packageName": "com.baidu.BaiduMap",
+      "id": "com.mcdonalds.gma.cn_splash",
+      "name": "麦当劳开屏",
+      "packageName": "com.mcdonalds.gma.cn",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -738,216 +1589,9 @@
       }
     },
     {
-      "id": "com.MobileTicket_splash",
-      "name": "铁路12306开屏",
-      "packageName": "com.MobileTicket",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "ctrip.android.view_splash",
-      "name": "携程旅行开屏",
-      "packageName": "ctrip.android.view",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.Qunar_splash",
-      "name": "去哪儿旅行开屏",
-      "packageName": "com.Qunar",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.taobao.trip_splash",
-      "name": "飞猪旅行开屏",
-      "packageName": "com.taobao.trip",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.netease.cloudmusic_splash",
-      "name": "网易云音乐开屏",
-      "packageName": "com.netease.cloudmusic",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.qqmusic_splash",
-      "name": "QQ音乐开屏",
-      "packageName": "com.tencent.qqmusic",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.kugou.android_splash",
-      "name": "酷狗音乐开屏",
-      "packageName": "com.kugou.android",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "cn.kuwo.player_splash",
-      "name": "酷我音乐开屏",
-      "packageName": "cn.kuwo.player",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.luna.music_splash",
-      "name": "汽水音乐开屏",
-      "packageName": "com.luna.music",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "cmccwm.musicstore_splash",
-      "name": "咪咕音乐开屏",
-      "packageName": "cmccwm.musicstore",
+      "id": "com.lucky.luckyclients_splash",
+      "name": "瑞幸咖啡开屏",
+      "packageName": "com.lucky.luckyclients",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1014,9 +1658,32 @@
       }
     },
     {
-      "id": "com.netease.news_splash",
+      "id": "com.netease.newsreader.activity_splash",
       "name": "网易新闻开屏",
-      "packageName": "com.netease.news",
+      "packageName": "com.netease.newsreader.activity",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.sohu.newsclient_splash",
+      "name": "搜狐新闻开屏",
+      "packageName": "com.sohu.newsclient",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1060,9 +1727,9 @@
       }
     },
     {
-      "id": "com.ifeng.news_splash",
+      "id": "com.ifeng.news2_splash",
       "name": "凤凰新闻开屏",
-      "packageName": "com.ifeng.news",
+      "packageName": "com.ifeng.news2",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1083,9 +1750,9 @@
       }
     },
     {
-      "id": "cn.cntvnews_splash",
-      "name": "央视新闻开屏",
-      "packageName": "cn.cntvnews",
+      "id": "com.baidu.searchbox_splash",
+      "name": "百度开屏",
+      "packageName": "com.baidu.searchbox",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1106,9 +1773,9 @@
       }
     },
     {
-      "id": "com.wondertek.paper_splash",
-      "name": "澎湃新闻开屏",
-      "packageName": "com.wondertek.paper",
+      "id": "com.UCMobile_splash",
+      "name": "UC浏览器开屏",
+      "packageName": "com.UCMobile",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1129,9 +1796,78 @@
       }
     },
     {
-      "id": "com.kingsoft.office_splash",
+      "id": "com.tencent.mtt_splash",
+      "name": "QQ浏览器开屏",
+      "packageName": "com.tencent.mtt",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.quark.browser_splash",
+      "name": "夸克开屏",
+      "packageName": "com.quark.browser",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.qihoo.browser_splash",
+      "name": "360浏览器开屏",
+      "packageName": "com.qihoo.browser",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "cn.wps.moffice_eng_splash",
       "name": "WPS Office开屏",
-      "packageName": "com.kingsoft.office",
+      "packageName": "cn.wps.moffice_eng",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1152,32 +1888,9 @@
       }
     },
     {
-      "id": "com.alibaba.android.rimet_splash",
-      "name": "钉钉开屏",
-      "packageName": "com.alibaba.android.rimet",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.wework_splash",
-      "name": "企业微信开屏",
-      "packageName": "com.tencent.wework",
+      "id": "com.tencent.wemeet.app_splash",
+      "name": "腾讯会议开屏",
+      "packageName": "com.tencent.wemeet.app",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1221,9 +1934,55 @@
       }
     },
     {
-      "id": "com.tencent.wemeet.app_splash",
-      "name": "腾讯会议开屏",
-      "packageName": "com.tencent.wemeet.app",
+      "id": "com.alibaba.android.rimet_splash",
+      "name": "钉钉开屏",
+      "packageName": "com.alibaba.android.rimet",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.yinxiang_splash",
+      "name": "印象笔记开屏",
+      "packageName": "com.yinxiang",
+      "activity": null,
+      "enabled": true,
+      "priority": 100,
+      "throttleMs": 5000,
+      "match": {
+        "type": "TEXT",
+        "text": [
+          "跳过",
+          "跳过广告",
+          "Skip"
+        ],
+        "regex": false,
+        "caseInsensitive": true
+      },
+      "action": {
+        "type": "CLICK_NODE",
+        "delayMs": 0
+      }
+    },
+    {
+      "id": "com.youdao.note_splash",
+      "name": "有道云笔记开屏",
+      "packageName": "com.youdao.note",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1290,9 +2049,9 @@
       }
     },
     {
-      "id": "com.qidian.QDReader_splash",
-      "name": "起点读书开屏",
-      "packageName": "com.qidian.QDReader",
+      "id": "com.netease.edu.open_splash",
+      "name": "网易公开课开屏",
+      "packageName": "com.netease.edu.open",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1313,9 +2072,9 @@
       }
     },
     {
-      "id": "com.dragon.read_splash",
-      "name": "番茄免费小说开屏",
-      "packageName": "com.dragon.read",
+      "id": "com.zuoyebang.airclass_splash",
+      "name": "作业帮开屏",
+      "packageName": "com.zuoyebang.airclass",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1336,9 +2095,9 @@
       }
     },
     {
-      "id": "com.kmxs.reader_splash",
-      "name": "七猫免费小说开屏",
-      "packageName": "com.kmxs.reader",
+      "id": "com.tencent.tmgp.sgame_splash",
+      "name": "王者荣耀开屏",
+      "packageName": "com.tencent.tmgp.sgame",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1359,285 +2118,9 @@
       }
     },
     {
-      "id": "com.tencent.weread_splash",
-      "name": "微信读书开屏",
-      "packageName": "com.tencent.weread",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.ximalaya.ting.android_splash",
-      "name": "喜马拉雅开屏",
-      "packageName": "com.ximalaya.ting.android",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.chaozh.iReaderFree_splash",
-      "name": "掌阅开屏",
-      "packageName": "com.chaozh.iReaderFree",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.duokan.reader_splash",
-      "name": "多看阅读开屏",
-      "packageName": "com.duokan.reader",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.mm_splash",
-      "name": "微信开屏",
-      "packageName": "com.tencent.mm",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.tencent.mobileqq_splash",
-      "name": "QQ开屏",
-      "packageName": "com.tencent.mobileqq",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.sina.weibo_splash",
-      "name": "微博开屏",
-      "packageName": "com.sina.weibo",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.ss.android.ugc.aweme_splash",
-      "name": "抖音开屏",
-      "packageName": "com.ss.android.ugc.aweme",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.smile.gifmaker_splash",
-      "name": "快手开屏",
-      "packageName": "com.smile.gifmaker",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.xingin.xhs_splash",
-      "name": "小红书开屏",
-      "packageName": "com.xingin.xhs",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.zhihu.android_splash",
-      "name": "知乎开屏",
-      "packageName": "com.zhihu.android",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.immomo.momo_splash",
-      "name": "陌陌开屏",
-      "packageName": "com.immomo.momo",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "cn.soulapp.android_splash",
-      "name": "Soul开屏",
-      "packageName": "cn.soulapp.android",
+      "id": "com.tencent.tmgp.pubgmhd_splash",
+      "name": "和平精英开屏",
+      "packageName": "com.tencent.tmgp.pubgmhd",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1842,9 +2325,9 @@
       }
     },
     {
-      "id": "com.qiyi.video_splash",
-      "name": "爱奇艺开屏",
-      "packageName": "com.qiyi.video",
+      "id": "com.qidian.QDReader_splash",
+      "name": "起点读书开屏",
+      "packageName": "com.qidian.QDReader",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1865,9 +2348,9 @@
       }
     },
     {
-      "id": "com.youku.phone_splash",
-      "name": "优酷开屏",
-      "packageName": "com.youku.phone",
+      "id": "com.dragon.read_splash",
+      "name": "番茄免费小说开屏",
+      "packageName": "com.dragon.read",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1888,9 +2371,9 @@
       }
     },
     {
-      "id": "com.tencent.qqlive_splash",
-      "name": "腾讯视频开屏",
-      "packageName": "com.tencent.qqlive",
+      "id": "com.kmxs.reader_splash",
+      "name": "七猫免费小说开屏",
+      "packageName": "com.kmxs.reader",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1911,9 +2394,9 @@
       }
     },
     {
-      "id": "tv.danmaku.bili_splash",
-      "name": "哔哩哔哩开屏",
-      "packageName": "tv.danmaku.bili",
+      "id": "com.tencent.weread_splash",
+      "name": "微信读书开屏",
+      "packageName": "com.tencent.weread",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1934,9 +2417,9 @@
       }
     },
     {
-      "id": "com.hunantv.imgo.activity_splash",
-      "name": "芒果TV开屏",
-      "packageName": "com.hunantv.imgo.activity",
+      "id": "com.chaozh.iReaderFree_splash",
+      "name": "掌阅开屏",
+      "packageName": "com.chaozh.iReaderFree",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1957,9 +2440,9 @@
       }
     },
     {
-      "id": "com.sohu.sohuvideo_splash",
-      "name": "搜狐视频开屏",
-      "packageName": "com.sohu.sohuvideo",
+      "id": "com.duokan.reader_splash",
+      "name": "多看阅读开屏",
+      "packageName": "com.duokan.reader",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -1980,9 +2463,9 @@
       }
     },
     {
-      "id": "com.huya.live_splash",
-      "name": "虎牙直播开屏",
-      "packageName": "com.huya.live",
+      "id": "com.coolapk.market_splash",
+      "name": "酷安开屏",
+      "packageName": "com.coolapk.market",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -2003,9 +2486,9 @@
       }
     },
     {
-      "id": "air.tv.douyu.android_splash",
-      "name": "斗鱼开屏",
-      "packageName": "air.tv.douyu.android",
+      "id": "com.smzdm.client.android_splash",
+      "name": "什么值得买开屏",
+      "packageName": "com.smzdm.client.android",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -2026,9 +2509,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.live_splash",
-      "name": "抖音火山版开屏",
-      "packageName": "com.ss.android.ugc.live",
+      "id": "com.hupu.games_splash",
+      "name": "虎扑开屏",
+      "packageName": "com.hupu.games",
       "activity": null,
       "enabled": true,
       "priority": 100,

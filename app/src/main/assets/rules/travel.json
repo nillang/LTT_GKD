@@ -1,12 +1,12 @@
 {
-  "name": "video",
+  "name": "travel",
   "version": 1,
   "author": "ltt_gkd",
   "rules": [
     {
-      "id": "tv.danmaku.bili_splash",
-      "name": "哔哩哔哩开屏",
-      "packageName": "tv.danmaku.bili",
+      "id": "com.autonavi.minimap_splash",
+      "name": "高德地图开屏",
+      "packageName": "com.autonavi.minimap",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -27,9 +27,9 @@
       }
     },
     {
-      "id": "com.qiyi.video_splash",
-      "name": "爱奇艺开屏",
-      "packageName": "com.qiyi.video",
+      "id": "com.baidu.BaiduMap_splash",
+      "name": "百度地图开屏",
+      "packageName": "com.baidu.BaiduMap",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -50,9 +50,9 @@
       }
     },
     {
-      "id": "com.tencent.qqlive_splash",
-      "name": "腾讯视频开屏",
-      "packageName": "com.tencent.qqlive",
+      "id": "com.tencent.map_splash",
+      "name": "腾讯地图开屏",
+      "packageName": "com.tencent.map",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -73,9 +73,9 @@
       }
     },
     {
-      "id": "com.youku.phone_splash",
-      "name": "优酷视频开屏",
-      "packageName": "com.youku.phone",
+      "id": "com.sdu.didi.psnger_splash",
+      "name": "滴滴出行开屏",
+      "packageName": "com.sdu.didi.psnger",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -96,9 +96,9 @@
       }
     },
     {
-      "id": "com.hunantv.imgo.activity_splash",
-      "name": "芒果TV开屏",
-      "packageName": "com.hunantv.imgo.activity",
+      "id": "com.jingyao.easybike_splash",
+      "name": "哈啰开屏",
+      "packageName": "com.jingyao.easybike",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -119,9 +119,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.aweme_splash",
-      "name": "抖音开屏",
-      "packageName": "com.ss.android.ugc.aweme",
+      "id": "com.huaxiaozhu.rider_splash",
+      "name": "花小猪打车开屏",
+      "packageName": "com.huaxiaozhu.rider",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -142,9 +142,9 @@
       }
     },
     {
-      "id": "com.smile.gifmaker_splash",
-      "name": "快手开屏",
-      "packageName": "com.smile.gifmaker",
+      "id": "ctrip.android.view_splash",
+      "name": "携程旅行开屏",
+      "packageName": "ctrip.android.view",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -165,9 +165,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.aweme.lite_splash",
-      "name": "抖音极速版开屏",
-      "packageName": "com.ss.android.ugc.aweme.lite",
+      "id": "com.Qunar_splash",
+      "name": "去哪儿开屏",
+      "packageName": "com.Qunar",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -188,9 +188,9 @@
       }
     },
     {
-      "id": "com.kuaishou.nebula_splash",
-      "name": "快手极速版开屏",
-      "packageName": "com.kuaishou.nebula",
+      "id": "com.taobao.trip_splash",
+      "name": "飞猪开屏",
+      "packageName": "com.taobao.trip",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -211,9 +211,9 @@
       }
     },
     {
-      "id": "com.ss.android.article.video_splash",
-      "name": "西瓜视频开屏",
-      "packageName": "com.ss.android.article.video",
+      "id": "com.MobileTicket_splash",
+      "name": "铁路12306开屏",
+      "packageName": "com.MobileTicket",
       "activity": null,
       "enabled": true,
       "priority": 100,
@@ -234,55 +234,9 @@
       }
     },
     {
-      "id": "com.ss.android.ugc.live_splash",
-      "name": "抖音火山版开屏",
-      "packageName": "com.ss.android.ugc.live",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "cn.cntv_splash",
-      "name": "央视频开屏",
-      "packageName": "cn.cntv",
-      "activity": null,
-      "enabled": true,
-      "priority": 100,
-      "throttleMs": 5000,
-      "match": {
-        "type": "TEXT",
-        "text": [
-          "跳过",
-          "跳过广告",
-          "Skip"
-        ],
-        "regex": false,
-        "caseInsensitive": true
-      },
-      "action": {
-        "type": "CLICK_NODE",
-        "delayMs": 0
-      }
-    },
-    {
-      "id": "com.bilibili.comic_splash",
-      "name": "哔哩哔哩漫画开屏",
-      "packageName": "com.bilibili.comic",
+      "id": "com.tmri.app.main_splash",
+      "name": "交管12123开屏",
+      "packageName": "com.tmri.app.main",
       "activity": null,
       "enabled": true,
       "priority": 100,

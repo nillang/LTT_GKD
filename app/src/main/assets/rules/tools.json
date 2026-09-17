@@ -1,7 +1,7 @@
 {
-  "name": "系统工具",
+  "name": "tools",
   "version": 1,
-  "author": "LTT_GKD builtin",
+  "author": "ltt_gkd",
   "rules": [
     {
       "id": "com.tencent.android.qqdownloader_splash",
