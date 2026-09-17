@@ -43,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope // 导入协程作用域
 import androidx.compose.runtime.setValue // 导入 setValue
 import androidx.compose.ui.Alignment // 导入对齐
 import androidx.compose.ui.Modifier // 导入修饰符
+import androidx.compose.ui.graphics.Color // 导入 Color 类
 import androidx.compose.ui.graphics.vector.ImageVector // 导入图标矢量
 import androidx.compose.ui.text.font.FontWeight // 导入字体粗细
 import androidx.compose.ui.text.input.PasswordVisualTransformation // 导入密码掩码
@@ -51,6 +52,8 @@ import androidx.compose.ui.unit.sp // 导入 sp
 import com.ltt.gkd.data.prefs.SettingsStore // 导入设置存储
 import com.ltt.gkd.ui.theme.AccentBlue // 导入强调蓝色（亮色）
 import com.ltt.gkd.ui.theme.AccentOrange // 导入强调橙色（亮色）
+import com.ltt.gkd.ui.theme.WarningContainer // 导入警告容器色（粉桃色）
+import com.ltt.gkd.ui.theme.OnWarningContainer // 导入警告容器前景色（深红褐色）
 import com.ltt.gkd.ui.theme.BlueBadgeBg // 导入蓝色徽章背景（亮色）
 import com.ltt.gkd.ui.theme.OrangeBadgeBg // 导入橙色徽章背景（亮色）
 import com.ltt.gkd.ui.theme.DarkBlueBadgeBg // 导入深色蓝色徽章背景
@@ -361,33 +364,35 @@ fun SettingsScreen( // 设置主组件
     }
 }
 
-/** 服务未运行时的醒目保活引导横幅：提示服务可能被系统回收，引导用户开启并做保活设置。 */
+/** 服务未运行时的醒目保活引导横幅：粉桃色警告样式，引导用户开启并做保活设置。 */
 @Composable // 标记为 Composable
 private fun KeepAliveBanner(onClick: () -> Unit) { // 保活引导横幅
+    val dark = isSystemInDarkTheme() // 深色模式判断
     Surface( // 横幅容器
-        color = MaterialTheme.colorScheme.errorContainer, // 醒目背景色（错误容器）
-        shape = RoundedCornerShape(12.dp), // 圆角
+        color = if (dark) Color(0xFF5D1F10) else WarningContainer, // 粉桃色背景（深色模式适配）
+        shape = RoundedCornerShape(16.dp), // 大圆角更柔和
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick) // 占满 + 整体可点击
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { // 内容列
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { // 标题行
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { // 内容列
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { // 标题行
                 Icon( // 信息图标
                     Icons.Filled.Info, // 图标
                     contentDescription = null, // 无障碍描述
-                    tint = MaterialTheme.colorScheme.onErrorContainer, // 前景色
-                    modifier = Modifier.size(18.dp) // 尺寸
+                    tint = if (dark) Color(0xFFFFB59D) else OnWarningContainer, // 前景色（深色适配）
+                    modifier = Modifier.size(20.dp) // 尺寸
                 )
                 Text( // 标题
                     "广告跳过服务未运行", // 文案
-                    fontSize = 14.sp, // 字号
+                    fontSize = 15.sp, // 字号
                     fontWeight = FontWeight.Bold, // 加粗
-                    color = MaterialTheme.colorScheme.onErrorContainer // 前景色
+                    color = if (dark) Color(0xFFFFB59D) else OnWarningContainer // 前景色（深色适配）
                 )
             }
             Text( // 说明
                 "服务可能被系统回收。建议：最近任务给小狐加锁、允许后台活动与自启动。点击前往开启。", // 文案
-                fontSize = 12.sp, // 字号
-                color = MaterialTheme.colorScheme.onErrorContainer // 前景色
+                fontSize = 13.sp, // 字号
+                color = if (dark) Color(0xFFFFD6CC) else OnWarningContainer, // 前景色（深色适配）
+                lineHeight = 18.sp // 行高
             )
         }
     }

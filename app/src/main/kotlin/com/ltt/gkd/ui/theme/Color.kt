@@ -30,6 +30,10 @@ val AccentPurple = Color(0xFF7B1FA2) // 强调紫色
 val AccentAmber = Color(0xFFFF8F00) // 强调琥珀色
 val AccentPink = Color(0xFFE91E63) // 强调粉色
 
+// ---- 警告色（粉桃色横幅，服务未运行提示） ----
+val WarningContainer = Color(0xFFFFD6CC) // 警告容器：粉桃色背景
+val OnWarningContainer = Color(0xFF8B2500) // 警告容器上的文字：深红褐色
+
 // 浅色背景底（徽章用）
 val BlueBadgeBg = Color(0xFFE3F2FD) // 蓝色徽章背景
 val OrangeBadgeBg = Color(0xFFFFF3E0) // 橙色徽章背景

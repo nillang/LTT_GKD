@@ -23,6 +23,8 @@
   --purple: #7B1FA2;
   --amber: #FF8F00;
   --pink: #E91E63;
+  --warning-container: #FFD6CC;
+  --on-warning-container: #8B2500;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
   --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
@@ -49,14 +51,14 @@ body { font-family:'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-s
 .icon-btn:hover { background:rgba(0,0,0,0.06); }
 .icon-btn svg { width:22px; height:22px; }
 
-/* Bottom Nav */
-.bottom-nav { height:60px; display:flex; border-top:1px solid var(--surface-variant); background:white; flex-shrink:0; }
-.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; position:relative; }
-.nav-item svg { width:22px; height:22px; color:var(--outline); }
+/* Bottom Nav — 胶囊形选中指示器 */
+.bottom-nav { height:64px; display:flex; align-items:center; padding:6px 8px; gap:4px; border-top:1px solid var(--surface-variant); background:white; flex-shrink:0; box-shadow:0 -2px 8px rgba(0,0,0,0.04); }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; position:relative; padding:8px 0; border-radius:24px; transition:background 0.2s; }
+.nav-item svg { width:24px; height:24px; color:var(--outline); }
+.nav-item.active { background:var(--primary-container); }
 .nav-item.active svg { color:var(--primary); }
-.nav-label { font-size:10px; color:var(--outline); font-weight:500; }
+.nav-label { font-size:12px; color:var(--outline); font-weight:500; }
 .nav-item.active .nav-label { color:var(--primary); font-weight:600; }
-.nav-item.active::before { content:''; position:absolute; top:0; width:32px; height:3px; background:var(--primary); border-radius:0 0 3px 3px; }
 
 /* === Home: Service button truly centered in screen === */
 .home-content { flex:1; position:relative; padding:0 20px; }
@@ -149,13 +151,14 @@ body { font-family:'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-s
 .toggle.off { background:#BDBDBD; }
 .toggle.off::after { right:auto; left:2px; }
 
-/* FAB with text labels */
-.fab-container { position:absolute; bottom:72px; right:14px; display:flex; flex-direction:column; gap:8px; z-index:50; align-items:center; }
+/* FAB with text labels — 圆角方形 */
+.fab-container { position:absolute; bottom:76px; right:14px; display:flex; flex-direction:column; gap:8px; z-index:50; align-items:center; }
 .fab-wrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
-.fab { width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-lg); cursor:pointer; }
-.fab-primary { background:var(--primary); color:white; }
+.fab { width:56px; height:56px; border-radius:20px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-lg); cursor:pointer; transition:transform 0.1s; }
+.fab:active { transform:scale(0.95); }
+.fab-primary { background:var(--primary-container); color:var(--primary); }
 .fab-upload { background:white; color:var(--primary); border:2px solid var(--primary); }
-.fab svg { width:22px; height:22px; }
+.fab svg { width:28px; height:28px; }
 .fab-label { font-size:9px; font-weight:600; color:var(--on-surface-variant); }
 
 /* === Upload dialog === */
@@ -242,6 +245,17 @@ body { font-family:'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-s
 
 /* === Settings === */
 .settings-content { padding:8px 14px 20px; display:flex; flex-direction:column; gap:16px; }
+
+/* 粉桃色警告横幅 */
+.warning-banner {
+  background: var(--warning-container);
+  color: var(--on-warning-container);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.warning-banner:hover { opacity: 0.9; }
 .settings-section { display:flex; flex-direction:column; gap:6px; }
 .settings-section-title { font-size:12px; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; padding-left:4px; }
 .settings-card { background:white; border-radius:var(--r-md); overflow:hidden; border:1px solid var(--surface-variant); }
@@ -289,7 +303,7 @@ body { font-family:'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-s
 <body>
 
 <h1 class="page-title">XH（小狐） — UI设计稿 v5</h1>
-<p class="page-subtitle">青绿色 #007070 · 动漫风格Tab · 三点菜单 · 订阅下拉框 · 设置精简</p>
+<p class="page-subtitle">青绿色 #007070 · 胶囊底部导航 · 圆角方形FAB · 粉桃警告横幅 · 动漫风格Tab</p>
 
 <div class="design-grid">
 
@@ -785,6 +799,14 @@ body { font-family:'Google Sans','Roboto','PingFang SC','Microsoft YaHei',sans-s
     </div>
     <div class="app-bar"><span class="app-bar-title">设置</span></div>
     <div class="content settings-content">
+      <!-- 服务未运行警告横幅 -->
+      <div class="warning-banner">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span style="font-size:15px;font-weight:700;">广告跳过服务未运行</span>
+        </div>
+        <p style="font-size:13px;line-height:1.5;">服务可能被系统回收。建议：最近任务给小狐加锁、允许后台活动与自启动。点击前往开启。</p>
+      </div>
       <!-- 基础设置 -->
       <div class="settings-section">
         <div class="settings-section-title">基础设置</div>
