@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Arrangement // 导入排列方向
 import androidx.compose.foundation.layout.Box // 导入 Box 容器
 import androidx.compose.foundation.layout.Column // 导入 Column 纵向容器
 import androidx.compose.foundation.layout.Row // 导入 Row 横向容器
-import androidx.compose.foundation.layout.fillMaxHeight // 导入填满高度修饰符
 import androidx.compose.foundation.layout.fillMaxWidth // 导入填满宽度修饰符
 import androidx.compose.foundation.layout.padding // 导入 padding 修饰符
 import androidx.compose.foundation.layout.size // 导入 size 修饰符
@@ -397,8 +396,7 @@ private fun PillBottomNavigation( // 胶囊形底部导航
                 val selected = selectedTab == index // 是否选中
                 Box( // 单项容器
                     modifier = Modifier
-                        .weight(1f) // 平均分配宽度
-                        .fillMaxHeight() // 填满高度
+                        .weight(1f) // 平均分配宽度（高度由内容自然撑开，禁止 fillMaxHeight——Scaffold bottomBar 槽位最大高度约束为整屏，会把导航栏撑满全屏）
                         .then( // 条件修饰符
                             if (selected) Modifier.background( // 选中时胶囊背景
                                 color = scheme.primaryContainer, // 主容器色
